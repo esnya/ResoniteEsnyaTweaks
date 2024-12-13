@@ -9,8 +9,8 @@ on:
 
 env:
   AppId: 2519830
-  ProjectName: EsnyaResoniteModTemplate
-  ArtifactDLL: EsnyaResoniteModTemplate.dll
+  ProjectName: EsnyaTweaks
+  ArtifactDLL: EsnyaTweaks.dll
   Configuration: Release
 
 jobs:
