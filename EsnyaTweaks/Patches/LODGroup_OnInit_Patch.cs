@@ -1,10 +1,12 @@
 ﻿using FrooxEngine;
 using HarmonyLib;
+using System.ComponentModel;
 using System.Reflection;
 
-namespace EsnyaTweaks.LOD;
+namespace EsnyaTweaks.Patches;
 
-[HarmonyPatchCategory(nameof(PatchCategory.LOD))]
+[HarmonyPatchCategory("LODGroup UpdateOrder")]
+[Description("Set LODGroup update order to 1000 to prevent rendering issues.")]
 [HarmonyPatch]
 internal static class LODGroup_OnInit_Patch
 {
@@ -18,8 +20,7 @@ internal static class LODGroup_OnInit_Patch
         if (__instance is LODGroup lodGroup)
         {
             lodGroup.UpdateOrder = 1000;
-            EsnyaTweaksMod.DebugFunc(() => $"LODGroup {lodGroup} found. Patching update order to {lodGroup.UpdateOrder}...");
+            ResoniteModLoader.ResoniteMod.DebugFunc(() => $"LODGroup {lodGroup} found. Patching update order to {lodGroup.UpdateOrder}...");
         }
     }
 }
-
