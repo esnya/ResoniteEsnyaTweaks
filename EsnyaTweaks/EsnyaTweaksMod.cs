@@ -4,8 +4,8 @@ using ResoniteModLoader;
 using System.Linq;
 using System.Reflection;
 using System;
-
-
+using System.Collections.Generic;
+using System.ComponentModel;
 
 
 #if DEBUG
@@ -43,9 +43,45 @@ public partial class EsnyaTweaksMod : ResoniteMod
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
 
-
     private static ModConfiguration? config;
     private static readonly Harmony harmony = new(HarmonyId);
+
+    private static readonly Dictionary<string, ModConfigurationKey<bool>> patchCategoryKeys = new();
+
+    static EsnyaTweaksMod()
+    {
+        DebugFunc(() => $"Static Initializing {nameof(EsnyaTweaksMod)}...");
+
+        var keys = from t in AccessTools.GetTypesFromAssembly(ModAssembly)
+                   select new KeyValuePair<string?, string?>(t.GetCustomAttribute<HarmonyPatchCategory>()?.info?.category, t.GetCustomAttribute<DescriptionAttribute>()?.Description) into pair
+                   where pair.Key is not null && pair.Value is not null
+                   select new ModConfigurationKey<bool>(pair.Key!, pair.Value!, computeDefault: () => true);
+
+        foreach (var key in keys)
+        {
+            DebugFunc(() => $"Registering patch category {key.Name}...");
+            patchCategoryKeys[key.Name] = key;
+        }
+    }
+
+    /// <summary>
+    /// Called when the mod is initialized to custom define configuration.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <exception cref="ArgumentNullException">Raised when builder is null.</exception>"
+    public override void DefineConfiguration(ModConfigurationDefinitionBuilder builder)
+    {
+        if (builder is null)
+        {
+            throw new ArgumentNullException(nameof(builder), "builder is null.");
+        }
+
+        foreach (var key in patchCategoryKeys.Values)
+        {
+            DebugFunc(() => $"Adding configuration key for {key.Name}...");
+            builder.Key(key);
+        }
+    }
 
     /// <summary>
     /// Called when the engine is initialized.
@@ -61,13 +97,60 @@ public partial class EsnyaTweaksMod : ResoniteMod
 
     private static void Init(ResoniteMod modInstance)
     {
+        config = modInstance.GetConfiguration();
 
-        foreach (var category in Enum.GetNames(typeof(PatchCategory)))
+        if (config is null)
         {
-            harmony.PatchCategory(category);
-        }
+            Warn("Configuration is null. Enabling all patches...");
 
-        config = modInstance?.GetConfiguration();
+            foreach (var pair in patchCategoryKeys)
+            {
+                UpdatePatch(pair.Key, true);
+            }
+        }
+        else
+        {
+            config.OnThisConfigurationChanged += OnConfigChanged;
+
+            foreach (var pair in patchCategoryKeys)
+            {
+                if (config.TryGetValue(pair.Value, out var value))
+                {
+                    UpdatePatch(pair.Key, value);
+                }
+                else if (config.TryGetValue(pair.Value, out value))
+                {
+                    UpdatePatch(pair.Key, value);
+                }
+                else
+                {
+                    Warn($"Configuration for {pair.Key} is not found. Force enabling...");
+                    UpdatePatch(pair.Key, true);
+                }
+            }
+        }
+    }
+
+    private static void UpdatePatch(string category, bool state)
+    {
+        if (state)
+        {
+            DebugFunc(() => $"Patching {category}...");
+            harmony.PatchCategory(category.ToString());
+        }
+        else
+        {
+            DebugFunc(() => $"Unpatching {category}...");
+            harmony.UnpatchAll(HarmonyId);
+        }
+    }
+
+    private static void OnConfigChanged(ConfigurationChangedEvent change)
+    {
+        if (change.Key is ModConfigurationKey<bool> key)
+        {
+            UpdatePatch(key.Name, change.Config.GetValue(key));
+        }
     }
 
 #if DEBUG
@@ -78,23 +161,32 @@ public partial class EsnyaTweaksMod : ResoniteMod
     {
         try
         {
-            foreach (var category in Enum.GetNames(typeof(PatchCategory)))
+            if (config is not null)
             {
-                harmony.UnpatchCategory(category);
+                config.OnThisConfigurationChanged -= OnConfigChanged;
+            }
+
+            foreach (var category in patchCategoryKeys.Keys)
+            {
+                UpdatePatch(category, false);
             }
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Error(e);
         }
     }
 
-    /// <summary>
-    /// Called after hot reload.
-    /// </summary>
+    /// <summary>Called after hot reload.</summary>
     /// <param name="modInstance"></param>
+    /// <exception cref="ArgumentNullException">Raised when modInstance is null.</exception>
     public static void OnHotReload(ResoniteMod modInstance)
     {
+        if (modInstance is null)
+        {
+            throw new ArgumentNullException(nameof(modInstance), "modInstance is null for hot reload. Hot reload failed.");
+        }
+
         Init(modInstance);
     }
 #endif

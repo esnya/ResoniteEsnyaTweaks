@@ -1,19 +1,20 @@
 ﻿using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
+using System.ComponentModel;
 
-namespace EsnyaTweaks.LOD;
+namespace EsnyaTweaks.Patches;
 
-[HarmonyPatchCategory(nameof(PatchCategory.LOD))]
+[HarmonyPatchCategory("LODGroup Inspector"), Description("Add useful buttons to LODGroup inspector.")]
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
-internal static class WorkerInspectorPatch
+internal static class WorkerInspector_BuildInspectorUI_Patch
 {
     static void Postfix(Worker worker, UIBuilder ui)
     {
         if (worker is LODGroup lodGroup)
         {
-            EsnyaTweaksMod.DebugFunc(() => $"LODGroup {lodGroup} found. Building inspector UI...");
+            ResoniteModLoader.ResoniteMod.DebugFunc(() => $"LODGroup {lodGroup} found. Building inspector UI...");
             BuildInspectorUI(lodGroup, ui);
         }
     }
