@@ -73,6 +73,14 @@
 			<HintPath>$(ResonitePath)Resonite_Data\Managed\Elements.Core.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="ProtoFlux.Core">
+			<HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="ProtoFlux.Nodes.FrooxEngine">
+			<HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="Newtonsoft.Json">
 			<HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
