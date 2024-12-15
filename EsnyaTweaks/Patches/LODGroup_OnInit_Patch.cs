@@ -1,5 +1,6 @@
 ﻿using FrooxEngine;
 using HarmonyLib;
+using ResoniteModLoader;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -20,7 +21,7 @@ internal static class LODGroup_OnInit_Patch
         if (__instance is LODGroup lodGroup)
         {
             lodGroup.UpdateOrder = 1000;
-            ResoniteModLoader.ResoniteMod.DebugFunc(() => $"LODGroup {lodGroup} found. Patching update order to {lodGroup.UpdateOrder}...");
+            ResoniteMod.DebugFunc(() => $"LODGroup {lodGroup} found. Patching update order to {lodGroup.UpdateOrder}...");
         }
     }
 }

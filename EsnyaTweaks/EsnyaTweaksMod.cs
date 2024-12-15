@@ -43,10 +43,15 @@ public partial class EsnyaTweaksMod : ResoniteMod
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
 
+    internal static int timeoutMs;
+
     private static ModConfiguration? config;
     private static readonly Harmony harmony = new(HarmonyId);
 
     private static readonly Dictionary<string, ModConfigurationKey<bool>> patchCategoryKeys = new();
+
+    [AutoRegisterConfigKey]
+    private static readonly ModConfigurationKey<int> timeoutKey = new("Timeout", "Timeout for in milliseconds.", computeDefault: () => 30_000);
 
     static EsnyaTweaksMod()
     {
@@ -112,6 +117,8 @@ public partial class EsnyaTweaksMod : ResoniteMod
         {
             config.OnThisConfigurationChanged += OnConfigChanged;
 
+            timeoutMs = config.GetValue(timeoutKey);
+
             foreach (var pair in patchCategoryKeys)
             {
                 if (config.TryGetValue(pair.Value, out var value))
@@ -150,6 +157,10 @@ public partial class EsnyaTweaksMod : ResoniteMod
         if (change.Key is ModConfigurationKey<bool> key)
         {
             UpdatePatch(key.Name, change.Config.GetValue(key));
+        }
+        else if (change.Key == timeoutKey)
+        {
+            timeoutMs = change.Config.GetValue(timeoutKey);
         }
     }
 
