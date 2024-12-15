@@ -23,34 +23,28 @@ jobs:
       - name: Find csproj file
         id: find_csproj
         run: |
-          FILE=$(find . -name "*.csproj" | head -n 1)
-          echo "::set-output name=FILE::$FILE"
-
+          echo "ProjectFile=$(find . -name "*.csproj" | head -n 1)" >> $GITHUB_OUTPUT
       - name: Get version from csproj
         id: get_version
         run: |
-          VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" ${{ steps.find_csproj.outputs.FILE }})
-          echo "::set-output name=VERSION::$VERSION"
-
+          echo "Version=$(grep -oPm1 "(?<=<Version>)[^<]+" ${{ steps.find_csproj.outputs.ProjectFile }})" >> $GITHUB_OUTPUT
       - name: Pull tags
         run: git fetch --tags
 
       - name: Check if tag exists
         id: check_tag
         run: |
-          TAG_EXISTS=$(git tag -l "v${{ steps.get_version.outputs.VERSION }}")
-          echo "::set-output name=TAG_EXISTS::$TAG_EXISTS"
-
+          echo "TagExists=$(git tag -l "v${{ steps.get_version.outputs.Version }}")" >> $GITHUB_OUTPUT
       - name: Create tag
-        if: steps.check_tag.outputs.TAG_EXISTS == ''
+        if: steps.check_tag.outputs.TagExists == ''
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ steps.get_version.outputs.VERSION }}"
-          git push origin "v${{ steps.get_version.outputs.VERSION }}"
+          git tag "v${{ steps.get_version.outputs.Version }}"
+          git push origin "v${{ steps.get_version.outputs.Version }}"
     outputs:
-      tagged: ${{ steps.check_tag.outputs.TAG_EXISTS == '' }}
-      tag: v${{ steps.get_version.outputs.VERSION }}
+      tagged: ${{ steps.check_tag.outputs.TagExists == '' }}
+      tag: v${{ steps.get_version.outputs.Version }}
 
   build:
     runs-on: windows-latest
