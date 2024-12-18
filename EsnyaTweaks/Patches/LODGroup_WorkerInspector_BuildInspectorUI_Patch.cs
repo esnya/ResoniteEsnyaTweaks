@@ -10,6 +10,9 @@ namespace EsnyaTweaks.Patches;
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
 internal static class WorkerInspector_BuildInspectorUI_Patch
 {
+    private const string ADD_LABEL = "[Mod] Add LOD Level from children";
+    private const string REMOVE_LABEL = "[Mod] Remove LODGroups from children";
+
     static void Postfix(Worker worker, UIBuilder ui)
     {
         if (worker is LODGroup lodGroup)
@@ -21,28 +24,34 @@ internal static class WorkerInspector_BuildInspectorUI_Patch
 
     private static void BuildInspectorUI(LODGroup lodGroup, UIBuilder ui)
     {
-
-        Button(ui, "[Mod] Add LOD Level from children", () => SetupFromChildren(lodGroup));
-        Button(ui, "[Mod] Remove LODGroups from children", () => RemoveFromChildren(lodGroup));
+        Button(ui, ADD_LABEL, button => SetupFromChildren(button, lodGroup));
+        Button(ui, REMOVE_LABEL, button => RemoveFromChildren(button, lodGroup));
     }
 
-    private static void Button(UIBuilder ui, string text, System.Action onClick)
+    private static void Button(UIBuilder ui, string text, System.Action<Button> onClick)
     {
         var button = ui.Button(text);
         button.IsPressed.OnValueChange += (value) =>
         {
-            if (value) onClick();
+            if (value) onClick(button);
         };
     }
 
-    private static void SetupFromChildren(LODGroup lodGroup)
+    private static void SetupFromChildren(Button button, LODGroup lodGroup)
     {
         lodGroup.AddLOD(0.01f, lodGroup.Slot);
     }
 
-    private static void RemoveFromChildren(LODGroup lodGroup)
+    private static void RemoveFromChildren(Button button, LODGroup lodGroup)
     {
-        lodGroup.Slot.GetComponentsInChildren<LODGroup>(c => c != lodGroup).ForEach(c => c.Destroy());
+        var groups = lodGroup.Slot.GetComponentsInChildren<LODGroup>(c => c != lodGroup);
+        int count = 0;
+        foreach (var group in groups)
+        {
+            group.Destroy();
+            count++;
+        }
+
+        button.LabelText = $"{REMOVE_LABEL} (Removed {count} groups)";
     }
 }
-
