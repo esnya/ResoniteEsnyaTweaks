@@ -1,4 +1,4 @@
-﻿using Elements.Core;
+﻿using FrooxEngine;
 using HarmonyLib;
 using ResoniteModLoader;
 using System;
@@ -24,14 +24,15 @@ internal static class SystemHelper_Ctor_Patch
 
         try
         {
-            UniLog.Log("Initializing system helper at: " + path);
+            ResoniteMod.Msg("Initializing system helper at: " + path);
+            AccessTools.PropertySetter(typeof(SystemHelper), "Current").Invoke(__instance, new object[] { __instance });
 
             string text = Path.Combine(path, "SystemHelperServer.exe");
-            UniLog.Log("System Helper Executable: " + text);
+            ResoniteMod.Msg("System Helper Executable: " + text);
             if (!File.Exists(text))
             {
-                UniLog.Log("System Helper Not supported");
-                return true;
+                ResoniteMod.Msg("System Helper Not supported");
+                return false;
             }
 
             AccessTools.PropertySetter(typeof(SystemHelper), "Initialized").Invoke(__instance, new object[] { true });
@@ -60,9 +61,25 @@ internal static class SystemHelper_Ctor_Patch
             var reader = new BinaryReader(stream, SystemHelper.StringEncoding);
             AccessTools.Field(typeof(SystemHelper), "reader").SetValue(__instance, reader);
 #pragma warning restore CA2000 // Dispose objects before losing scope
-            UniLog.Log("System Helper initialized");
 
-            return true;
+            Engine.Current.OnShutdownRequest += (_) =>
+            {
+                try
+                {
+                    reader.Close();
+                    writer.Close();
+                    connection.Close();
+                    process.Kill();
+                }
+                catch (Exception ex)
+                {
+                    ResoniteMod.Error("Error while closing SystemHelper connection");
+                    ResoniteMod.Error(ex);
+                }
+            };
+
+            ResoniteMod.Msg("System Helper initialized");
+            return false;
         }
         catch (Exception ex)
         {
@@ -72,9 +89,9 @@ internal static class SystemHelper_Ctor_Patch
         finally
         {
             tcpListener?.Stop();
-            process?.Kill();
         }
 
+        process?.Kill();
         ResoniteMod.Msg("Retrying after 3s...");
         Task.Delay(3_000).Wait();
 
