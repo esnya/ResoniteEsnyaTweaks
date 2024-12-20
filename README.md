@@ -2,6 +2,13 @@
 
 A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader) mod for [Resonite](https://resonite.com/).
 
+## Features
+
+- **While Timeout**: Adds timeout functionality to `While` and `AsyncWhile` loops to prevent infinite loops.
+- **LODGroup UpdateOrder**: Sets `LODGroup` update order to 1000 to prevent rendering issues.
+- **LODGroup Inspector Enhancements**: Adds buttons to the LODGroup inspector for adding/removing LOD levels from children.
+- **PhotonDust Inspector Enhancements**: Adds buttons to the PhotonDust inspector for adding/removing modules to/from parent ParticleStyle.
+- **System Helper Timeout**: Adds timeout and restart functionality to `SystemHelper` initialization.
 
 ## Installation
 
