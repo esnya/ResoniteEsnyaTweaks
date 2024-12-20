@@ -140,15 +140,23 @@ public partial class EsnyaTweaksMod : ResoniteMod
 
     private static void UpdatePatch(string category, bool state)
     {
-        if (state)
+        try
         {
-            DebugFunc(() => $"Patching {category}...");
-            harmony.PatchCategory(category.ToString());
+
+            if (state)
+            {
+                DebugFunc(() => $"Patching {category}...");
+                harmony.PatchCategory(category.ToString());
+            }
+            else
+            {
+                DebugFunc(() => $"Unpatching {category}...");
+                harmony.UnpatchAll(HarmonyId);
+            }
         }
-        else
+        catch (Exception e)
         {
-            DebugFunc(() => $"Unpatching {category}...");
-            harmony.UnpatchAll(HarmonyId);
+            Error(e);
         }
     }
 
