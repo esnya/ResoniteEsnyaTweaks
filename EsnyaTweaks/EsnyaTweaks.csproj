@@ -85,6 +85,10 @@
       <HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="SystemHelperClient">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\SystemHelperClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 
     <Reference Include="ResoniteHotReloadLib" Condition="'$(Configuration)'=='Debug'">
       <HintPath>$(ResonitePath)rml_libs\ResoniteHotReloadLib.dll</HintPath>
