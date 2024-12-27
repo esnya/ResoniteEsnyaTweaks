@@ -2,7 +2,11 @@ name: .NET Build
 
 on:
   push:
-    branches: ["master", "feature/ci"]
+    branches:
+      - master
+      - feature/ci
+    tags:
+      - v*
 
 env:
   project: EsnyaTweaks
