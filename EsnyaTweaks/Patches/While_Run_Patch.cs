@@ -1,21 +1,25 @@
-﻿using FrooxEngine.ProtoFlux;
+﻿using EsnyaTweaks.Attributes;
+using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 using ProtoFlux.Runtimes.Execution.Nodes;
 using ResoniteModLoader;
-using System.ComponentModel;
 
 namespace EsnyaTweaks.Patches;
 
 
-[HarmonyPatchCategory("While Timeout"), Description("Timeout While/AsyncWhile")]
+[HarmonyPatchCategory("While Timeout"), TweakDescription("Timeout While/AsyncWhile")]
 [HarmonyPatch(typeof(While), "Run")]
 internal static class While_Run_Patch
 {
     internal static bool Prefix(While __instance, ExecutionContext context, ref IOperation __result)
     {
-        if (context is not FrooxEngineContext frooxEngineContext) return false;
+        if (context is not FrooxEngineContext frooxEngineContext)
+        {
+            return false;
+        }
+
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
         __instance.LoopStart.Execute(context);

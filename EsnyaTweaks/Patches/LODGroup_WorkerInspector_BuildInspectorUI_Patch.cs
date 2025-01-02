@@ -1,17 +1,17 @@
 ﻿using Elements.Core;
+using EsnyaTweaks.Attributes;
 using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
 using ResoniteModLoader;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace EsnyaTweaks.Patches;
 
 
-[HarmonyPatchCategory(CATEGORY), Description(DESCRIPTION)]
+[HarmonyPatchCategory(CATEGORY), TweakDescription(DESCRIPTION)]
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
 internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
@@ -28,7 +28,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         if (worker is LODGroup lodGroup)
         {
             ResoniteMod.DebugFunc(() => $"LODGroup on {lodGroup.Slot.Name} found. Building inspector UI...");
-            PatchSliderUI(lodGroup, ui);
+            //PatchSliderUI(lodGroup, ui);
             BuildInspectorUI(lodGroup, ui);
         }
     }
@@ -82,7 +82,10 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         var button = ui.Button(text);
         button.IsPressed.OnValueChange += (value) =>
         {
-            if (value) onClick(button);
+            if (value)
+            {
+                onClick(button);
+            }
         };
     }
 

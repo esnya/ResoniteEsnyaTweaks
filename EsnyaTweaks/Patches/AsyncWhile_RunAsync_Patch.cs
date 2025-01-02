@@ -1,17 +1,17 @@
-﻿using FrooxEngine.ProtoFlux;
+﻿using EsnyaTweaks.Attributes;
+using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 using ProtoFlux.Runtimes.Execution.Nodes;
 using ResoniteModLoader;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace EsnyaTweaks.Patches;
 
-[HarmonyPatchCategory("While Timeout"), Description("Timeout While/AsyncWhile")]
+[HarmonyPatchCategory("While Timeout"), TweakDescription("Timeout While/AsyncWhile")]
 [HarmonyPatch(typeof(AsyncWhile), "RunAsync")]
 internal static class AsyncWhile_RunAsync_Patch
 {
