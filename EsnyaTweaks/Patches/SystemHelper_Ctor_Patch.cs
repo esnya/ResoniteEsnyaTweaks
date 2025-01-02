@@ -1,8 +1,8 @@
-﻿using FrooxEngine;
+﻿using EsnyaTweaks.Attributes;
+using FrooxEngine;
 using HarmonyLib;
 using ResoniteModLoader;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -13,7 +13,7 @@ using SystemHelperClient;
 namespace EsnyaTweaks.Patches;
 
 
-[HarmonyPatchCategory("System Helper Timeout"), Description("Timeout and restart SystemHelper")]
+[HarmonyPatchCategory("System Helper Timeout"), TweakDescription("Timeout and restart SystemHelper")]
 [HarmonyPatch(typeof(SystemHelper), MethodType.Constructor, new[] { typeof(string) })]
 internal static class SystemHelper_Ctor_Patch
 {

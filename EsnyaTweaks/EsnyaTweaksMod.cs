@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using EsnyaTweaks.Attributes;
+
+
 
 
 #if DEBUG
@@ -58,9 +60,9 @@ public partial class EsnyaTweaksMod : ResoniteMod
         DebugFunc(() => $"Static Initializing {nameof(EsnyaTweaksMod)}...");
 
         var keys = from t in AccessTools.GetTypesFromAssembly(ModAssembly)
-                   select new KeyValuePair<string?, string?>(t.GetCustomAttribute<HarmonyPatchCategory>()?.info?.category, t.GetCustomAttribute<DescriptionAttribute>()?.Description) into pair
-                   where pair.Key is not null && pair.Value is not null
-                   select new ModConfigurationKey<bool>(pair.Key!, pair.Value!, computeDefault: () => true);
+                   select (t.GetCustomAttribute<HarmonyPatchCategory>(), t.GetCustomAttribute<TweakDescriptionAttribute>()) into t
+                   where t.Item1 is not null && t.Item2 is not null
+                   select new ModConfigurationKey<bool>(t.Item1.info.category, t.Item2.Description, computeDefault: () => t.Item2.DefaultValue);
 
         foreach (var key in keys)
         {

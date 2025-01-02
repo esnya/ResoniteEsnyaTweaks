@@ -1,14 +1,14 @@
-﻿using FrooxEngine;
+﻿using EsnyaTweaks.Attributes;
+using FrooxEngine;
 using FrooxEngine.PhotonDust;
 using FrooxEngine.UIX;
 using HarmonyLib;
 using ResoniteModLoader;
-using System.ComponentModel;
 using System.Linq;
 
 namespace EsnyaTweaks.Patches;
 
-[HarmonyPatchCategory("PhotonDust Inspector"), Description("Add add and remove to parent style buttons.")]
+[HarmonyPatchCategory("PhotonDust Inspector"), TweakDescription("Add add and remove to parent style buttons.")]
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
 internal static class PhotonDust_WorkerInspector_BuildInspectorUI_Patch
@@ -45,7 +45,10 @@ internal static class PhotonDust_WorkerInspector_BuildInspectorUI_Patch
         var button = ui.Button(text);
         button.IsPressed.OnValueChange += (value) =>
         {
-            if (value) onClick(button);
+            if (value)
+            {
+                onClick(button);
+            }
         };
     }
 
