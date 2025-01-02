@@ -14,11 +14,14 @@ namespace EsnyaTweaks.Patches;
 
 
 [HarmonyPatchCategory("System Helper Timeout"), TweakDescription("Timeout and restart SystemHelper")]
-[HarmonyPatch(typeof(SystemHelper), MethodType.Constructor, new[] { typeof(string) })]
-internal static class SystemHelper_Ctor_Patch
+[HarmonyPatch(typeof(SystemHelper))]
+internal static class SystemHelper_Patch
 {
-    internal static bool Prefix(ref SystemHelper __instance, string path)
+    private static string? systemHelperPath;
+
+    private static bool StartSystemHelper(SystemHelper __instance, string path)
     {
+        systemHelperPath = path;
         TcpListener? tcpListener = null;
         Process? process = null;
 
@@ -39,6 +42,9 @@ internal static class SystemHelper_Ctor_Patch
 
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, 0));
             tcpListener.Start();
+
+            ResoniteMod.Msg("Listening on: " + ((IPEndPoint)tcpListener.LocalEndpoint).Port);
+
             process = Process.Start(text, $"{((IPEndPoint)tcpListener.LocalEndpoint).Port}");
 
             var blockingTask = Task.Run(() => tcpListener.AcceptTcpClient());
@@ -95,6 +101,28 @@ internal static class SystemHelper_Ctor_Patch
         ResoniteMod.Msg("Retrying after 3s...");
         Task.Delay(3_000).Wait();
 
-        return Prefix(ref __instance, path);
+        return StartSystemHelper(__instance, path);
+    }
+
+    [HarmonyPatch(MethodType.Constructor, new[] { typeof(string) })]
+    [HarmonyPrefix]
+    internal static bool Ctor_Prefix(ref SystemHelper __instance, string path)
+    {
+        return StartSystemHelper(__instance, path);
+    }
+
+    [HarmonyPatch(nameof(SystemHelper.GetClipboardData))]
+    [HarmonyPrefix]
+    internal static void GetClipboardData_Prefix(SystemHelper __instance)
+    {
+        var connection = AccessTools.Field(typeof(SystemHelper), "connection").GetValue(__instance) as TcpClient;
+        if ((connection is not null && connection.Connected) || systemHelperPath is null)
+        {
+            return;
+        }
+
+        ResoniteMod.Error("SystemHelper connection is not available. Restarting...");
+
+        StartSystemHelper(__instance, systemHelperPath);
     }
 }
