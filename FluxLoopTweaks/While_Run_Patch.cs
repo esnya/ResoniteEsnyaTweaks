@@ -1,21 +1,19 @@
-﻿using EsnyaTweaks.Attributes;
-using FrooxEngine.ProtoFlux;
+﻿using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 using ProtoFlux.Runtimes.Execution.Nodes;
 using ResoniteModLoader;
 
-namespace EsnyaTweaks.Patches;
+namespace EsnyaTweaks.FluxLoopTweaks;
 
 
-[HarmonyPatchCategory("While Timeout"), TweakDescription("Timeout While/AsyncWhile")]
 [HarmonyPatch(typeof(While), "Run")]
 internal static class While_Run_Patch
 {
     internal static bool Prefix(While __instance, ExecutionContext context, ref IOperation __result)
     {
-        if (context is not FrooxEngineContext frooxEngineContext)
+        if (context is not FrooxEngineContext)
         {
             return false;
         }
@@ -25,7 +23,7 @@ internal static class While_Run_Patch
         __instance.LoopStart.Execute(context);
         while (__instance.Condition.Evaluate(context, defaultValue: false))
         {
-            if (stopwatch.ElapsedMilliseconds > EsnyaTweaksMod.timeoutMs || context.AbortExecution)
+            if (stopwatch.ElapsedMilliseconds > FluxLoopTweaksMod.TimeoutMs || context.AbortExecution)
             {
                 ResoniteMod.Warn($"While Timedout: {__instance} ({stopwatch.ElapsedMilliseconds}ms)");
                 context.AbortExecution = true;

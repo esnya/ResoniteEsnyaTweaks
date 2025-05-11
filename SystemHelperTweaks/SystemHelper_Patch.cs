@@ -1,33 +1,32 @@
-﻿using EsnyaTweaks.Attributes;
-using FrooxEngine;
-using HarmonyLib;
-using ResoniteModLoader;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using FrooxEngine;
+using HarmonyLib;
+using ResoniteModLoader;
 using SystemHelperClient;
 
-namespace EsnyaTweaks.Patches;
+namespace EsnyaTweaks.SystemHelperTweaks;
 
-
-[HarmonyPatchCategory("System Helper Timeout"), TweakDescription("Timeout and restart SystemHelper")]
 [HarmonyPatch(typeof(SystemHelper))]
 internal static class SystemHelper_Patch
 {
+
     private static string? systemHelperPath;
 
+#pragma warning disable CA1031
     private static bool StartSystemHelper(SystemHelper __instance, string path)
     {
         systemHelperPath = path;
         TcpListener? tcpListener = null;
-        Process? process = null;
+        System.Diagnostics.Process? process = null;
 
         try
         {
             ResoniteMod.Msg("Initializing system helper at: " + path);
+            Engine.Current.InitProgress?.SetFixedPhase("Initializing System Helper");
             AccessTools.PropertySetter(typeof(SystemHelper), "Current").Invoke(__instance, new object[] { __instance });
 
             string text = Path.Combine(path, "SystemHelperServer.exe");
@@ -45,7 +44,7 @@ internal static class SystemHelper_Patch
 
             ResoniteMod.Msg("Listening on: " + ((IPEndPoint)tcpListener.LocalEndpoint).Port);
 
-            process = Process.Start(text, $"{((IPEndPoint)tcpListener.LocalEndpoint).Port}");
+            process = System.Diagnostics.Process.Start(text, $"{((IPEndPoint)tcpListener.LocalEndpoint).Port}");
 
             var blockingTask = Task.Run(() => tcpListener.AcceptTcpClient());
             if (!blockingTask.Wait(10_000))
@@ -85,6 +84,7 @@ internal static class SystemHelper_Patch
             };
 
             ResoniteMod.Msg("System Helper initialized");
+            Engine.Current.InitProgress?.SetFixedPhase("System Helper Initialized");
             return false;
         }
         catch (Exception ex)
@@ -99,21 +99,24 @@ internal static class SystemHelper_Patch
 
         process?.Kill();
         ResoniteMod.Msg("Retrying after 3s...");
+        Engine.Current.InitProgress?.SetFixedPhase("Retrying System Helper Initialization");
         Task.Delay(3_000).Wait();
 
         return StartSystemHelper(__instance, path);
     }
+#pragma warning restore CA1031
 
     [HarmonyPatch(MethodType.Constructor, new[] { typeof(string) })]
     [HarmonyPrefix]
-    internal static bool Ctor_Prefix(ref SystemHelper __instance, string path)
+    public static bool Ctor_Prefix(ref SystemHelper __instance, string path)
     {
-        return StartSystemHelper(__instance, path);
+        StartSystemHelper(__instance, path);
+        return false;
     }
 
     [HarmonyPatch(nameof(SystemHelper.GetClipboardData))]
     [HarmonyPrefix]
-    internal static void GetClipboardData_Prefix(SystemHelper __instance)
+    public static void GetClipboardData_Prefix(SystemHelper __instance)
     {
         var connection = AccessTools.Field(typeof(SystemHelper), "connection").GetValue(__instance) as TcpClient;
         if ((connection is not null && connection.Connected) || systemHelperPath is null)

@@ -1,5 +1,4 @@
 ﻿using Elements.Core;
-using EsnyaTweaks.Attributes;
 using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
@@ -8,10 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace EsnyaTweaks.Patches;
+namespace EsnyaTweaks.LODGroupTweaks;
 
-
-[HarmonyPatchCategory(CATEGORY), TweakDescription(DESCRIPTION)]
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
 internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
@@ -28,7 +25,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         if (worker is LODGroup lodGroup)
         {
             ResoniteMod.DebugFunc(() => $"LODGroup on {lodGroup.Slot.Name} found. Building inspector UI...");
-            //PatchSliderUI(lodGroup, ui);
             BuildInspectorUI(lodGroup, ui);
         }
     }

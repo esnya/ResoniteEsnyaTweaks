@@ -1,0 +1,4 @@
+
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("Style", "IDE0060:未使用のパラメーターを削除します", Justification = "<保留中>", Scope = "member", Target = "~M:EsnyaTweaks.LODGroupTweaks.LODGroupTweaksMod.OnHotReload(ResoniteModLoader.ResoniteMod)")]

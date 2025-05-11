@@ -14,6 +14,7 @@
     <AnalysisLevel>latest-all</AnalysisLevel>
     <WarningLevel>9999</WarningLevel>
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -105,6 +106,30 @@
     <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods" ContinueOnError="true" />
   </Target>
   <ItemGroup>
+    <Compile Remove="EyeTrackingTweaks\**" />
+    <Compile Remove="FluxLoopTweaks\**" />
+    <Compile Remove="LODGroupTweaks\**" />
+    <Compile Remove="Patches\**" />
+    <Compile Remove="PhotonDustTweaks\**" />
+    <Compile Remove="SystemHelperTweaks\**" />
+    <Compile Remove="UniLogTweaks\**" />
+    <Compile Remove="VideoTweaks\**" />
     <EditorConfigFiles Remove="$(MSBuildThisFileDirectory)**\*.editorconfig" />
+    <EmbeddedResource Remove="EyeTrackingTweaks\**" />
+    <EmbeddedResource Remove="FluxLoopTweaks\**" />
+    <EmbeddedResource Remove="LODGroupTweaks\**" />
+    <EmbeddedResource Remove="Patches\**" />
+    <EmbeddedResource Remove="PhotonDustTweaks\**" />
+    <EmbeddedResource Remove="SystemHelperTweaks\**" />
+    <EmbeddedResource Remove="UniLogTweaks\**" />
+    <EmbeddedResource Remove="VideoTweaks\**" />
+    <None Remove="EyeTrackingTweaks\**" />
+    <None Remove="FluxLoopTweaks\**" />
+    <None Remove="LODGroupTweaks\**" />
+    <None Remove="Patches\**" />
+    <None Remove="PhotonDustTweaks\**" />
+    <None Remove="SystemHelperTweaks\**" />
+    <None Remove="UniLogTweaks\**" />
+    <None Remove="VideoTweaks\**" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
-﻿using EsnyaTweaks.Attributes;
-using FrooxEngine.ProtoFlux;
+﻿using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
@@ -9,9 +8,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace EsnyaTweaks.Patches;
+namespace EsnyaTweaks.FluxLoopTweaks;
 
-[HarmonyPatchCategory("While Timeout"), TweakDescription("Timeout While/AsyncWhile")]
 [HarmonyPatch(typeof(AsyncWhile), "RunAsync")]
 internal static class AsyncWhile_RunAsync_Patch
 {
@@ -47,7 +45,7 @@ internal static class AsyncWhile_RunAsync_Patch
     {
         if (context is FrooxEngineContext frooxEngineContext)
         {
-            __result = RunAsync(__instance, frooxEngineContext, __instance.Condition, __instance.LoopStart, __instance.LoopIteration, __instance.LoopEnd, EsnyaTweaksMod.timeoutMs);
+            __result = RunAsync(__instance, frooxEngineContext, __instance.Condition, __instance.LoopStart, __instance.LoopIteration, __instance.LoopEnd, FluxLoopTweaksMod.TimeoutMs);
             return true;
         }
         return false;

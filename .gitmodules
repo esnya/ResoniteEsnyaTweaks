@@ -1,0 +1,3 @@
+[submodule "EyeTrackingTweaks/VIVE-OpenXR-Unity"]
+	path = EyeTrackingTweaks/VIVE-OpenXR-Unity
+	url = https://github.com/ViveSoftware/VIVE-OpenXR-Unity.git
