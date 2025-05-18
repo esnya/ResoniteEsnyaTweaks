@@ -24,7 +24,7 @@ jobs:
       - name: Set version from tag
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
-          for FILE in $(find . -name '*.csproj'); do
+          find . -name '*.csproj' -print0 | while IFS= read -r -d '' FILE; do
             sed -i "s|<Version>[^<]*</Version>|<Version>${VERSION}</Version>|" "$FILE"
           done
     outputs:
