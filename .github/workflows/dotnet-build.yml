@@ -25,7 +25,7 @@ jobs:
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
           for FILE in $(find . -name '*.csproj'); do
-            sed -i "s|<Version>[^<]*|<Version>${VERSION}|" "$FILE"
+            sed -i "s|<Version>[^<]*</Version>|<Version>${VERSION}</Version>|" "$FILE"
           done
     outputs:
       tagged: true
