@@ -13,32 +13,27 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout repository
-          uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-        - name: Retrieve previous version from csproj
-          id: get_version
-          run: |
-            FILE=$(find . -name "*.csproj" | head -n 1)
-            VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" $FILE)
-            echo "previousVersion=$VERSION" >> $GITHUB_OUTPUT
+      - name: Retrieve previous version
+        id: get_version
+        run: |
+          FILE=$(find . -name "*.csproj" | head -n 1)
+          VERSION=$(grep -oPm1 '(?<=<Version>)[^<]+' "$FILE")
+          echo "previous=$VERSION" >> "$GITHUB_OUTPUT"
 
-        - name: Set version in csproj
-          run: |
-            FILE=$(find . -name "*.csproj" | head -n 1)
-            sed -i "s/>${{ steps.get_version.outputs.previousVersion }}/>${{ github.event.inputs.version }}/" $FILE
+      - name: Set version in csproj files
+        run: |
+          for FILE in $(find . -name '*.csproj'); do
+            sed -i "s|<Version>[^<]*|<Version>${{ github.event.inputs.version }}|" "$FILE"
+          done
 
-        - name: Create tag
-          run: |
-            git tag -v${{ github.event.inputs.version }}
-        - name: Commit changes
-          run: |
-            git config --local user.name "github-actions[bot]"
-            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "chore: 📦️ v${{ github.event.inputs.version }}"
-
-        - name: Push changes
-          run: |
-            git push
-            git push --tags
+      - name: Commit and tag
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add *.csproj
+          git commit -m "chore: 📦 bump version to ${{ github.event.inputs.version }}" || echo 'No changes to commit'
+          git tag v${{ github.event.inputs.version }}
+          git push --follow-tags
