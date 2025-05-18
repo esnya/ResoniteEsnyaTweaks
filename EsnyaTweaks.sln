@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemHelperTweaks", "Syste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonDustTweaks", "PhotonDustTweaks\PhotonDustTweaks.csproj", "{A7A0326B-D757-4E2C-ACD6-426B0F3F18E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTweaks", "VideoTweaks\VideoTweaks.csproj", "{EBC4680C-7AAA-494E-8549-0687D82DC15E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,14 +74,6 @@ Global
 		{A7A0326B-D757-4E2C-ACD6-426B0F3F18E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A7A0326B-D757-4E2C-ACD6-426B0F3F18E4}.Release|x64.ActiveCfg = Release|x64
 		{A7A0326B-D757-4E2C-ACD6-426B0F3F18E4}.Release|x64.Build.0 = Release|x64
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Debug|x64.Build.0 = Debug|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Release|x64.ActiveCfg = Release|Any CPU
-		{EBC4680C-7AAA-494E-8549-0687D82DC15E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
