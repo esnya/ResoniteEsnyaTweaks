@@ -15,37 +15,21 @@ on:
 
 jobs:
   vtag:
-    if: github.event_name != 'pull_request'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Find csproj file
-        id: find_csproj
+      - name: Set version from tag
         run: |
-          echo "ProjectFile=$(find . -name "*.csproj" | head -n 1)" >> $GITHUB_OUTPUT
-      - name: Get version from csproj
-        id: get_version
-        run: |
-          echo "Version=$(grep -oPm1 "(?<=<Version>)[^<]+" ${{ steps.find_csproj.outputs.ProjectFile }})" >> $GITHUB_OUTPUT
-      - name: Pull tags
-        run: git fetch --tags
-
-      - name: Check if tag exists
-        id: check_tag
-        run: |
-          echo "TagExists=$(git tag -l "v${{ steps.get_version.outputs.Version }}")" >> $GITHUB_OUTPUT
-      - name: Create tag
-        if: steps.check_tag.outputs.TagExists == ''
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ steps.get_version.outputs.Version }}"
-          git push origin "v${{ steps.get_version.outputs.Version }}"
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          find . -name '*.csproj' -print0 | while IFS= read -r -d '' FILE; do
+            sed -i "s|<Version>[^<]*</Version>|<Version>${VERSION}</Version>|" "$FILE"
+          done
     outputs:
-      tagged: ${{ steps.check_tag.outputs.TagExists == '' }}
-      tag: v${{ steps.get_version.outputs.Version }}
+      tagged: true
+      tag: ${{ github.ref }}
 
   build:
     runs-on: windows-latest
