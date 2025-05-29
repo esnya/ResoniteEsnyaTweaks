@@ -1,4 +1,4 @@
-﻿using FrooxEngine.ProtoFlux;
+using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
