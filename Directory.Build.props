@@ -33,7 +33,7 @@
   <!-- Derived properties -->
   <PropertyGroup>
     <Product>$(AssemblyTitle)</Product>
-    <Copyright>Copylight (c) 2024 $(Authors)</Copyright>
+    <Copyright>Copyright (c) 2024 $(Authors)</Copyright>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -54,6 +54,6 @@
     <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')">$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath>
     <!-- Steam Deck and other Linux distributions -->
     <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
-    <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">�home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
   </PropertyGroup>
 </Project>
