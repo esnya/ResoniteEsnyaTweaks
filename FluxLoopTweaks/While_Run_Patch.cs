@@ -15,7 +15,7 @@ internal static class While_Run_Patch
     {
         if (context is not FrooxEngineContext)
         {
-            return false;
+            return true;
         }
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -35,6 +35,6 @@ internal static class While_Run_Patch
 
         __result = __instance.LoopEnd.Target;
 
-        return true;
+        return false;
     }
 }
