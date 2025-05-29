@@ -124,6 +124,16 @@ jobs:
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Debug downloaded files
+        run: |
+          echo "=== Downloaded files ==="
+          ls -la
+          echo "=== Looking for DLL files ==="
+          find . -name "*.dll" -type f || echo "No DLL files found"
+          echo "=== End debug ==="
 
       - name: Release
         env:
@@ -131,7 +141,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            *.dll
+            **/*.dll
           generate_release_notes: true
           tag_name: ${{ needs.vtag.outputs.tag || github.ref_name }}
 
