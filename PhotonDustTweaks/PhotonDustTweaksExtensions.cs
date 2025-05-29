@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using FrooxEngine;
 using FrooxEngine.PhotonDust;
@@ -7,7 +7,7 @@ using ResoniteModLoader;
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 
-internal static class PhotonDustTweaksExntensions
+internal static class PhotonDustTweaksExtensions
 {
     private const string ADD_FROM_LABEL = "[Mod] Add modules from children";
     private const string REPLACE_FROM_LABEL = "[Mod] Replace modules from children";

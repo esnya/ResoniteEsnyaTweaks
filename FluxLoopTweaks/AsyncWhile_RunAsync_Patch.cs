@@ -1,4 +1,4 @@
-﻿using FrooxEngine.ProtoFlux;
+using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
@@ -43,11 +43,12 @@ internal static class AsyncWhile_RunAsync_Patch
 
     internal static bool Prefix(AsyncWhile __instance, ExecutionContext context, ref Task<IOperation> __result)
     {
-        if (context is FrooxEngineContext frooxEngineContext)
+        if (context is not FrooxEngineContext frooxEngineContext)
         {
-            __result = RunAsync(__instance, frooxEngineContext, __instance.Condition, __instance.LoopStart, __instance.LoopIteration, __instance.LoopEnd, FluxLoopTweaksMod.TimeoutMs);
             return true;
         }
+
+        __result = RunAsync(__instance, frooxEngineContext, __instance.Condition, __instance.LoopStart, __instance.LoopIteration, __instance.LoopEnd, FluxLoopTweaksMod.TimeoutMs);
         return false;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Elements.Core;
+using Elements.Core;
 using EsnyaTweaks.Attributes;
 using FrooxEngine;
 using HarmonyLib;

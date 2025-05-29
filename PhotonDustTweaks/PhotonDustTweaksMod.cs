@@ -22,7 +22,6 @@ public partial class PhotonDustTweaksMod : ResoniteMod
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
 
 
-    //private static ModConfiguration? config;
     private static readonly Harmony harmony = new(HarmonyId);
 
     public override void OnEngineInit()
@@ -37,7 +36,6 @@ public partial class PhotonDustTweaksMod : ResoniteMod
     private static void Init(ResoniteMod modInstance)
     {
         harmony.PatchAll();
-        //config = modInstance?.GetConfiguration();
     }
 
 #if DEBUG

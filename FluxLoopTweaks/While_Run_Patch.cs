@@ -1,4 +1,4 @@
-﻿using FrooxEngine.ProtoFlux;
+using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
@@ -15,7 +15,7 @@ internal static class While_Run_Patch
     {
         if (context is not FrooxEngineContext)
         {
-            return false;
+            return true;
         }
 
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -35,6 +35,6 @@ internal static class While_Run_Patch
 
         __result = __instance.LoopEnd.Target;
 
-        return true;
+        return false;
     }
 }

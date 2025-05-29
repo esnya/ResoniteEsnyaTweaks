@@ -1,8 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using Elements.Core;
 using HarmonyLib;
 
-namespace EsnyaTweaks.UniLogeTweaks;
+namespace EsnyaTweaks.UniLogTweaks;
 
 #pragma warning disable IDE0060
 

@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!-- Project-specific properties -->
 	<PropertyGroup>
 		<RootNamespace>EsnyaTweaks.FluxLoopTweaks</RootNamespace>
 		<AssemblyName>EsnyaTweaks.FluxLoopTweaks</AssemblyName>
@@ -7,7 +6,6 @@
 		<Title>EsnyaTweaks.FluxLoopTweaks</Title>
 	</PropertyGroup>
 
-	<!-- Project-specific references (ProtoFlux assemblies) -->
 	<ItemGroup>
 		<Reference Include="ProtoFlux.Core">
 			<HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
