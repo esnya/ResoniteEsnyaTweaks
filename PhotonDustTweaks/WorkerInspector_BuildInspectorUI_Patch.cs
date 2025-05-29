@@ -1,4 +1,4 @@
-﻿using FrooxEngine;
+using FrooxEngine;
 using FrooxEngine.PhotonDust;
 using FrooxEngine.UIX;
 using HarmonyLib;
