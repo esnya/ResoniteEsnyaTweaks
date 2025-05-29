@@ -10,7 +10,7 @@ using System.Reflection;
 using ResoniteHotReloadLib;
 #endif
 
-namespace EsnyaTweaks.UniLogeTweaks;
+namespace EsnyaTweaks.UniLogTweaks;
 
 /// <summary>
 /// Represents the UniLogTweaksMod which is a sealed class inheriting from ResoniteMod.
