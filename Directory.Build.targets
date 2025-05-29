@@ -1,0 +1,49 @@
+<!-- This file contains common references and targets shared across all projects in this solution -->
+<Project>
+  <!-- Common reference assemblies -->
+  <ItemGroup>
+    <Reference Include="ResoniteModLoader">
+      <HintPath>$(ResonitePath)Libraries\ResoniteModLoader.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HarmonyLib">
+      <HintPath>$(ResonitePath)rml_libs\0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')">$(ResonitePath)0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="FrooxEngine">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\FrooxEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Elements.Core">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\Elements.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Debug mode hot reload library -->
+    <Reference Include="ResoniteHotReloadLib" Condition="'$(Configuration)'=='Debug'">
+      <HintPath>$(ResonitePath)rml_libs\ResoniteHotReloadLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Common build targets -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CopyToMods)'=='true'">
+    <Message Text="Attempting to copy $(TargetFileName) to $(ResonitePath)rml_mods" Importance="high" />
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods" ContinueOnError="true" />
+  </Target>
+  
+  <Target Name="PostBuildHotReload" AfterTargets="PostBuildEvent" Condition="'$(CopyToMods)'=='true' and '$(Configuration)'=='Debug'">
+    <Message Text="Attempting to copy $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods" Importance="high" />
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods" ContinueOnError="true" />
+  </Target>
+
+  <!-- Common editor config exclusion -->
+  <ItemGroup>
+    <EditorConfigFiles Remove="$(MSBuildThisFileDirectory)**\*.editorconfig" />
+  </ItemGroup>
+</Project>
