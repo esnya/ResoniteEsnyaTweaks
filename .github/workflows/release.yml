@@ -44,9 +44,13 @@ jobs:
     - name: Check if tag exists
       id: check_tag
       run: |
-        echo "TagExists=$(git tag -l "v${{ steps.get_version.outputs.Version }}")" >> $GITHUB_OUTPUT
+        if [ -z "$(git tag -l "v${{ steps.get_version.outputs.Version }}")" ]; then
+          echo "TagExists=false" >> $GITHUB_OUTPUT
+        else
+          echo "TagExists=true" >> $GITHUB_OUTPUT
+        fi
     outputs:
-      should_release: ${{ steps.check_tag.outputs.TagExists == '' }}
+      should_release: ${{ steps.check_tag.outputs.TagExists == 'false' }}
       version: ${{ steps.get_version.outputs.Version }}
 
   build:
