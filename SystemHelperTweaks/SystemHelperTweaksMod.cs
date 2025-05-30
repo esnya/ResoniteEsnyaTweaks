@@ -12,13 +12,20 @@ using ResoniteHotReloadLib;
 
 namespace EsnyaTweaks.SystemHelperTweaks;
 
+/// <summary>
+/// Tweaks System Helper initialization.
+/// </summary>
 public partial class SystemHelperTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(SystemHelperTweaksMod).Assembly;
 
+    /// <inheritdoc/>
     public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+    /// <inheritdoc/>
     public override string Author => ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+    /// <inheritdoc/>
     public override string Version => ModAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+    /// <inheritdoc/>
     public override string Link => ModAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().First(meta => meta.Key == "RepositoryUrl").Value;
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
@@ -26,6 +33,7 @@ public partial class SystemHelperTweaksMod : ResoniteMod
 
     private static readonly Harmony harmony = new(HarmonyId);
 
+    /// <inheritdoc/>
     public override void OnEngineInit()
     {
         Init();
@@ -41,11 +49,17 @@ public partial class SystemHelperTweaksMod : ResoniteMod
     }
 
 #if DEBUG
+    /// <summary>
+    /// Unpatches Harmony before recompiling.
+    /// </summary>
     public static void BeforeHotReload()
     {
         harmony.UnpatchAll(HarmonyId);
     }
 
+    /// <summary>
+    /// Re-initializes the mod after recompiling.
+    /// </summary>
     public static void OnHotReload(ResoniteMod modInstance)
     {
         Init();

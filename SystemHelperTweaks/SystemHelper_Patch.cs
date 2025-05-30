@@ -108,6 +108,9 @@ internal static class SystemHelper_Patch
 
     [HarmonyPatch(MethodType.Constructor, new[] { typeof(string) })]
     [HarmonyPrefix]
+    /// <summary>
+    /// Starts the System Helper process.
+    /// </summary>
     public static bool Ctor_Prefix(ref SystemHelper __instance, string path)
     {
         StartSystemHelper(__instance, path);
@@ -116,6 +119,9 @@ internal static class SystemHelper_Patch
 
     [HarmonyPatch(nameof(SystemHelper.GetClipboardData))]
     [HarmonyPrefix]
+    /// <summary>
+    /// Ensures the helper connection is alive.
+    /// </summary>
     public static void GetClipboardData_Prefix(SystemHelper __instance)
     {
         var connection = AccessTools.Field(typeof(SystemHelper), "connection").GetValue(__instance) as TcpClient;

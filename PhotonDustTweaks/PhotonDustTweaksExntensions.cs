@@ -15,18 +15,27 @@ internal static class PhotonDustTweaksExntensions
     private const string ADD_TO_LABEL = "[Mod] Add to parent ParticleStyle";
     private const string REMOVE_FROM_LABEL = "[Mod] Remove from parent ParticleStyle";
 
+    /// <summary>
+    /// Adds inspector buttons for a module.
+    /// </summary>
     public static void BuildInspectorUI(this IParticleSystemSubsystem module, UIBuilder ui)
     {
         ui.LocalButton(ADD_TO_LABEL, (button, _) => module.AddToStyle(button));
         ui.LocalButton(REMOVE_FROM_LABEL, (button, _) => module.RemoveFromStyle(button));
     }
 
+    /// <summary>
+    /// Creates a button with a local handler.
+    /// </summary>
     public static void LocalButton(this UIBuilder ui, in string label, ButtonEventHandler localAction)
     {
         var button = ui.Button(label);
         button.LocalPressed += localAction;
     }
 
+    /// <summary>
+    /// Adds the module to its parent style.
+    /// </summary>
     public static void AddToStyle(this IParticleSystemSubsystem module, IButton button)
     {
         if (module.Slot.GetComponentInParents<ParticleStyle>() is ParticleStyle style)
@@ -37,6 +46,9 @@ internal static class PhotonDustTweaksExntensions
         }
     }
 
+    /// <summary>
+    /// Removes the module from its parent style.
+    /// </summary>
     public static void RemoveFromStyle(this IParticleSystemSubsystem module, IButton button)
     {
         if (module.Slot.GetComponentInParents<ParticleStyle>() is ParticleStyle style)
@@ -54,6 +66,9 @@ internal static class PhotonDustTweaksExntensions
     }
 
 
+    /// <summary>
+    /// Adds inspector buttons for a particle style.
+    /// </summary>
     public static void BuildInspectorUI(this ParticleStyle style, UIBuilder ui)
     {
         ui.LocalButton(ADD_FROM_LABEL, (button, _) => style.AddFromStyle(button));
@@ -61,11 +76,17 @@ internal static class PhotonDustTweaksExntensions
         ui.LocalButton(DEDUPLICATE_LABEL, (button, _) => style.DeduplicateStyle(button));
     }
 
+    /// <summary>
+    /// Returns modules found in children.
+    /// </summary>
     public static List<IParticleSystemSubsystem> GetParticleModulesInChildren(this ParticleStyle style)
     {
         return style.Slot.GetComponentsInChildren<IParticleSystemSubsystem>(c => c != style && c is not ParticleEmitter);
     }
 
+    /// <summary>
+    /// Adds modules from children to the style.
+    /// </summary>
     public static void AddFromStyle(this ParticleStyle style, IButton button)
     {
         var modules = style.GetParticleModulesInChildren();
@@ -78,6 +99,9 @@ internal static class PhotonDustTweaksExntensions
         ResoniteMod.DebugFunc(() => $"Added {count} module(s) to {style}");
     }
 
+    /// <summary>
+    /// Replaces style modules with modules from children.
+    /// </summary>
     public static void ReplaceFromStyle(this ParticleStyle style, IButton button)
     {
         var modules = style.GetParticleModulesInChildren();
@@ -88,6 +112,9 @@ internal static class PhotonDustTweaksExntensions
         ResoniteMod.DebugFunc(() => $"Replaced {count} module(s) to {style}");
     }
 
+    /// <summary>
+    /// Removes duplicate modules from the style.
+    /// </summary>
     public static void DeduplicateStyle(this ParticleStyle style, IButton button)
     {
         var prevCount = style.Modules.Count;

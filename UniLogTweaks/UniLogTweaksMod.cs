@@ -13,31 +13,22 @@ using ResoniteHotReloadLib;
 namespace EsnyaTweaks.UniLogTweaks;
 
 /// <summary>
-/// Represents the UniLogTweaksMod which is a sealed class inheriting from ResoniteMod.
-/// This class provides the necessary configurations and methods to initialize and manage the mod.
+/// Tweaks UniLog behavior.
 /// </summary>
 public sealed class UniLogTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(UniLogTweaksMod).Assembly;
 
-    /// <summary>
-    /// Gets the name of the mod from the AssemblyTitle attribute of the assembly.
-    /// </summary>
+    /// <inheritdoc/>
     public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
 
-    /// <summary>
-    /// Gets the author of the mod from the AssemblyCompany attribute of the assembly.
-    /// </summary>
+    /// <inheritdoc/>
     public override string Author => ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
 
-    /// <summary>
-    /// Gets the version of the mod from the AssemblyInformationalVersion attribute of the assembly.
-    /// </summary>
+    /// <inheritdoc/>
     public override string Version => ModAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
-    /// <summary>
-    /// Gets the link to the repository of the mod from the AssemblyMetadata attribute of the assembly.
-    /// </summary>
+    /// <inheritdoc/>
     public override string Link => ModAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().First(meta => meta.Key == "RepositoryUrl").Value;
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
@@ -57,9 +48,7 @@ public sealed class UniLogTweaksMod : ResoniteMod
 
     internal static bool AddIndent => config?.TryGetValue(addIndent, out var value) != true || value;
 
-    /// <summary>
-    /// Initializes the mod.
-    /// </summary>
+    /// <inheritdoc/>
     public override void OnEngineInit()
     {
 #if DEBUG
@@ -78,7 +67,7 @@ public sealed class UniLogTweaksMod : ResoniteMod
 #if DEBUG
 
     /// <summary>
-    /// Called before hot reload.
+    /// Unpatches Harmony before recompiling.
     /// </summary>
     public static void BeforeHotReload()
     {
@@ -86,11 +75,10 @@ public sealed class UniLogTweaksMod : ResoniteMod
     }
 
 
-    /// <summary>
-    /// Called after hot reload.
-    /// </summary>
-    /// <param name="modInstance"></param>
 
+    /// <summary>
+    /// Re-initializes the mod after recompiling.
+    /// </summary>
     public static void OnHotReload(ResoniteMod modInstance)
     {
         Init(modInstance);
