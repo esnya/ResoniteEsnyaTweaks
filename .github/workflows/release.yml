@@ -31,7 +31,7 @@ jobs:
     - name: Get version from Directory.Build.props
       id: get_version
       run: |
-        VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" Directory.Build.props)
+        VERSION=$(grep -o '<Version>[^<]*</Version>' Directory.Build.props | sed -e 's/<Version>//' -e 's/<\/Version>//')
         echo "Version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Debug version info
