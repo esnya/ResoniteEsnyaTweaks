@@ -1,10 +1,12 @@
-name: .NET Build
+name: Build and Release EsnyaTweaks
 
 on:
   push:
     branches:
       - master
       - feature/ci
+      - ci
+      - ci/*
     tags:
       - v*
   pull_request:
@@ -12,60 +14,51 @@ on:
       - master
 
 permissions:
-  contents: write
-  actions: read
-  id-token: write
+  contents: read
 
 jobs:
-  vtag:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  prepare-release:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/ci' || startsWith(github.ref, 'refs/heads/ci/'))
     runs-on: ubuntu-latest
-    outputs:
-      tagged: ${{ steps.check-tag.outputs.tagged }}
-      version: ${{ steps.extract-version.outputs.version }}
-      tag: ${{ steps.extract-version.outputs.tag }}
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Extract version from Directory.Build.props
-        id: extract-version
-        run: |
-          VERSION=$(grep -o '<Version>[^<]*</Version>' Directory.Build.props | sed 's/<Version>\(.*\)<\/Version>/\1/')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
-          echo "Extracted version: $VERSION"
+    - name: Get version from Directory.Build.props
+      id: get_version
+      run: |
+        VERSION=$(grep -o '<Version>[^<]*</Version>' Directory.Build.props | sed -e 's/<Version>//' -e 's/<\/Version>//')
+        echo "Version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Check if tag exists
-        id: check-tag
-        run: |
-          TAG="v${{ steps.extract-version.outputs.version }}"
-          if git rev-parse --verify "refs/tags/$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists"
-            echo "tagged=false" >> $GITHUB_OUTPUT
-          else
-            echo "Tag $TAG does not exist, creating new tag"
-            echo "tagged=true" >> $GITHUB_OUTPUT
-          fi
+    - name: Debug version info
+      run: |
+        echo "Found version: ${{ steps.get_version.outputs.Version }}"
 
-      - name: Create and push tag
-        if: steps.check-tag.outputs.tagged == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG="v${{ steps.extract-version.outputs.version }}"
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git tag "$TAG"
-          git push origin "$TAG"
-          echo "Created and pushed tag: $TAG"
+    - name: Pull tags
+      run: git fetch --tags
+
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        if [ -z "$(git tag -l "v${{ steps.get_version.outputs.Version }}")" ]; then
+          echo "TagExists=false" >> $GITHUB_OUTPUT
+        else
+          echo "TagExists=true" >> $GITHUB_OUTPUT
+        fi
+    outputs:
+      should_release: ${{ steps.check_tag.outputs.TagExists == 'false' }}
+      version: ${{ steps.get_version.outputs.Version }}
 
   build:
-    if: always() && (needs.vtag.result == 'success' || needs.vtag.result == 'skipped') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-    needs: [vtag]
+    if: always() && (needs.prepare-release.result == 'success' || needs.prepare-release.result == 'skipped') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    needs: [prepare-release]
     runs-on: windows-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -86,41 +79,49 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check Steam Login Secret
-        id: check-steam
-        run: |
-          if [ -z "${{ secrets.STEAMLOGIN }}" ]; then
-            echo "steam-available=false" >> $GITHUB_OUTPUT
-            echo "Warning: STEAMLOGIN secret is not available"
-          else
-            echo "steam-available=true" >> $GITHUB_OUTPUT
-          fi
-        shell: bash
-
-      - name: Build
-        env:
-          STEAMLOGIN: ${{ secrets.STEAMLOGIN }}
-        uses: esnya/build-rml-mod@v1
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
         with:
-          project: ${{ github.workspace }}/${{ matrix.project }}
-          steam-login: ${{ steps.check-steam.outputs.steam-available == 'true' && secrets.STEAMLOGIN || '' }}
+          dotnet-version: '9.0.x'
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup RML environment
+        uses: esnya/setup-rml-env@v2
+        with:
+          steam-login: ${{ secrets.STEAMLOGIN }}
+
+      - name: Build RML mod
+        shell: pwsh
+        run: |
+          dotnet restore
+          dotnet build ${{ matrix.project }} --configuration Release --output ${{ github.workspace }}/${{ matrix.project }}/bin/Release/net472
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: bin/Release/${{ matrix.artifact }}
+          path: ${{ matrix.project }}/bin/Release/net472/${{ matrix.artifact }}
 
   release:
-    if: (github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/v')) || (needs.vtag.outputs.tagged == 'true')
-    needs:
-      - vtag
-      - build
+    if: needs.prepare-release.outputs.should_release == 'true'
+    needs: [build, prepare-release]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Create tag
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ needs.prepare-release.outputs.version }}"
+          git push origin "v${{ needs.prepare-release.outputs.version }}"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -136,12 +137,10 @@ jobs:
           echo "=== End debug ==="
 
       - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: softprops/action-gh-release@v2
         with:
           files: |
             **/*.dll
           generate_release_notes: true
-          tag_name: ${{ needs.vtag.outputs.tag || github.ref_name }}
+          tag_name: v${{ needs.prepare-release.outputs.version }}
 
