@@ -1,9 +1,2 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!-- Project-specific properties -->
-	<PropertyGroup>
-		<RootNamespace>EsnyaTweaks.UniLogTweaks</RootNamespace>
-		<AssemblyName>EsnyaTweaks.UniLogTweaks</AssemblyName>
-		<AssemblyTitle>EsnyaTweaks.UniLogTweaks</AssemblyTitle>
-		<Title>EsnyaTweaks.UniLogTweaks</Title>
-	</PropertyGroup>
 </Project>

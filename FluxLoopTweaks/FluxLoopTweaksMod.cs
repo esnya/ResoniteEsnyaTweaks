@@ -12,13 +12,18 @@ using ResoniteHotReloadLib;
 
 namespace EsnyaTweaks.FluxLoopTweaks;
 
+/// <inheritdoc/>
 public partial class FluxLoopTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(FluxLoopTweaksMod).Assembly;
 
+    /// <inheritdoc/>
     public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+    /// <inheritdoc/>
     public override string Author => ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+    /// <inheritdoc/>
     public override string Version => ModAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+    /// <inheritdoc/>
     public override string Link => ModAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().First(meta => meta.Key == "RepositoryUrl").Value;
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
@@ -29,8 +34,12 @@ public partial class FluxLoopTweaksMod : ResoniteMod
     [AutoRegisterConfigKey]
     private static readonly ModConfigurationKey<int> timeoutKey = new("Timeout", "Timeout for in milliseconds.", computeDefault: () => 30_000);
 
-    public static int TimeoutMs => (config?.TryGetValue(timeoutKey, out var timeout)) == true ? timeout : 30_000;
+    /// <summary>
+    /// Gets the timeout value in milliseconds for loop operations.
+    /// </summary>
+    public static int TimeoutMs => config?.GetValue(timeoutKey) ?? 30_000;
 
+    /// <inheritdoc/>
     public override void OnEngineInit()
     {
         Init(this);
@@ -47,11 +56,14 @@ public partial class FluxLoopTweaksMod : ResoniteMod
     }
 
 #if DEBUG
+    /// <inheritdoc/>
     public static void BeforeHotReload()
     {
         harmony.UnpatchAll(HarmonyId);
     }
 
+    /// <inheritdoc/>
+    /// <param name="modInstance">The mod instance.</param>
     public static void OnHotReload(ResoniteMod modInstance)
     {
         Init(modInstance);

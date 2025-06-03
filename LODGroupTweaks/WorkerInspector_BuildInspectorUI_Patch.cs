@@ -20,7 +20,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     private const string SETUP_LABEL = "[Mod] Setup LOD Levels by parts";
     private const string REMOVE_LABEL = "[Mod] Remove LODGroups from children";
 
-    static void Postfix(Worker worker, UIBuilder ui)
+    private static void Postfix(Worker worker, UIBuilder ui)
     {
         if (worker is LODGroup lodGroup)
         {
@@ -110,7 +110,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     private static void AddLOD(LODGroup lodGroup, float baseThreshold, in List<KeyValuePair<MeshRenderer, float>> rendererWithBounds)
     {
         var levelSize = rendererWithBounds.Last().Value;
-        lodGroup.AddLOD(baseThreshold / levelSize, rendererWithBounds.Select(p => p.Key).ToArray());
+        lodGroup.AddLOD(baseThreshold / levelSize, [.. rendererWithBounds.Select(p => p.Key)]);
     }
 
     private static void SetupByParts(Button _, LODGroup lodGroup)
@@ -170,7 +170,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     private static void RemoveFromChildren(Button button, LODGroup lodGroup)
     {
         var groups = lodGroup.Slot.GetComponentsInChildren<LODGroup>(c => c != lodGroup);
-        int count = 0;
+        var count = 0;
         foreach (var group in groups)
         {
             group.Destroy();

@@ -9,7 +9,7 @@ namespace EsnyaTweaks.PhotonDustTweaks;
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
 internal static class PhotonDust_WorkerInspector_BuildInspectorUI_Patch
 {
-    static void Postfix(Worker worker, UIBuilder ui)
+    private static void Postfix(Worker worker, UIBuilder ui)
     {
         if (worker is IParticleSystemSubsystem module)
         {

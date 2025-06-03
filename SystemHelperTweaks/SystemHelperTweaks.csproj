@@ -1,19 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<!-- Project-specific properties -->
 	<PropertyGroup>
-		<RootNamespace>EsnyaTweaks.SystemHelperTweaks</RootNamespace>
-		<AssemblyName>EsnyaTweaks.SystemHelperTweaks</AssemblyName>
-		<AssemblyTitle>EsnyaTweaks.SystemHelperTweaks</AssemblyTitle>
-		<Title>EsnyaTweaks.SystemHelperTweaks</Title>
 		<!-- Override the default repository URL for this project -->
 		<RepositoryUrl>https://github.com/esnya/EsnyaResoniteModTemplate</RepositoryUrl>
 	</PropertyGroup>
-
-	<!-- Project-specific references (SystemHelperClient) -->
-	<ItemGroup>
-		<Reference Include="SystemHelperClient">
-			<HintPath>$(ResonitePath)Resonite_Data\Managed\SystemHelperClient.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-	</ItemGroup>
 </Project>

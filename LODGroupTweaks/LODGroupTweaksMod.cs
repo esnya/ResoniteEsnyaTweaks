@@ -12,13 +12,18 @@ using ResoniteHotReloadLib;
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
+/// <inheritdoc/>
 public partial class LODGroupTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(LODGroupTweaksMod).Assembly;
 
+    /// <inheritdoc/>
     public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+    /// <inheritdoc/>
     public override string Author => ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+    /// <inheritdoc/>
     public override string Version => ModAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+    /// <inheritdoc/>
     public override string Link => ModAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().First(meta => meta.Key == "RepositoryUrl").Value;
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
@@ -26,6 +31,7 @@ public partial class LODGroupTweaksMod : ResoniteMod
 
     private static readonly Harmony harmony = new(HarmonyId);
 
+    /// <inheritdoc/>
     public override void OnEngineInit()
     {
         Init();
@@ -41,12 +47,14 @@ public partial class LODGroupTweaksMod : ResoniteMod
     }
 
 #if DEBUG
+    /// <inheritdoc/>
     public static void BeforeHotReload()
     {
         harmony.UnpatchAll(HarmonyId);
     }
 
-    public static void OnHotReload(ResoniteMod modInstance)
+    /// <inheritdoc/>
+    public static void OnHotReload(ResoniteMod _)
     {
         Init();
     }

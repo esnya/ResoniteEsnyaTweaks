@@ -1,0 +1,57 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{cs,csx,vb,vbx}]
+indent_style = space
+indent_size = 4
+
+# C# formatting and style rules
+[*.cs]
+
+# 'using' directive preferences
+csharp_style_namespace_declarations = file_scoped:warning
+
+# Wrapping preferences
+csharp_preserve_single_line_statements = false:warning
+
+# Style preferences - use var instead of explicit type
+csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = true:warning
+
+# Code analysis rules - Category-level settings (キツめ設定)
+dotnet_analyzer_diagnostic.category-design.severity = warning
+dotnet_analyzer_diagnostic.category-globalization.severity = warning
+dotnet_analyzer_diagnostic.category-interoperability.severity = warning
+dotnet_analyzer_diagnostic.category-maintainability.severity = warning
+dotnet_analyzer_diagnostic.category-naming.severity = warning
+dotnet_analyzer_diagnostic.category-performance.severity = warning
+dotnet_analyzer_diagnostic.category-security.severity = warning
+dotnet_analyzer_diagnostic.category-style.severity = warning
+dotnet_analyzer_diagnostic.category-usage.severity = warning
+dotnet_analyzer_diagnostic.category-reliability.severity = warning
+
+# IDE category-level settings for comprehensive IDE rule coverage
+dotnet_analyzer_diagnostic.category-CodeQuality.severity = warning
+dotnet_analyzer_diagnostic.category-Compiler.severity = warning
+dotnet_analyzer_diagnostic.category-Roslynator.severity = warning
+
+# Specific overrides for .NET Framework compatibility
+dotnet_diagnostic.CA2007.severity = none     # ConfigureAwait for .NET Framework is less relevant
+
+# IDE-specific overrides
+dotnet_diagnostic.IDE0058.severity = none    # Allow implicit discard of expression values
+
+[*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
+indent_size = 2
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

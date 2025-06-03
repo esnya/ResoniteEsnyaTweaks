@@ -1,9 +1,2 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!-- Project-specific properties -->
-	<PropertyGroup>
-		<RootNamespace>EsnyaTweaks.PhotonDustTweaks</RootNamespace>
-		<AssemblyName>EsnyaTweaks.PhotonDustTweaks</AssemblyName>
-		<AssemblyTitle>EsnyaTweaks.PhotonDustTweaks</AssemblyTitle>
-		<Title>EsnyaTweaks.PhotonDustTweaks</Title>
-	</PropertyGroup>
 </Project>

@@ -1,9 +1,2 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!-- Project-specific properties -->
-	<PropertyGroup>
-		<RootNamespace>EsnyaTweaks.LODGroupTweaks</RootNamespace>
-		<AssemblyName>EsnyaTweaks.LODGroupTweaks</AssemblyName>
-		<AssemblyTitle>EsnyaTweaks.LODGroupTweaks</AssemblyTitle>
-		<Title>EsnyaTweaks.LODGroupTweaks</Title>
-	</PropertyGroup>
 </Project>

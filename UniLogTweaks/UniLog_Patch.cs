@@ -10,7 +10,7 @@ namespace EsnyaTweaks.UniLogTweaks;
 internal static class UniLog_Patch
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static void Patch(ref string message, ref bool stackTrace, bool allowStackTrace)
+    private static void Patch(ref string message, ref bool stackTrace, bool allowStackTrace)
     {
         if (UniLogTweaksMod.AddIndent)
         {
@@ -24,16 +24,24 @@ internal static class UniLog_Patch
     }
 
 
-    [HarmonyPatch(nameof(UniLog.Log), new[] { typeof(string), typeof(bool) })]
+    [HarmonyPatch(nameof(UniLog.Log), [typeof(string), typeof(bool)])]
     [HarmonyPrefix]
-    internal static void Log_Prefix(ref string message, ref bool stackTrace) => Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowInfo);
-
+    internal static void Log_Prefix(ref string message, ref bool stackTrace)
+    {
+        Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowInfo);
+    }
 
     [HarmonyPatch(nameof(UniLog.Warning))]
     [HarmonyPrefix]
-    internal static void Warning_Prefix(ref string message, ref bool stackTrace) => Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowWarning);
+    internal static void Warning_Prefix(ref string message, ref bool stackTrace)
+    {
+        Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowWarning);
+    }
 
     [HarmonyPatch(nameof(UniLog.Error))]
     [HarmonyPrefix]
-    internal static void Error_Prefix(ref string message, ref bool stackTrace) => Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowError);
+    internal static void Error_Prefix(ref string message, ref bool stackTrace)
+    {
+        Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowError);
+    }
 }

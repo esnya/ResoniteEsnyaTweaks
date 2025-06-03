@@ -1,24 +1,5 @@
 <!-- This file contains common properties shared across all projects in this solution -->
 <Project>
-  <!-- Common build properties -->
-  <PropertyGroup>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-    <TargetFramework>net472</TargetFramework>
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <Deterministic>true</Deterministic>
-    <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
-    <DebugType Condition="'$(Configuration)'=='Debug'">embedded</DebugType>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <AnalysisLevel>latest-all</AnalysisLevel>
-    <WarningLevel>9999</WarningLevel>
-    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
-    <Platforms>AnyCPU;x64</Platforms>
-  </PropertyGroup>
-
   <!-- Common assembly metadata -->
   <PropertyGroup>
     <Authors>esnya</Authors>
@@ -27,17 +8,34 @@
     <PackageTags>Resonite,Mod,ResoniteModLoader</PackageTags>
     <Version>0.1.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Description></Description>
+  </PropertyGroup>
+
+  <!-- Common build properties -->
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
+    <DebugType Condition="'$(Configuration)'=='Debug'">embedded</DebugType>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <WarningLevel>9999</WarningLevel>
+    <Platforms>AnyCPU;x64</Platforms>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <!-- Derived properties -->
   <PropertyGroup>
     <Product>$(AssemblyTitle)</Product>
     <Copyright>Copyright (c) 2024 $(Authors)</Copyright>
-    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <DelaySign>False</DelaySign>
+
+    <!-- Auto-generate common properties from MSBuildProjectName -->
+    <RootNamespace Condition="'$(RootNamespace)'==''">EsnyaTweaks.$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName Condition="'$(AssemblyName)'==''">EsnyaTweaks.$(MSBuildProjectName)</AssemblyName>
+    <AssemblyTitle Condition="'$(AssemblyTitle)'==''">$(AssemblyName)</AssemblyTitle>
+    <Title Condition="'$(Title)'==''">$(AssemblyTitle)</Title>
   </PropertyGroup>
 
   <!-- Resonite path detection -->
@@ -56,4 +54,68 @@
     <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
   </PropertyGroup>
+
+  <!-- Common reference assemblies -->
+  <ItemGroup>
+    <Reference Include="ResoniteModLoader">
+      <HintPath>$(ResonitePath)Libraries\ResoniteModLoader.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HarmonyLib">
+      <HintPath>$(ResonitePath)rml_libs\0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')">$(ResonitePath)0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="FrooxEngine">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\FrooxEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Elements.Core">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\Elements.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Debug mode hot reload library -->
+    <Reference Include="ResoniteHotReloadLib" Condition="'$(Configuration)'=='Debug'">
+      <HintPath>$(ResonitePath)rml_libs\ResoniteHotReloadLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- ProtoFlux references (used by FluxLoopTweaks) -->
+    <Reference Include="ProtoFlux.Core">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ProtoFlux.Nodes.FrooxEngine">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- SystemHelper reference (used by SystemHelperTweaks) -->
+    <Reference Include="SystemHelperClient">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\SystemHelperClient.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Common editor config exclusion -->
+  <ItemGroup>
+    <EditorConfigFiles Remove="$(MSBuildThisFileDirectory)**\*.editorconfig" />
+  </ItemGroup>
+
+  <!-- Include common documentation files in all projects -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Link="README.md" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Link="LICENSE" />
+    <None Include="$(MSBuildThisFileDirectory).editorconfig" Link=".editorconfig" />
+    <None Include="$(MSBuildThisFileDirectory).gitignore" Link=".gitignore" />
+    <None Include="$(MSBuildThisFileDirectory).gitattributes" Link=".gitattributes" />
+    <None Include="$(MSBuildThisFileDirectory)Directory.Build.props" Link="Directory.Build.props" />
+    <None Include="$(MSBuildThisFileDirectory)Directory.Build.targets" Link="Directory.Build.targets" />
+    <None Include="$(MSBuildThisFileDirectory).github\workflows\release.yml" Link=".github\workflows\release.yml" />
+  </ItemGroup>
 </Project>

@@ -27,9 +27,9 @@ internal static class SystemHelper_Patch
         {
             ResoniteMod.Msg("Initializing system helper at: " + path);
             Engine.Current.InitProgress?.SetFixedPhase("Initializing System Helper");
-            AccessTools.PropertySetter(typeof(SystemHelper), "Current").Invoke(__instance, new object[] { __instance });
+            AccessTools.PropertySetter(typeof(SystemHelper), "Current").Invoke(__instance, [__instance]);
 
-            string text = Path.Combine(path, "SystemHelperServer.exe");
+            var text = Path.Combine(path, "SystemHelperServer.exe");
             ResoniteMod.Msg("System Helper Executable: " + text);
             if (!File.Exists(text))
             {
@@ -37,7 +37,7 @@ internal static class SystemHelper_Patch
                 return false;
             }
 
-            AccessTools.PropertySetter(typeof(SystemHelper), "Initialized").Invoke(__instance, new object[] { true });
+            AccessTools.PropertySetter(typeof(SystemHelper), "Initialized").Invoke(__instance, [true]);
 
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, 0));
             tcpListener.Start();
@@ -106,7 +106,7 @@ internal static class SystemHelper_Patch
     }
 #pragma warning restore CA1031
 
-    [HarmonyPatch(MethodType.Constructor, new[] { typeof(string) })]
+    [HarmonyPatch(MethodType.Constructor, [typeof(string)])]
     [HarmonyPrefix]
     public static bool Ctor_Prefix(ref SystemHelper __instance, string path)
     {

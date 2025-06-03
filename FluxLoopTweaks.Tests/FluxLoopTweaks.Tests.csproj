@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Test project properties -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!-- xUnit v3 packages -->
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" Version="2.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.1.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+  </ItemGroup>
+
+  <!-- Reference to the main project -->
+  <ItemGroup>
+    <ProjectReference Include="..\FluxLoopTweaks\FluxLoopTweaks.csproj" />
+  </ItemGroup>
+
+  <!-- Test-specific references (same as main project for testing) -->
+  <ItemGroup>
+    <Reference Include="ProtoFlux.Core">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ProtoFlux.Nodes.FrooxEngine">
+      <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
