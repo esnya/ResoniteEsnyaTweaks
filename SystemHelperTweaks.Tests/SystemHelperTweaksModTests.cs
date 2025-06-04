@@ -4,7 +4,7 @@ using Xunit;
 
 namespace EsnyaTweaks.SystemHelperTweaks.Tests;
 
-internal static class SystemHelperTweaksModTests
+public static class SystemHelperTweaksModTests
 {
     [Fact]
     public static void Mod_Should_Have_Valid_Name()

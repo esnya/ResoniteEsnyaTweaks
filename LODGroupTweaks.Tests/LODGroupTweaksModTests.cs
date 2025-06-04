@@ -4,7 +4,7 @@ using Xunit;
 
 namespace EsnyaTweaks.LODGroupTweaks.Tests;
 
-internal static class LODGroupTweaksModTests
+public static class LODGroupTweaksModTests
 {
     [Fact]
     public static void Mod_Should_Have_Valid_Name()

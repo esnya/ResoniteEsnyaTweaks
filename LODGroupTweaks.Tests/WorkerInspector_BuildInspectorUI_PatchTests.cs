@@ -11,7 +11,7 @@ using Xunit;
 
 namespace EsnyaTweaks.LODGroupTweaks.Tests;
 
-internal static class WorkerInspector_BuildInspectorUI_PatchTests
+public static class WorkerInspector_BuildInspectorUI_PatchTests
 {
     [Fact]
     public static void Patch_Should_Have_HarmonyPatch_Attribute()

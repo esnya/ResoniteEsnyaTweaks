@@ -4,7 +4,7 @@ using Xunit;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
-internal static class UniLogTweaksModTests
+public static class UniLogTweaksModTests
 {
     [Fact]
     public static void Mod_Should_Have_Valid_Name()

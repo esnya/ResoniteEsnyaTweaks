@@ -5,7 +5,7 @@ using Xunit;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
-internal static class UniLog_PatchBehaviorTests
+public static class UniLog_PatchBehaviorTests
 {
     private static Type GetPatchType()
     {

@@ -18,6 +18,11 @@ internal static class SystemHelper_Patch
 #pragma warning disable CA1031
     private static bool StartSystemHelper(SystemHelper __instance, string path)
     {
+        if (__instance == null || string.IsNullOrEmpty(path))
+        {
+            return false;
+        }
+
         systemHelperPath = path;
         TcpListener? tcpListener = null;
         System.Diagnostics.Process? process = null;
@@ -25,7 +30,10 @@ internal static class SystemHelper_Patch
         try
         {
             ResoniteMod.Msg("Initializing system helper at: " + path);
-            Engine.Current.InitProgress?.SetFixedPhase("Initializing System Helper");
+            if (Engine.Current?.InitProgress != null)
+            {
+                Engine.Current.InitProgress.SetFixedPhase("Initializing System Helper");
+            }
             AccessTools
                 .PropertySetter(typeof(SystemHelper), "Current")
                 .Invoke(__instance, [__instance]);
@@ -73,24 +81,30 @@ internal static class SystemHelper_Patch
             AccessTools.Field(typeof(SystemHelper), "reader").SetValue(__instance, reader);
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
-            Engine.Current.OnShutdownRequest += (_) =>
+            if (Engine.Current != null)
             {
-                try
+                Engine.Current.OnShutdownRequest += (_) =>
                 {
-                    reader.Close();
-                    writer.Close();
-                    connection.Close();
-                    process.Kill();
-                }
-                catch (Exception ex)
-                {
-                    ResoniteMod.Error("Error while closing SystemHelper connection");
-                    ResoniteMod.Error(ex);
-                }
-            };
+                    try
+                    {
+                        reader.Close();
+                        writer.Close();
+                        connection.Close();
+                        process.Kill();
+                    }
+                    catch (Exception ex)
+                    {
+                        ResoniteMod.Error("Error while closing SystemHelper connection");
+                        ResoniteMod.Error(ex);
+                    }
+                };
+            }
 
             ResoniteMod.Msg("System Helper initialized");
-            Engine.Current.InitProgress?.SetFixedPhase("System Helper Initialized");
+            if (Engine.Current?.InitProgress != null)
+            {
+                Engine.Current.InitProgress.SetFixedPhase("System Helper Initialized");
+            }
             return false;
         }
         catch (Exception ex)
@@ -105,10 +119,21 @@ internal static class SystemHelper_Patch
 
         process?.Kill();
         ResoniteMod.Msg("Retrying after 3s...");
-        Engine.Current.InitProgress?.SetFixedPhase("Retrying System Helper Initialization");
+        if (Engine.Current?.InitProgress != null)
+        {
+            Engine.Current.InitProgress.SetFixedPhase("Retrying System Helper Initialization");
+        }
         Task.Delay(3_000).Wait();
 
-        return StartSystemHelper(__instance, path);
+        try
+        {
+            return StartSystemHelper(__instance, path);
+        }
+        catch (Exception ex)
+        {
+            ResoniteMod.Error($"Recursive restart failed: {ex.Message}");
+            return false;
+        }
     }
 #pragma warning restore CA1031
 
@@ -124,15 +149,53 @@ internal static class SystemHelper_Patch
     [HarmonyPrefix]
     public static void GetClipboardData_Prefix(SystemHelper __instance)
     {
-        var connection =
-            AccessTools.Field(typeof(SystemHelper), "connection").GetValue(__instance) as TcpClient;
-        if ((connection is not null && connection.Connected) || systemHelperPath is null)
+        if (__instance == null || systemHelperPath is null)
         {
             return;
         }
 
+        try
+        {
+            var connectionField = AccessTools.Field(typeof(SystemHelper), "connection");
+            var connection = connectionField?.GetValue(__instance) as TcpClient;
+
+            if (connection is not null && connection.Connected)
+            {
+                return;
+            }
+        }
+        catch (ObjectDisposedException ex)
+        {
+            ResoniteMod.Debug($"Connection was disposed: {ex.Message}");
+            // Continue to restart attempt
+        }
+        catch (InvalidOperationException ex)
+        {
+            ResoniteMod.Debug($"Invalid connection operation: {ex.Message}");
+            // Continue to restart attempt
+        }
+
         ResoniteMod.Error("SystemHelper connection is not available. Restarting...");
 
-        StartSystemHelper(__instance, systemHelperPath);
+        try
+        {
+            StartSystemHelper(__instance, systemHelperPath);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            ResoniteMod.Error($"Access denied when starting SystemHelper: {ex.Message}");
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            ResoniteMod.Error($"Failed to start SystemHelper process: {ex.Message}");
+        }
+        catch (DirectoryNotFoundException ex)
+        {
+            ResoniteMod.Error($"SystemHelper directory not found: {ex.Message}");
+        }
+        catch (FileNotFoundException ex)
+        {
+            ResoniteMod.Error($"SystemHelper executable not found: {ex.Message}");
+        }
     }
 }
