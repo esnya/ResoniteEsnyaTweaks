@@ -1,5 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluxLoopTweaks\FluxLoopTweaks.csproj" />
+    <Compile Include="..\FluxLoopTweaks\While_Run_Patch.cs" Link="While_Run_Patch.cs" />
+    <Compile
+      Include="..\FluxLoopTweaks\AsyncWhile_RunAsync_Patch.cs"
+      Link="AsyncWhile_RunAsync_Patch.cs"
+    />
+    <Compile Include="TestStubs.cs" />
   </ItemGroup>
 </Project>
