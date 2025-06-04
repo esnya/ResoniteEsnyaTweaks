@@ -23,7 +23,6 @@ internal static class UniLog_Patch
         }
     }
 
-
     [HarmonyPatch(nameof(UniLog.Log), [typeof(string), typeof(bool)])]
     [HarmonyPrefix]
     internal static void Log_Prefix(ref string message, ref bool stackTrace)

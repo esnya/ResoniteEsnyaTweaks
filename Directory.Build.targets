@@ -1,12 +1,21 @@
-<!-- This file contains common build targets shared across all projects in this solution -->
 <Project>
-  <!-- Custom Install target that always copies to mods folder -->
   <Target Name="Install">
     <Message Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods" Importance="high" />
-    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods" ContinueOnError="true" />
-
-    <!-- Also copy to HotReloadMods if Debug configuration -->
-    <Message Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods for hot reload (Debug configuration detected)" Importance="high" Condition="'$(Configuration)'=='Debug'" />
-    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods" ContinueOnError="true" Condition="'$(Configuration)'=='Debug'" />
+    <Copy
+      SourceFiles="$(TargetDir)$(TargetFileName)"
+      DestinationFolder="$(ResonitePath)rml_mods"
+      ContinueOnError="true"
+    />
+    <Message
+      Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods"
+      Importance="high"
+      Condition="'$(Configuration)'=='Debug'"
+    />
+    <Copy
+      SourceFiles="$(TargetDir)$(TargetFileName)"
+      DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods"
+      ContinueOnError="true"
+      Condition="'$(Configuration)'=='Debug'"
+    />
   </Target>
 </Project>

@@ -21,7 +21,11 @@ internal static class PhotonDustTweaksExtensions
         ui.LocalButton(REMOVE_FROM_LABEL, (button, _) => module.RemoveFromStyle(button));
     }
 
-    public static void LocalButton(this UIBuilder ui, in string label, ButtonEventHandler localAction)
+    public static void LocalButton(
+        this UIBuilder ui,
+        in string label,
+        ButtonEventHandler localAction
+    )
     {
         var button = ui.Button(label);
         button.LocalPressed += localAction;
@@ -47,12 +51,12 @@ internal static class PhotonDustTweaksExtensions
 
             if (removed > 0)
             {
-                button.LabelText = $"{REMOVE_FROM_LABEL} (Removed {removed} items from {style.Slot.Name}.{style.Name})";
+                button.LabelText =
+                    $"{REMOVE_FROM_LABEL} (Removed {removed} items from {style.Slot.Name}.{style.Name})";
                 ResoniteMod.DebugFunc(() => $"Removed {removed} module(s) from {style}");
             }
         }
     }
-
 
     public static void BuildInspectorUI(this ParticleStyle style, UIBuilder ui)
     {
@@ -61,9 +65,13 @@ internal static class PhotonDustTweaksExtensions
         ui.LocalButton(DEDUPLICATE_LABEL, (button, _) => style.DeduplicateStyle(button));
     }
 
-    public static List<IParticleSystemSubsystem> GetParticleModulesInChildren(this ParticleStyle style)
+    public static List<IParticleSystemSubsystem> GetParticleModulesInChildren(
+        this ParticleStyle style
+    )
     {
-        return style.Slot.GetComponentsInChildren<IParticleSystemSubsystem>(c => c != style && c is not ParticleEmitter);
+        return style.Slot.GetComponentsInChildren<IParticleSystemSubsystem>(c =>
+            c != style && c is not ParticleEmitter
+        );
     }
 
     public static void AddFromStyle(this ParticleStyle style, IButton button)
@@ -74,7 +82,8 @@ internal static class PhotonDustTweaksExtensions
         style.Modules.AddRangeUnique(modules);
         var count = style.Modules.Count - prevCount;
 
-        button.LabelText = $"{ADD_FROM_LABEL} (Added {count} items to {style.Slot.Name}.{style.Name})";
+        button.LabelText =
+            $"{ADD_FROM_LABEL} (Added {count} items to {style.Slot.Name}.{style.Name})";
         ResoniteMod.DebugFunc(() => $"Added {count} module(s) to {style}");
     }
 
@@ -84,7 +93,8 @@ internal static class PhotonDustTweaksExtensions
         style.Modules.Clear();
         style.Modules.AddRange(modules);
         var count = modules.Count;
-        button.LabelText = $"{ADD_FROM_LABEL} (Replaced {count} items to {style.Slot.Name}.{style.Name})";
+        button.LabelText =
+            $"{ADD_FROM_LABEL} (Replaced {count} items to {style.Slot.Name}.{style.Name})";
         ResoniteMod.DebugFunc(() => $"Replaced {count} module(s) to {style}");
     }
 
@@ -95,7 +105,8 @@ internal static class PhotonDustTweaksExtensions
         style.Modules.Clear();
         style.Modules.AddRangeUnique(modules);
         var count = prevCount - style.Modules.Count;
-        button.LabelText = $"{DEDUPLICATE_LABEL} (Removed {count} items from {style.Slot.Name}.{style.Name})";
+        button.LabelText =
+            $"{DEDUPLICATE_LABEL} (Removed {count} items from {style.Slot.Name}.{style.Name})";
         ResoniteMod.DebugFunc(() => $"Deduplicated {count} module(s) from {style}");
     }
 }

@@ -1,17 +1,22 @@
+using System.Collections.Generic;
+using System.Reflection.Emit;
 using Elements.Core;
 using EsnyaTweaks.Attributes;
 using FrooxEngine;
 using HarmonyLib;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace EsnyaTweaks.Patches;
 
-[HarmonyPatchCategory("ObjectScroller"), TweakDescription("Fix Scaling of ObjectScroller (Only local).", defaultValue: false)]
+[
+    HarmonyPatchCategory("ObjectScroller"),
+    TweakDescription("Fix Scaling of ObjectScroller (Only local).", defaultValue: false)
+]
 [HarmonyPatch(typeof(ObjectScroller), "OnChanges")]
 internal static class ObjectScroller_OnChanges_Patch
 {
-    internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    internal static IEnumerable<CodeInstruction> Transpiler(
+        IEnumerable<CodeInstruction> instructions
+    )
     {
         var mathxMin = typeof(MathX).Method(nameof(MathX.Min), new[] { typeof(float[]) });
 
@@ -28,7 +33,6 @@ internal static class ObjectScroller_OnChanges_Patch
                 yield return CodeInstruction.LoadLocal(12);
                 yield return new CodeInstruction(OpCodes.Stelem_R4);
                 yield return instruction;
-
             }
             else
             {

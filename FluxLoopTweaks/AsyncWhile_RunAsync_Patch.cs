@@ -1,12 +1,12 @@
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 using ProtoFlux.Runtimes.Execution.Nodes;
 using ResoniteModLoader;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace EsnyaTweaks.FluxLoopTweaks;
 
@@ -14,7 +14,15 @@ namespace EsnyaTweaks.FluxLoopTweaks;
 internal static class AsyncWhile_RunAsync_Patch
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static async Task<IOperation> RunAsync(AsyncWhile instance, FrooxEngineContext context, ValueInput<bool> Condition, AsyncCall LoopStart, AsyncCall LoopIteration, Continuation LoopEnd, int timeout)
+    private static async Task<IOperation> RunAsync(
+        AsyncWhile instance,
+        FrooxEngineContext context,
+        ValueInput<bool> Condition,
+        AsyncCall LoopStart,
+        AsyncCall LoopIteration,
+        Continuation LoopEnd,
+        int timeout
+    )
     {
         await LoopStart.ExecuteAsync(context).ConfigureAwait(true);
 
@@ -30,9 +38,16 @@ internal static class AsyncWhile_RunAsync_Patch
             }
             else if (stopwatch.ElapsedMilliseconds > timeout || context.AbortExecution)
             {
-                ResoniteMod.Warn($"AsyncWhile Timedout: {instance} ({stopwatch.ElapsedMilliseconds}ms)");
+                ResoniteMod.Warn(
+                    $"AsyncWhile Timedout: {instance} ({stopwatch.ElapsedMilliseconds}ms)"
+                );
                 context.AbortExecution = true;
-                throw new ExecutionAbortedException(instance.Runtime as IExecutionRuntime, instance, LoopIteration.Target, isAsync: true);
+                throw new ExecutionAbortedException(
+                    instance.Runtime as IExecutionRuntime,
+                    instance,
+                    LoopIteration.Target,
+                    isAsync: true
+                );
             }
             previousTick = currentTick;
 
@@ -41,14 +56,26 @@ internal static class AsyncWhile_RunAsync_Patch
         return LoopEnd.Target;
     }
 
-    internal static bool Prefix(AsyncWhile __instance, ExecutionContext context, ref Task<IOperation> __result)
+    internal static bool Prefix(
+        AsyncWhile __instance,
+        ExecutionContext context,
+        ref Task<IOperation> __result
+    )
     {
         if (context is not FrooxEngineContext frooxEngineContext)
         {
             return true;
         }
 
-        __result = RunAsync(__instance, frooxEngineContext, __instance.Condition, __instance.LoopStart, __instance.LoopIteration, __instance.LoopEnd, FluxLoopTweaksMod.TimeoutMs);
+        __result = RunAsync(
+            __instance,
+            frooxEngineContext,
+            __instance.Condition,
+            __instance.LoopStart,
+            __instance.LoopIteration,
+            __instance.LoopEnd,
+            FluxLoopTweaksMod.TimeoutMs
+        );
         return false;
     }
 }
