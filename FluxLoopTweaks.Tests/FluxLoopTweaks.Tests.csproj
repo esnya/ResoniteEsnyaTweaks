@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile
-      Include="..\FluxLoopTweaks\AsyncWhile_RunAsync_Patch.cs"
-      Link="AsyncWhile_RunAsync_Patch.cs"
-    />
-    <Compile Include="..\FluxLoopTweaks\While_Run_Patch.cs" Link="While_Run_Patch.cs" />
-    <Compile Include="Stubs\**\*.cs" />
+    <Compile Include="**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FluxLoopTweaks\FluxLoopTweaks.csproj" />
   </ItemGroup>
 </Project>

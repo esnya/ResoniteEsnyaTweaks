@@ -6,7 +6,7 @@ using Xunit;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
-public static class UniLog_PatchTests
+internal static class UniLog_PatchTests
 {
     private static System.Type GetPatchType()
     {

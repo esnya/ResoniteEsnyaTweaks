@@ -6,7 +6,7 @@ using Xunit;
 
 namespace EsnyaTweaks.SystemHelperTweaks.Tests;
 
-public static class SystemHelper_PatchTests
+internal static class SystemHelper_PatchTests
 {
     private static System.Type GetPatchType()
     {

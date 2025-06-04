@@ -4,7 +4,7 @@ using Xunit;
 
 namespace EsnyaTweaks.PhotonDustTweaks.Tests;
 
-public static class PhotonDustTweaksModTests
+internal static class PhotonDustTweaksModTests
 {
     [Fact]
     public static void Mod_Should_Have_Valid_Name()

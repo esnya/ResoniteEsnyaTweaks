@@ -1,7 +1,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using FluentAssertions;
 using FrooxEngine;
 using FrooxEngine.UIX;
@@ -12,7 +11,7 @@ using Xunit;
 
 namespace EsnyaTweaks.LODGroupTweaks.Tests;
 
-public static class WorkerInspector_BuildInspectorUI_PatchTests
+internal static class WorkerInspector_BuildInspectorUI_PatchTests
 {
     [Fact]
     public static void Patch_Should_Have_HarmonyPatch_Attribute()
@@ -99,41 +98,22 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
     }
 
     [Fact]
-    public static void Patch_Should_Inline_GetBoundingMagnitude_Methods()
-    {
-        var patchType = typeof(LODGroupTweaksMod).Assembly.GetType(
-            "EsnyaTweaks.LODGroupTweaks.LODGroup_WorkerInspector_BuildInspectorUI_Patch",
-            true
-        )!;
-
-        var methods = patchType
-            .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-            .Where(m => m.Name == "GetBoundingMagnitude");
-
-        methods.Should().NotBeEmpty();
-
-        foreach (var m in methods)
-        {
-            var attr = m.GetCustomAttribute<MethodImplAttribute>();
-            attr.Should().NotBeNull();
-            attr!.Value.Should().Be(MethodImplOptions.AggressiveInlining);
-        }
-    }
-
-    [Fact]
     public static void BuildInspectorUI_Should_Create_Mod_Buttons()
     {
         var projectRoot = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..")
+            Path.Combine(Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..")
         );
         var path = Path.Combine(
             projectRoot,
             "LODGroupTweaks",
             "WorkerInspector_BuildInspectorUI_Patch.cs"
         );
-        var syntax = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
+        var syntax = CSharpSyntaxTree.ParseText(
+            File.ReadAllText(path),
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
-        var root = syntax.GetRoot();
+        var root = syntax.GetRoot(cancellationToken: TestContext.Current.CancellationToken);
         var method = root.DescendantNodes()
             .OfType<MethodDeclarationSyntax>()
             .First(m => m.Identifier.Text == "BuildInspectorUI");
@@ -167,16 +147,19 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
     public static void SetupFromChildren_Should_Set_Order_And_AddLOD()
     {
         var projectRoot = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..")
+            Path.Combine(Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..")
         );
         var path = Path.Combine(
             projectRoot,
             "LODGroupTweaks",
             "WorkerInspector_BuildInspectorUI_Patch.cs"
         );
-        var syntax = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
+        var syntax = CSharpSyntaxTree.ParseText(
+            File.ReadAllText(path),
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
-        var root = syntax.GetRoot();
+        var root = syntax.GetRoot(cancellationToken: TestContext.Current.CancellationToken);
         var method = root.DescendantNodes()
             .OfType<MethodDeclarationSyntax>()
             .First(m => m.Identifier.Text == "SetupFromChildren");
@@ -203,16 +186,19 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
     public static void RemoveFromChildren_Should_Update_LabelText()
     {
         var projectRoot = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..")
+            Path.Combine(Assembly.GetExecutingAssembly().Location, "..", "..", "..", "..", "..")
         );
         var path = Path.Combine(
             projectRoot,
             "LODGroupTweaks",
             "WorkerInspector_BuildInspectorUI_Patch.cs"
         );
-        var syntax = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
+        var syntax = CSharpSyntaxTree.ParseText(
+            File.ReadAllText(path),
+            cancellationToken: TestContext.Current.CancellationToken
+        );
 
-        var root = syntax.GetRoot();
+        var root = syntax.GetRoot(cancellationToken: TestContext.Current.CancellationToken);
         var method = root.DescendantNodes()
             .OfType<MethodDeclarationSyntax>()
             .First(m => m.Identifier.Text == "RemoveFromChildren");

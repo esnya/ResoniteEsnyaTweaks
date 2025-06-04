@@ -6,7 +6,7 @@ using Xunit;
 
 namespace EsnyaTweaks.PhotonDustTweaks.Tests;
 
-public static class WorkerInspector_BuildInspectorUI_PatchTests
+internal static class WorkerInspector_BuildInspectorUI_PatchTests
 {
     [Fact]
     public static void Patch_Should_Have_HarmonyPatch_Attribute()
