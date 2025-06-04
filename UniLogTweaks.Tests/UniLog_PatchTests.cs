@@ -10,7 +10,10 @@ public static class UniLog_PatchTests
 {
     private static System.Type GetPatchType()
     {
-        return typeof(UniLogTweaksMod).Assembly.GetType("EsnyaTweaks.UniLogTweaks.UniLog_Patch", true)!;
+        return typeof(UniLogTweaksMod).Assembly.GetType(
+            "EsnyaTweaks.UniLogTweaks.UniLog_Patch",
+            true
+        )!;
     }
 
     [Fact]
