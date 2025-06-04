@@ -1,11 +1,8 @@
+using System.Linq;
+using System.Reflection;
 using Elements.Core;
 using HarmonyLib;
 using ResoniteModLoader;
-using System.Linq;
-using System.Reflection;
-
-
-
 #if DEBUG
 using ResoniteHotReloadLib;
 #endif
@@ -19,15 +16,25 @@ public partial class SystemHelperTweaksMod : ResoniteMod
 
     /// <inheritdoc/>
     public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+
     /// <inheritdoc/>
-    public override string Author => ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+    public override string Author =>
+        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+
     /// <inheritdoc/>
-    public override string Version => ModAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+    public override string Version =>
+        ModAssembly
+            .GetCustomAttribute<AssemblyVersionAttribute>()
+            .Version;
+
     /// <inheritdoc/>
-    public override string Link => ModAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().First(meta => meta.Key == "RepositoryUrl").Value;
+    public override string Link =>
+        ModAssembly
+            .GetCustomAttributes<AssemblyMetadataAttribute>()
+            .First(meta => meta.Key == "RepositoryUrl")
+            .Value;
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
-
 
     private static readonly Harmony harmony = new(HarmonyId);
 

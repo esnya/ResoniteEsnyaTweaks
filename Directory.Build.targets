@@ -3,10 +3,34 @@
   <!-- Custom Install target that always copies to mods folder -->
   <Target Name="Install">
     <Message Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods" Importance="high" />
-    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods" ContinueOnError="true" />
-
+    <Copy
+      SourceFiles="$(TargetDir)$(TargetFileName)"
+      DestinationFolder="$(ResonitePath)rml_mods"
+      ContinueOnError="true"
+    />
     <!-- Also copy to HotReloadMods if Debug configuration -->
-    <Message Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods for hot reload (Debug configuration detected)" Importance="high" Condition="'$(Configuration)'=='Debug'" />
-    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods" ContinueOnError="true" Condition="'$(Configuration)'=='Debug'" />
+    <Message
+      Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods for hot reload (Debug configuration detected)"
+      Importance="high"
+      Condition="'$(Configuration)'=='Debug'"
+    />
+    <Copy
+      SourceFiles="$(TargetDir)$(TargetFileName)"
+      DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods"
+      ContinueOnError="true"
+      Condition="'$(Configuration)'=='Debug'"
+    />
   </Target>
+
+  <!-- Test coverage configuration for test projects -->
+  <PropertyGroup Condition="$(IsTestProject) == 'true'">
+    <!-- Include all assemblies from this solution -->
+    <Include>[EsnyaTweaks.*]*</Include>
+    <!-- Exclude test assemblies and auto-generated code -->
+    <Exclude>[*.Tests]*,[*]*.Program,[*]*Attribute</Exclude>
+    <!-- Exclude files (wildcards supported) -->
+    <ExcludeByFile>**/*Designer.cs,**/obj/**/*</ExcludeByFile>
+    <!-- Skip auto props -->
+    <SkipAutoProps>true</SkipAutoProps>
+  </PropertyGroup>
 </Project>

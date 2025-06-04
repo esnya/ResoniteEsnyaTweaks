@@ -13,7 +13,6 @@ namespace EsnyaTweaks.SystemHelperTweaks;
 [HarmonyPatch(typeof(SystemHelper))]
 internal static class SystemHelper_Patch
 {
-
     private static string? systemHelperPath;
 
 #pragma warning disable CA1031
@@ -27,7 +26,9 @@ internal static class SystemHelper_Patch
         {
             ResoniteMod.Msg("Initializing system helper at: " + path);
             Engine.Current.InitProgress?.SetFixedPhase("Initializing System Helper");
-            AccessTools.PropertySetter(typeof(SystemHelper), "Current").Invoke(__instance, [__instance]);
+            AccessTools
+                .PropertySetter(typeof(SystemHelper), "Current")
+                .Invoke(__instance, [__instance]);
 
             var text = Path.Combine(path, "SystemHelperServer.exe");
             ResoniteMod.Msg("System Helper Executable: " + text);
@@ -37,14 +38,19 @@ internal static class SystemHelper_Patch
                 return false;
             }
 
-            AccessTools.PropertySetter(typeof(SystemHelper), "Initialized").Invoke(__instance, [true]);
+            AccessTools
+                .PropertySetter(typeof(SystemHelper), "Initialized")
+                .Invoke(__instance, [true]);
 
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, 0));
             tcpListener.Start();
 
             ResoniteMod.Msg("Listening on: " + ((IPEndPoint)tcpListener.LocalEndpoint).Port);
 
-            process = System.Diagnostics.Process.Start(text, $"{((IPEndPoint)tcpListener.LocalEndpoint).Port}");
+            process = System.Diagnostics.Process.Start(
+                text,
+                $"{((IPEndPoint)tcpListener.LocalEndpoint).Port}"
+            );
 
             var blockingTask = Task.Run(() => tcpListener.AcceptTcpClient());
             if (!blockingTask.Wait(10_000))
@@ -118,7 +124,8 @@ internal static class SystemHelper_Patch
     [HarmonyPrefix]
     public static void GetClipboardData_Prefix(SystemHelper __instance)
     {
-        var connection = AccessTools.Field(typeof(SystemHelper), "connection").GetValue(__instance) as TcpClient;
+        var connection =
+            AccessTools.Field(typeof(SystemHelper), "connection").GetValue(__instance) as TcpClient;
         if ((connection is not null && connection.Connected) || systemHelperPath is null)
         {
             return;

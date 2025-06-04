@@ -14,7 +14,9 @@ internal static class PhotonDust_WorkerInspector_BuildInspectorUI_Patch
         if (worker is IParticleSystemSubsystem module)
         {
             module.BuildInspectorUI(ui);
-            ResoniteMod.DebugFunc(() => $"ParticleSystem module {module} found. Building inspector UI...");
+            ResoniteMod.DebugFunc(() =>
+                $"ParticleSystem module {module} found. Building inspector UI..."
+            );
         }
         if (worker is ParticleStyle style)
         {

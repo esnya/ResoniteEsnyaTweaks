@@ -9,7 +9,19 @@
     <Version>0.1.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
+  <!-- Derived properties -->
+  <PropertyGroup>
+    <Product>$(AssemblyTitle)</Product>
+    <Copyright>Copyright (c) 2024 $(Authors)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- Auto-generate common properties from MSBuildProjectName -->
+    <RootNamespace Condition="'$(RootNamespace)'==''"
+      >EsnyaTweaks.$(MSBuildProjectName)</RootNamespace
+    >
+    <AssemblyName Condition="'$(AssemblyName)'==''">EsnyaTweaks.$(MSBuildProjectName)</AssemblyName>
+    <AssemblyTitle Condition="'$(AssemblyTitle)'==''">$(AssemblyName)</AssemblyTitle>
+    <Title Condition="'$(Title)'==''">$(AssemblyTitle)</Title>
+  </PropertyGroup>
   <!-- Common build properties -->
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -24,98 +36,126 @@
     <Platforms>AnyCPU;x64</Platforms>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <!-- Derived properties -->
-  <PropertyGroup>
-    <Product>$(AssemblyTitle)</Product>
-    <Copyright>Copyright (c) 2024 $(Authors)</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-
-    <!-- Auto-generate common properties from MSBuildProjectName -->
-    <RootNamespace Condition="'$(RootNamespace)'==''">EsnyaTweaks.$(MSBuildProjectName)</RootNamespace>
-    <AssemblyName Condition="'$(AssemblyName)'==''">EsnyaTweaks.$(MSBuildProjectName)</AssemblyName>
-    <AssemblyTitle Condition="'$(AssemblyTitle)'==''">$(AssemblyName)</AssemblyTitle>
-    <Title Condition="'$(Title)'==''">$(AssemblyTitle)</Title>
+  <!-- Test build properties -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Coverage configuration -->
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <TreatWarningsAsErrors Condition="'$(Configuration)'=='Release'">true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <!-- Resonite path detection -->
   <PropertyGroup Condition="'$(ResonitePath)'==''">
     <!-- If you don't want to provide a ResonitePath in dotnet build, you can specify one here -->
     <ResonitePath>$(MSBuildThisFileDirectory)Resonite/</ResonitePath>
-    <!-- GitHub Actions build-rml-mod action installs to project-specific Resonite directory -->
-    <ResonitePath Condition="Exists('$(MSBuildProjectDirectory)\Resonite\')">$(MSBuildProjectDirectory)\Resonite\</ResonitePath>
-    <!-- Standard Steam installation paths -->
-    <ResonitePath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')">C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath>
-    <ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')">$(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath>
-    <!-- Alternative Steam paths -->
-    <ResonitePath Condition="Exists('C:\Program Files\Steam\steamapps\common\Resonite\')">C:\Program Files\Steam\steamapps\common\Resonite\</ResonitePath>
-    <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')">$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath>
-    <!-- Steam Deck and other Linux distributions -->
-    <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
-    <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('$(MSBuildProjectDirectory)\Resonite\')"
+      >$(MSBuildProjectDirectory)\Resonite\</ResonitePath
+    >
+    <ResonitePath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')"
+      >C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath
+    >
+    <ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')"
+      >$(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath
+    >
+    <ResonitePath Condition="Exists('C:\Program Files\Steam\steamapps\common\Resonite\')"
+      >C:\Program Files\Steam\steamapps\common\Resonite\</ResonitePath
+    >
+    <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')"
+      >$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath
+    >
+    <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')"
+      >$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath
+    >
+    <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')"
+      >/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath
+    >
   </PropertyGroup>
-
   <!-- Common reference assemblies -->
   <ItemGroup>
     <Reference Include="ResoniteModLoader">
       <HintPath>$(ResonitePath)Libraries\ResoniteModLoader.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="HarmonyLib">
       <HintPath>$(ResonitePath)rml_libs\0Harmony.dll</HintPath>
-      <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')">$(ResonitePath)0Harmony.dll</HintPath>
-      <Private>False</Private>
+      <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')"
+        >$(ResonitePath)0Harmony.dll</HintPath
+      >
+      <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="FrooxEngine">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\FrooxEngine.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="Elements.Core">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\Elements.Core.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
-
     <!-- Debug mode hot reload library -->
     <Reference Include="ResoniteHotReloadLib" Condition="'$(Configuration)'=='Debug'">
       <HintPath>$(ResonitePath)rml_libs\ResoniteHotReloadLib.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
-
     <!-- ProtoFlux references (used by FluxLoopTweaks) -->
     <Reference Include="ProtoFlux.Core">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="ProtoFlux.Nodes.FrooxEngine">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
-
     <!-- SystemHelper reference (used by SystemHelperTweaks) -->
     <Reference Include="SystemHelperClient">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\SystemHelperClient.dll</HintPath>
-      <Private>False</Private>
+      <Private>$(IsTestProject)</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition="$(IsTestProject) == 'true'">
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3.runner.inproc.console"></PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
 
-  <!-- Common editor config exclusion -->
+    <PackageReference Include="Moq" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="AutoFixture" />
+    <PackageReference Include="AutoFixture.AutoMoq" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <EditorConfigFiles Remove="$(MSBuildThisFileDirectory)**\*.editorconfig" />
-  </ItemGroup>
-
-  <!-- Include common documentation files in all projects -->
-  <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)README.md" Link="README.md" />
     <None Include="$(MSBuildThisFileDirectory)LICENSE" Link="LICENSE" />
     <None Include="$(MSBuildThisFileDirectory).editorconfig" Link=".editorconfig" />
     <None Include="$(MSBuildThisFileDirectory).gitignore" Link=".gitignore" />
     <None Include="$(MSBuildThisFileDirectory).gitattributes" Link=".gitattributes" />
     <None Include="$(MSBuildThisFileDirectory)Directory.Build.props" Link="Directory.Build.props" />
-    <None Include="$(MSBuildThisFileDirectory)Directory.Build.targets" Link="Directory.Build.targets" />
-    <None Include="$(MSBuildThisFileDirectory).github\workflows\release.yml" Link=".github\workflows\release.yml" />
+    <None
+      Include="$(MSBuildThisFileDirectory)Directory.Build.targets"
+      Link="Directory.Build.targets"
+    />
+    <None
+      Include="$(MSBuildThisFileDirectory).github\workflows\release.yml"
+      Link=".github\workflows\release.yml"
+    />
   </ItemGroup>
 </Project>

@@ -1,14 +1,13 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
 using ResoniteModLoader;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace EsnyaTweaks.LODGroupTweaks;
-
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
 internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
@@ -24,7 +23,9 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     {
         if (worker is LODGroup lodGroup)
         {
-            ResoniteMod.DebugFunc(() => $"LODGroup on {lodGroup.Slot.Name} found. Building inspector UI...");
+            ResoniteMod.DebugFunc(() =>
+                $"LODGroup on {lodGroup.Slot.Name} found. Building inspector UI..."
+            );
             BuildInspectorUI(lodGroup, ui);
         }
     }
@@ -34,34 +35,36 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         var root = ui.Root;
         foreach (var listEditor in ui.Canvas.Slot.GetComponentsInChildren<ListEditor>())
         {
-            lodGroup.StartTask(async delegate
-            {
-                var sliders = Pool.BorrowList<SliderMemberEditor>();
-
-                try
+            lodGroup.StartTask(
+                async delegate
                 {
-                    while (!root.IsDestroyed)
-                    {
-                        root.GetComponentsInChildren(sliders);
+                    var sliders = Pool.BorrowList<SliderMemberEditor>();
 
-                        if (sliders.Count > 0)
+                    try
+                    {
+                        while (!root.IsDestroyed)
                         {
-                            foreach (var slider in sliders)
+                            root.GetComponentsInChildren(sliders);
+
+                            if (sliders.Count > 0)
                             {
-                                slider.TextFormat = "F4";
+                                foreach (var slider in sliders)
+                                {
+                                    slider.TextFormat = "F4";
+                                }
+
+                                return;
                             }
 
-                            return;
+                            await default(NextUpdate);
                         }
-
-                        await default(NextUpdate);
+                    }
+                    finally
+                    {
+                        Pool.Return(ref sliders);
                     }
                 }
-                finally
-                {
-                    Pool.Return(ref sliders);
-                }
-            });
+            );
         }
     }
 
@@ -71,7 +74,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         Button(ui, SETUP_LABEL, button => SetupByParts(button, lodGroup));
         Button(ui, REMOVE_LABEL, button => RemoveFromChildren(button, lodGroup));
     }
-
 
     private static void Button(UIBuilder ui, string text, System.Action<Button> onClick)
     {
@@ -107,7 +109,11 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         return slot.ComputeBoundingBox(filter: static c => c is MeshRenderer).Size.Magnitude;
     }
 
-    private static void AddLOD(LODGroup lodGroup, float baseThreshold, in List<KeyValuePair<MeshRenderer, float>> rendererWithBounds)
+    private static void AddLOD(
+        LODGroup lodGroup,
+        float baseThreshold,
+        in List<KeyValuePair<MeshRenderer, float>> rendererWithBounds
+    )
     {
         var levelSize = rendererWithBounds.Last().Value;
         lodGroup.AddLOD(baseThreshold / levelSize, [.. rendererWithBounds.Select(p => p.Key)]);
@@ -133,7 +139,10 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
 
             rendererWithScore.AddRange(
                 from r in renderers
-                select new KeyValuePair<MeshRenderer, float>(r, GetBoundingMagnitude(space, r)) into p
+                select new KeyValuePair<MeshRenderer, float>(
+                    r,
+                    GetBoundingMagnitude(space, r)
+                ) into p
                 orderby p.Value descending
                 select p
             );
@@ -156,7 +165,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             {
                 AddLOD(lodGroup, 0.005f * totalSize, rendererWithScore);
             }
-
         }
         finally
         {
@@ -164,7 +172,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             Pool.Return(ref rendererWithScore);
             Pool.Return(ref largeRanderers);
         }
-
     }
 
     private static void RemoveFromChildren(Button button, LODGroup lodGroup)

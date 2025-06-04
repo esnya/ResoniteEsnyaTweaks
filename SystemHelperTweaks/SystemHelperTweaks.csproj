@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<!-- Project-specific properties -->
-	<PropertyGroup>
-		<!-- Override the default repository URL for this project -->
-		<RepositoryUrl>https://github.com/esnya/EsnyaResoniteModTemplate</RepositoryUrl>
-	</PropertyGroup>
+  <!-- Project-specific properties -->
+  <PropertyGroup>
+    <!-- Override the default repository URL for this project -->
+    <RepositoryUrl>https://github.com/esnya/EsnyaResoniteModTemplate</RepositoryUrl>
+  </PropertyGroup>
 </Project>
