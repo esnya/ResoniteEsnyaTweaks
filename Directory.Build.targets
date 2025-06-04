@@ -1,6 +1,4 @@
-<!-- This file contains common build targets shared across all projects in this solution -->
 <Project>
-  <!-- Custom Install target that always copies to mods folder -->
   <Target Name="Install">
     <Message Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods" Importance="high" />
     <Copy
@@ -8,9 +6,8 @@
       DestinationFolder="$(ResonitePath)rml_mods"
       ContinueOnError="true"
     />
-    <!-- Also copy to HotReloadMods if Debug configuration -->
     <Message
-      Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods for hot reload (Debug configuration detected)"
+      Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods"
       Importance="high"
       Condition="'$(Configuration)'=='Debug'"
     />
@@ -21,16 +18,10 @@
       Condition="'$(Configuration)'=='Debug'"
     />
   </Target>
-
-  <!-- Test coverage configuration for test projects -->
   <PropertyGroup Condition="$(IsTestProject) == 'true'">
-    <!-- Include all assemblies from this solution -->
     <Include>[EsnyaTweaks.*]*</Include>
-    <!-- Exclude test assemblies and auto-generated code -->
     <Exclude>[*.Tests]*,[*]*.Program,[*]*Attribute</Exclude>
-    <!-- Exclude files (wildcards supported) -->
     <ExcludeByFile>**/*Designer.cs,**/obj/**/*</ExcludeByFile>
-    <!-- Skip auto props -->
     <SkipAutoProps>true</SkipAutoProps>
   </PropertyGroup>
 </Project>

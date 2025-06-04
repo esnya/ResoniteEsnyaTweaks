@@ -32,9 +32,7 @@ public sealed class UniLogTweaksMod : ResoniteMod
     /// Gets the version of the mod from the AssemblyVersion attribute of the assembly.
     /// </summary>
     public override string Version =>
-        ModAssembly
-            .GetCustomAttribute<AssemblyVersionAttribute>()
-            .Version;
+        ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>().Version;
 
     /// <summary>
     /// Gets the link to the repository of the mod from the AssemblyMetadata attribute of the assembly.

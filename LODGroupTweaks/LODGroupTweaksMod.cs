@@ -23,9 +23,7 @@ public partial class LODGroupTweaksMod : ResoniteMod
 
     /// <inheritdoc/>
     public override string Version =>
-        ModAssembly
-            .GetCustomAttribute<AssemblyVersionAttribute>()
-            .Version;
+        ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>().Version;
 
     /// <inheritdoc/>
     public override string Link =>
