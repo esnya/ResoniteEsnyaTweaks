@@ -47,11 +47,12 @@ dotnet_diagnostic.CA2007.severity = none     # ConfigureAwait for .NET Framework
 # IDE-specific overrides
 dotnet_diagnostic.IDE0058.severity = none    # Allow implicit discard of expression values
 
+dotnet_diagnostic.CA1031.severity = none  # Mod should not throw exceptions to keep game running
+
 # Tests Overrides
 [*Tests.cs]
 dotnet_diagnostic.CS1591.severity = none  # test classes often don't have XML comments
 dotnet_diagnostic.CA1707.severity = none  # test classes often don't follow naming conventions
-dotnet_diagnostic.CA1031.severity = none  # test classes often catch general exceptions for testing purposes
 
 [*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
 indent_size = 2
