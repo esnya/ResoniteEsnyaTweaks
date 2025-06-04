@@ -13,7 +13,7 @@
     <AssemblyName Condition="'$(AssemblyName)'==''">EsnyaTweaks.$(MSBuildProjectName)</AssemblyName>
     <AssemblyTitle Condition="'$(AssemblyTitle)'==''">$(AssemblyName)</AssemblyTitle>
     <Title Condition="'$(Title)'==''">$(AssemblyTitle)</Title>
-    <Copyright>Copyright (c) 2024 $(Authors)</Copyright>
+    <Copyright>Copyright (c) 2025 $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -25,7 +25,6 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <WarningLevel>9999</WarningLevel>
-    <Platforms>AnyCPU;x64</Platforms>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
@@ -33,7 +32,6 @@
     <IsTestProject>true</IsTestProject>
     <OutputType>Exe</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
     <TreatWarningsAsErrors Condition="'$(Configuration)'=='Release'">true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition="'$(ResonitePath)'==''">

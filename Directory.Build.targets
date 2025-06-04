@@ -18,10 +18,4 @@
       Condition="'$(Configuration)'=='Debug'"
     />
   </Target>
-  <PropertyGroup Condition="$(IsTestProject) == 'true'">
-    <Include>[EsnyaTweaks.*]*</Include>
-    <Exclude>[*.Tests]*,[*]*.Program,[*]*Attribute</Exclude>
-    <ExcludeByFile>**/*Designer.cs,**/obj/**/*</ExcludeByFile>
-    <SkipAutoProps>true</SkipAutoProps>
-  </PropertyGroup>
 </Project>
