@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
 using HarmonyLib;
 using Xunit;
@@ -87,5 +88,79 @@ public static class AsyncWhile_RunAsync_PatchTests
         harmonyPrefixAttribute
             ?.Should()
             .NotBeNull("if present, HarmonyPrefix attribute should be valid");
+    }
+
+    [Fact]
+    public static async Task Prefix_Should_Run_AsyncWhile_Loop()
+    {
+        var engine = new ProtoFlux.Runtimes.Execution.Engine();
+        var context = new ProtoFlux.Runtimes.Execution.FrooxEngineContext();
+        context.Engine.UpdateTick = 0;
+        var iteration = 0;
+        var asyncWhile = new ProtoFlux.Runtimes.Execution.Nodes.AsyncWhile
+        {
+            Condition = new ProtoFlux.Runtimes.Execution.Nodes.ValueInput<bool>
+            {
+                Evaluator = _ => iteration < 3,
+            },
+            LoopStart = new ProtoFlux.Runtimes.Execution.Nodes.AsyncCall(),
+            LoopIteration = new ProtoFlux.Runtimes.Execution.Nodes.AsyncCall
+            {
+                Body = ctx =>
+                {
+                    iteration++;
+                    ctx.Engine.UpdateTick++;
+                    return Task.CompletedTask;
+                },
+            },
+            LoopEnd = new ProtoFlux.Runtimes.Execution.Nodes.Continuation
+            {
+                Target = new ProtoFlux.Core.DummyOperation(),
+            },
+        };
+        EsnyaTweaks.FluxLoopTweaks.FluxLoopTweaksMod.TimeoutMs = 1000;
+        Task<ProtoFlux.Core.IOperation>? task = null;
+        var ret = AsyncWhile_RunAsync_Patch.Prefix(asyncWhile, context, ref task!);
+        ret.Should().BeFalse();
+        var op = await task!;
+        op.Should().BeSameAs(asyncWhile.LoopEnd.Target);
+        context.AbortExecution.Should().BeFalse();
+    }
+
+    [Fact]
+    public static async Task Prefix_Should_Abort_When_Timeout()
+    {
+        var context = new ProtoFlux.Runtimes.Execution.FrooxEngineContext();
+        var asyncWhile = new ProtoFlux.Runtimes.Execution.Nodes.AsyncWhile
+        {
+            Condition = new ProtoFlux.Runtimes.Execution.Nodes.ValueInput<bool>
+            {
+                Evaluator = _ => true,
+            },
+            LoopStart = new ProtoFlux.Runtimes.Execution.Nodes.AsyncCall(),
+            LoopIteration = new ProtoFlux.Runtimes.Execution.Nodes.AsyncCall(),
+            LoopEnd = new ProtoFlux.Runtimes.Execution.Nodes.Continuation
+            {
+                Target = new ProtoFlux.Core.DummyOperation(),
+            },
+        };
+        EsnyaTweaks.FluxLoopTweaks.FluxLoopTweaksMod.TimeoutMs = 0;
+        Task<ProtoFlux.Core.IOperation>? task = null;
+        AsyncWhile_RunAsync_Patch.Prefix(asyncWhile, context, ref task!);
+        await Assert.ThrowsAsync<ProtoFlux.Runtimes.Execution.ExecutionAbortedException>(async () =>
+            await task!
+        );
+        context.AbortExecution.Should().BeTrue();
+        ResoniteModLoader.ResoniteMod.LastWarning.Should().NotBeNull();
+    }
+
+    [Fact]
+    public static void Prefix_Should_Return_True_For_Non_FrooxEngine_Context()
+    {
+        var context = new ProtoFlux.Runtimes.Execution.ExecutionContext();
+        var node = new ProtoFlux.Runtimes.Execution.Nodes.AsyncWhile();
+        Task<ProtoFlux.Core.IOperation>? task = null;
+        var result = AsyncWhile_RunAsync_Patch.Prefix(node, context, ref task!);
+        result.Should().BeTrue();
     }
 }
