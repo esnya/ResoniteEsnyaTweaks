@@ -103,4 +103,72 @@ public static class While_Run_PatchTests
             ?.Should()
             .NotBeNull("if present, HarmonyPrefix attribute should be valid");
     }
+
+    [Fact]
+    public static void Prefix_Should_Run_While_Loop()
+    {
+        var context = new ProtoFlux.Runtimes.Execution.FrooxEngineContext();
+        var iteration = 0;
+        var loop = new ProtoFlux.Runtimes.Execution.Nodes.While
+        {
+            Condition = new ProtoFlux.Runtimes.Execution.Nodes.ValueInput<bool>
+            {
+                Evaluator = _ => iteration < 3,
+            },
+            LoopStart = new ProtoFlux.Runtimes.Execution.Nodes.Call(),
+            LoopIteration = new ProtoFlux.Runtimes.Execution.Nodes.Call
+            {
+                Body = ctx =>
+                {
+                    iteration++;
+                },
+            },
+            LoopEnd = new ProtoFlux.Runtimes.Execution.Nodes.Continuation
+            {
+                Target = new ProtoFlux.Core.DummyOperation(),
+            },
+        };
+        EsnyaTweaks.FluxLoopTweaks.FluxLoopTweaksMod.TimeoutMs = 1000;
+        ProtoFlux.Core.IOperation? op = null;
+        var ret = While_Run_Patch.Prefix(loop, context, ref op!);
+        ret.Should().BeFalse();
+        op.Should().BeSameAs(loop.LoopEnd.Target);
+        context.AbortExecution.Should().BeFalse();
+    }
+
+    [Fact]
+    public static void Prefix_Should_Abort_When_Timeout()
+    {
+        var context = new ProtoFlux.Runtimes.Execution.FrooxEngineContext();
+        var loop = new ProtoFlux.Runtimes.Execution.Nodes.While
+        {
+            Condition = new ProtoFlux.Runtimes.Execution.Nodes.ValueInput<bool>
+            {
+                Evaluator = _ => true,
+            },
+            LoopStart = new ProtoFlux.Runtimes.Execution.Nodes.Call(),
+            LoopIteration = new ProtoFlux.Runtimes.Execution.Nodes.Call(),
+            LoopEnd = new ProtoFlux.Runtimes.Execution.Nodes.Continuation
+            {
+                Target = new ProtoFlux.Core.DummyOperation(),
+            },
+        };
+        EsnyaTweaks.FluxLoopTweaks.FluxLoopTweaksMod.TimeoutMs = 0;
+        ProtoFlux.Core.IOperation? op = null;
+        Assert.Throws<ProtoFlux.Runtimes.Execution.ExecutionAbortedException>(() =>
+            While_Run_Patch.Prefix(loop, context, ref op!)
+        );
+        context.AbortExecution.Should().BeTrue();
+        ResoniteModLoader.ResoniteMod.LastWarning.Should().NotBeNull();
+    }
+
+    [Fact]
+    public static void Prefix_Should_Return_True_For_Non_FrooxEngine_Context()
+    {
+        var context = new ProtoFlux.Runtimes.Execution.ExecutionContext();
+        var loop = new ProtoFlux.Runtimes.Execution.Nodes.While();
+        ProtoFlux.Core.IOperation? op = null;
+        var result = While_Run_Patch.Prefix(loop, context, ref op!);
+        result.Should().BeTrue();
+    }
 }
