@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using AutoFixture;
 using FluentAssertions;
 using Xunit;
@@ -118,5 +120,21 @@ public static class FluxLoopTweaksModTests
 
         randomString.Should().NotBeNullOrEmpty();
         randomInt.Should().NotBe(0);
+    }
+
+    [Fact]
+    public static void Assembly_Should_Expose_Internals_To_Tests()
+    {
+        var assembly = typeof(FluxLoopTweaksMod).Assembly;
+
+        var attribute = assembly
+            .GetCustomAttributes<InternalsVisibleToAttribute>()
+            .FirstOrDefault(attr => attr.AssemblyName == "EsnyaTweaks.FluxLoopTweaks.Tests");
+
+        attribute
+            .Should()
+            .NotBeNull(
+                "internals should be visible to the test assembly so that private members can be tested"
+            );
     }
 }
