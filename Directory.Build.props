@@ -1,54 +1,40 @@
-<!-- This file contains common properties shared across all projects in this solution -->
 <Project>
-  <!-- Common assembly metadata -->
   <PropertyGroup>
     <Authors>esnya</Authors>
     <RepositoryUrl>https://github.com/esnya/EsnyaTweaks</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Resonite,Mod,ResoniteModLoader</PackageTags>
     <Version>0.1.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
-  <!-- Derived properties -->
-  <PropertyGroup>
     <Product>$(AssemblyTitle)</Product>
-    <Copyright>Copyright (c) 2024 $(Authors)</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <!-- Auto-generate common properties from MSBuildProjectName -->
     <RootNamespace Condition="'$(RootNamespace)'==''"
       >EsnyaTweaks.$(MSBuildProjectName)</RootNamespace
     >
     <AssemblyName Condition="'$(AssemblyName)'==''">EsnyaTweaks.$(MSBuildProjectName)</AssemblyName>
     <AssemblyTitle Condition="'$(AssemblyTitle)'==''">$(AssemblyName)</AssemblyTitle>
     <Title Condition="'$(Title)'==''">$(AssemblyTitle)</Title>
+    <Copyright>Copyright (c) 2025 $(Authors)</Copyright>
   </PropertyGroup>
-  <!-- Common build properties -->
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
     <DebugType Condition="'$(Configuration)'=='Debug'">embedded</DebugType>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <WarningLevel>9999</WarningLevel>
-    <Platforms>AnyCPU;x64</Platforms>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-  <!-- Test build properties -->
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <OutputType>Exe</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <!-- Coverage configuration -->
-    <RunCodeAnalysis>true</RunCodeAnalysis>
     <TreatWarningsAsErrors Condition="'$(Configuration)'=='Release'">true</TreatWarningsAsErrors>
   </PropertyGroup>
-  <!-- Resonite path detection -->
   <PropertyGroup Condition="'$(ResonitePath)'==''">
-    <!-- If you don't want to provide a ResonitePath in dotnet build, you can specify one here -->
     <ResonitePath>$(MSBuildThisFileDirectory)Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('$(MSBuildProjectDirectory)\Resonite\')"
       >$(MSBuildProjectDirectory)\Resonite\</ResonitePath
@@ -72,7 +58,6 @@
       >/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath
     >
   </PropertyGroup>
-  <!-- Common reference assemblies -->
   <ItemGroup>
     <Reference Include="ResoniteModLoader">
       <HintPath>$(ResonitePath)Libraries\ResoniteModLoader.dll</HintPath>
@@ -97,12 +82,10 @@
       <HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
-    <!-- Debug mode hot reload library -->
     <Reference Include="ResoniteHotReloadLib" Condition="'$(Configuration)'=='Debug'">
       <HintPath>$(ResonitePath)rml_libs\ResoniteHotReloadLib.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
-    <!-- ProtoFlux references (used by FluxLoopTweaks) -->
     <Reference Include="ProtoFlux.Core">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
       <Private>$(IsTestProject)</Private>
@@ -111,7 +94,6 @@
       <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
-    <!-- SystemHelper reference (used by SystemHelperTweaks) -->
     <Reference Include="SystemHelperClient">
       <HintPath>$(ResonitePath)Resonite_Data\Managed\SystemHelperClient.dll</HintPath>
       <Private>$(IsTestProject)</Private>
@@ -123,15 +105,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="xunit.v3.runner.inproc.console"></PackageReference>
+    <PackageReference Include="xunit.v3.runner.inproc.console" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-
     <PackageReference Include="Moq" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="AutoFixture" />
     <PackageReference Include="AutoFixture.AutoMoq" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-
     <PackageReference Include="coverlet.collector">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
