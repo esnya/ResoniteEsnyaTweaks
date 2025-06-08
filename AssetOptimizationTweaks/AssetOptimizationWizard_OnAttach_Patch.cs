@@ -6,7 +6,7 @@ using ResoniteModLoader;
 namespace EsnyaTweaks.AssetOptimizationTweaks;
 
 [HarmonyPatch(typeof(AssetOptimizationWizard), "OnAttach")]
-internal static class AssetOptimization_WorkerInspector_BuildInspectorUI_Patch
+internal static class AssetOptimizationWizard_OnAttach_Patch
 {
     public static void Postfix(AssetOptimizationWizard __instance)
     {
@@ -22,7 +22,7 @@ internal static class AssetOptimization_WorkerInspector_BuildInspectorUI_Patch
         uiBuilder.ForceNext = message.RectTransform;
 
         uiBuilder.LocalButton(
-            "[Mod] Deduplicate Procedual Assets",
+            "[Mod] Deduplicate Procedural Assets",
             (_, _) =>
             {
                 var removedCount = __instance.Slot.DeduplicateProceduralAssets();
