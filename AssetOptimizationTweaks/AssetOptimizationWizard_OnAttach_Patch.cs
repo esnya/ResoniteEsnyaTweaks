@@ -1,3 +1,4 @@
+using System.Linq;
 using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
@@ -10,23 +11,32 @@ internal static class AssetOptimizationWizard_OnAttach_Patch
 {
     public static void Postfix(AssetOptimizationWizard __instance)
     {
-        var uiBuilder = new UIBuilder(__instance.Slot);
-        var message = __instance.TryGetField<Text>("_message")?.Value;
-
-        if (message is null)
+        var lastElement = __instance
+            .Slot.GetComponentsInChildren<RectTransform>()
+            .LastOrDefault()
+            ?.Slot?.Parent;
+        if (lastElement is null)
         {
-            ResoniteMod.Warn("AssetOptimizationWizard message field not found.");
+            ResoniteMod.Warn("Failed to find the last element in AssetOptimizationWizard.");
             return;
         }
 
-        uiBuilder.ForceNext = message.RectTransform;
-
+        var uiBuilder = new UIBuilder(lastElement);
+        RadiantUI_Constants.SetupEditorStyle(uiBuilder);
+        uiBuilder.Style.MinHeight = 24;
+        uiBuilder.Style.PreferredHeight = 24;
         uiBuilder.LocalButton(
             "[Mod] Deduplicate Procedural Assets",
             (_, _) =>
             {
-                var removedCount = __instance.Slot.DeduplicateProceduralAssets();
-                message.Content.Value = $"Deduplicated {removedCount} procedural assets.";
+                var root = __instance.Root.Target;
+                if (root is null)
+                {
+                    ResoniteMod.Warn("AssetOptimizationWizard root is null.");
+                    return;
+                }
+
+                var removedCount = root.DeduplicateProceduralAssets();
                 ResoniteMod.DebugFunc(() =>
                     $"AssetOptimizationWizard: Deduplicated {removedCount} procedural assets"
                 );
