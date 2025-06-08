@@ -20,19 +20,36 @@ public sealed class UniLogTweaksMod : ResoniteMod
     /// <summary>
     /// Gets the name of the mod from the AssemblyTitle attribute of the assembly.
     /// </summary>
-    public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+    public override string Name =>
+        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
 
     /// <summary>
     /// Gets the author of the mod from the AssemblyCompany attribute of the assembly.
     /// </summary>
     public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
 
     /// <summary>
-    /// Gets the version of the mod from the AssemblyVersion attribute of the assembly.
+    /// Gets the version of the mod from the AssemblyInformationalVersion attribute of the assembly.
     /// </summary>
-    public override string Version =>
-        ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>().Version;
+    public override string Version
+    {
+        get
+        {
+            var informationalVersion = ModAssembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
+            if (informationalVersion != null)
+            {
+                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
+                var plusIndex = informationalVersion.IndexOf('+');
+                return plusIndex >= 0
+                    ? informationalVersion.Substring(0, plusIndex)
+                    : informationalVersion;
+            }
+            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
+        }
+    }
 
     /// <summary>
     /// Gets the link to the repository of the mod from the AssemblyMetadata attribute of the assembly.

@@ -18,15 +18,32 @@ public class FluxLoopTweaksMod : ResoniteMod
     private static Assembly ModAssembly => typeof(FluxLoopTweaksMod).Assembly;
 
     /// <inheritdoc/>
-    public override string Name => ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+    public override string Name =>
+        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
 
     /// <inheritdoc/>
     public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
+        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
 
     /// <inheritdoc/>
-    public override string Version =>
-        ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>().Version;
+    public override string Version
+    {
+        get
+        {
+            var informationalVersion = ModAssembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
+            if (informationalVersion != null)
+            {
+                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
+                var plusIndex = informationalVersion.IndexOf('+');
+                return plusIndex >= 0
+                    ? informationalVersion.Substring(0, plusIndex)
+                    : informationalVersion;
+            }
+            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
+        }
+    }
 
     /// <inheritdoc/>
     public override string Link =>
