@@ -18,7 +18,6 @@ public sealed class DeduplicateProceduralAssetsTests : IDisposable
 
     public DeduplicateProceduralAssetsTests()
     {
-        // Initialize Resonite engine and world for testing
         _engine = new Engine();
         _world = _engine.WorldManager.StartLocal(_ => { });
     }
@@ -204,6 +203,47 @@ public sealed class DeduplicateProceduralAssetsTests : IDisposable
         result.Should().Be(1);
         var finalComponentCount = testSlot.GetComponents<Component>().Count;
         finalComponentCount.Should().BeLessThan(initialComponentCount);
+    }
+
+    [Fact]
+    public void DeduplicateProceduralAssets_ShouldRedirectReferencesToFirstInstance()
+    {
+        // Arrange
+        var testSlot = _world.AddSlot("TestSlot");
+
+        var slot1 = testSlot.AddSlot("Box1");
+        var slot2 = testSlot.AddSlot("Box2");
+
+        // Create two identical BoxMesh components
+        var boxMesh1 = slot1.AttachComponent<BoxMesh>();
+        var boxCollider1 = slot1.AttachComponent<BoxCollider>();
+        var valueCopy1 = slot1.AttachComponent<ValueCopy<float3>>();
+        valueCopy1.Source.Target = boxMesh1.Size;
+        valueCopy1.Target.Target = boxCollider1.Size;
+
+        var boxMesh2 = slot2.AttachComponent<BoxMesh>();
+        var boxCollider2 = slot2.AttachComponent<BoxCollider>();
+        var valueCopy2 = slot2.AttachComponent<ValueCopy<float3>>();
+        valueCopy2.Source.Target = boxMesh2.Size;
+        valueCopy2.Target.Target = boxCollider2.Size;
+
+        var initialProviderCount = GetProceduralAssetProviderCount(testSlot);
+        initialProviderCount.Should().Be(2);
+
+        valueCopy1.Source.Target.Should().NotBe(valueCopy2.Source.Target);
+        valueCopy1.Target.Target.Should().NotBe(valueCopy2.Target.Target);
+
+        // Act
+        var result = testSlot.DeduplicateProceduralAssets();
+
+        // Assert
+        result.Should().Be(1); // One duplicate should be removed
+        var finalProviderCount = GetProceduralAssetProviderCount(testSlot);
+        finalProviderCount.Should().Be(1); // Only one should remain
+
+        // Verify that references are redirected
+        valueCopy1.Source.Target.Should().Be(valueCopy2.Source.Target);
+        valueCopy1.Target.Target.Should().Be(valueCopy2.Target.Target);
     }
 
     private static BoxMesh CreateProceduralAssetProvider(Slot slot)
