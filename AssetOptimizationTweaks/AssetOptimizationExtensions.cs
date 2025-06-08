@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.UIX;
-using FrooxEngine.Undo;
 using ResoniteModLoader;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks;
@@ -16,98 +16,170 @@ internal static class AssetOptimizationExtensions
 
     public static int DeduplicateProceduralAssets(this Slot root, Slot? replaceRoot = null)
     {
-        var num = 0;
-        var dictionary = Pool.BorrowDictionary<IWorldElement, IWorldElement>();
         var allProviders = Pool.BorrowList<IAssetProvider>();
+        var groupedProviders = new Dictionary<Type, List<IAssetProvider>>();
+        var redirectionMap = new Dictionary<IWorldElement, IWorldElement>();
 
         root.GetComponentsInChildren(allProviders);
         ResoniteMod.DebugFunc(() => $"{allProviders.Count} asset providers found under {root}");
 
-        var dictionary2 = Pool.BorrowDictionaryList<Type, IAssetProvider>();
-        foreach (var provider in allProviders)
+        try
         {
-            if (IsProceduralAssetProvider(provider) && IsNotDriven(provider) && provider.Slot.AllowOptimization())
+            GroupProceduralAssetProviders(allProviders, groupedProviders);
+            LogGroupedProviders(groupedProviders);
+
+            BuildRedirectionMap(groupedProviders, redirectionMap);
+            var deduplicatedCount = redirectionMap.Count(kvp => kvp.Key is Component);
+
+            if (redirectionMap.Count > 0)
             {
-                dictionary2.Add(provider.GetType(), provider);
+                ApplyRedirections(root, redirectionMap, replaceRoot);
             }
+
+            ResoniteMod.Msg($"{deduplicatedCount} procedural asset providers deduplicated");
+            return deduplicatedCount;
         }
-
-        if (ResoniteMod.IsDebugEnabled())
+        finally
         {
-            foreach (var item in dictionary2)
-            {
-                ResoniteMod.Debug(
-                    $"Found {item.Value.Count} procedural asset providers of type {item.Key.Name}"
-                );
-            }
+            Pool.Return(ref redirectionMap);
+            Pool.Return(ref groupedProviders);
+            Pool.Return(ref allProviders);
         }
+    }
 
-        Pool.Return(ref allProviders);
-
-        var undoManager = root.World.GetUndoManager();
-        undoManager?.BeginBatch("[Mod] Deduplicate Procedural Asset Providers");
-        foreach (var item2 in dictionary2)
+    internal static void GroupProceduralAssetProviders(
+        List<IAssetProvider> providers,
+        Dictionary<Type, List<IAssetProvider>> grouped
+    )
+    {
+        foreach (var provider in providers)
         {
-            for (var i = 0; i < item2.Value.Count; i++)
+            if (
+                IsProceduralAssetProvider(provider)
+                && IsNotDriven(provider)
+                && provider.Slot.AllowOptimization()
+            )
             {
-                var component = (Component)item2.Value[i];
-                for (var num2 = item2.Value.Count - 1; num2 > i; num2--)
+                if (!grouped.TryGetValue(provider.GetType(), out var list))
                 {
-                    var component2 = (Component)item2.Value[num2];
-                    if (component.PublicMembersEqual(component2))
-                    {
-                        ResoniteMod.DebugFunc(() =>
-                            $"Deduplicating procedural asset provider {component2} in favor of {component}"
-                        );
-                        foreach (var (e2, e1) in component2.SyncMembers.Zip(component.SyncMembers, (e2, e1) => (e2, e1)))
-                        {
-                            if (e2 == null || e1 == null)
-                            {
-                                continue;
-                            }
+                    list = [];
+                    grouped[provider.GetType()] = list;
+                }
+                list.Add(provider);
+            }
+        }
+    }
 
-                            ResoniteMod.DebugFunc(() =>
-                                $"Redirecting reference from {e2} to {e1}"
-                            );
-                            dictionary.Add(e2, e1);
-                        }
-                        dictionary.Add(component2, component);
-                        item2.Value.RemoveAt(num2);
-                        num++;
-                    }
+    internal static void BuildRedirectionMap(
+        Dictionary<Type, List<IAssetProvider>> groupedProviders,
+        Dictionary<IWorldElement, IWorldElement> redirectionMap
+    )
+    {
+        foreach (var providerGroup in groupedProviders)
+        {
+            var duplicatePairs = FindDuplicatePairs(providerGroup.Value);
+
+            foreach (var (original, duplicate) in duplicatePairs)
+            {
+                AddSyncMemberRedirections(redirectionMap, duplicate, original);
+                redirectionMap.Add(duplicate, original);
+            }
+        }
+    }
+
+    internal static (Component Original, Component Duplicate)[] FindDuplicatePairs(
+        List<IAssetProvider> providers
+    )
+    {
+        var pairs = Pool.BorrowList<(Component, Component)>();
+
+        for (var i = 0; i < providers.Count; i++)
+        {
+            var original = (Component)providers[i];
+
+            for (var j = i + 1; j < providers.Count; j++)
+            {
+                var candidate = (Component)providers[j];
+
+                if (original.PublicMembersEqual(candidate))
+                {
+                    ResoniteMod.DebugFunc(() => $"Found duplicate: {candidate} matches {original}");
+                    pairs.Add((original, candidate));
                 }
             }
         }
 
-        Pool.Return(ref dictionary2);
+        var result = pairs.ToArray();
+        Pool.Return(ref pairs);
+        return result;
+    }
 
+    internal static void AddSyncMemberRedirections(
+        Dictionary<IWorldElement, IWorldElement> redirectionMap,
+        Component duplicate,
+        Component original
+    )
+    {
+        foreach (
+            var (duplicateMember, originalMember) in duplicate.SyncMembers.Zip(
+                original.SyncMembers,
+                (d, o) => (d, o)
+            )
+        )
+        {
+            if (duplicateMember != null && originalMember != null)
+            {
+                ResoniteMod.DebugFunc(() =>
+                    $"Redirecting reference from {duplicateMember} to {originalMember}"
+                );
+                redirectionMap.Add(duplicateMember, originalMember);
+            }
+        }
+    }
+
+    private static void LogGroupedProviders(Dictionary<Type, List<IAssetProvider>> groupedProviders)
+    {
         if (ResoniteMod.IsDebugEnabled())
         {
-            ResoniteMod.DebugFunc(() => $"{num} procedural asset providers deduplicated");
+            foreach (var group in groupedProviders)
+            {
+                ResoniteMod.Debug(
+                    $"Found {group.Value.Count} procedural asset providers of type {group.Key.Name}"
+                );
+            }
         }
+    }
+
+    private static void ApplyRedirections(
+        Slot root,
+        Dictionary<IWorldElement, IWorldElement> redirectionMap,
+        Slot? replaceRoot
+    )
+    {
+        if (ResoniteMod.IsDebugEnabled())
+        {
+            var componentCount = redirectionMap.Count(kvp => kvp.Key is Component);
+            ResoniteMod.DebugFunc(() =>
+                $"{componentCount} procedural asset providers will be deduplicated"
+            );
+        }
+
         root.World.ReplaceReferenceTargets(
-            dictionary,
+            redirectionMap,
             nullIfIncompatible: false,
             replaceRoot ?? root.World.RootSlot
         );
 
-        foreach (var item3 in dictionary)
+        foreach (var kvp in redirectionMap)
         {
-            if (item3.Key is Component component3)
+            if (kvp.Key is Component component)
             {
                 ResoniteMod.DebugFunc(() =>
-                    $"Redirecting references from {item3.Key} to {item3.Value} in {component3.Slot}"
+                    $"Destroying duplicate component {kvp.Key} (redirected to {kvp.Value}) in {component.Slot}"
                 );
-
-                component3?.UndoableDestroy();
+                component.Destroy();
             }
         }
-        undoManager?.EndBatch();
-
-        Pool.Return(ref dictionary);
-
-        ResoniteMod.Msg($"{num} procedural asset providers deduplicated");
-        return num;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -130,7 +202,6 @@ internal static class AssetOptimizationExtensions
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool CheckInheritanceHierarchy(Type type)
     {
-        // より効率的なアプローチ：基底型の階層を辿る
         var currentType = type;
         while (currentType != null && currentType != typeof(object))
         {
