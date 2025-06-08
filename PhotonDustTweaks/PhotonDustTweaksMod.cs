@@ -10,7 +10,7 @@ using ResoniteHotReloadLib;
 namespace EsnyaTweaks.PhotonDustTweaks;
 
 /// <inheritdoc/>
-public partial class PhotonDustTweaksMod : ResoniteMod
+public class PhotonDustTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(PhotonDustTweaksMod).Assembly;
 

@@ -13,7 +13,7 @@ using ResoniteHotReloadLib;
 namespace EsnyaTweaks.FluxLoopTweaks;
 
 /// <inheritdoc/>
-public partial class FluxLoopTweaksMod : ResoniteMod
+public class FluxLoopTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(FluxLoopTweaksMod).Assembly;
 

@@ -10,7 +10,7 @@ using ResoniteHotReloadLib;
 namespace EsnyaTweaks.SystemHelperTweaks;
 
 /// <inheritdoc/>
-public partial class SystemHelperTweaksMod : ResoniteMod
+public class SystemHelperTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(SystemHelperTweaksMod).Assembly;
 

@@ -10,7 +10,7 @@ using ResoniteHotReloadLib;
 namespace EsnyaTweaks.LODGroupTweaks;
 
 /// <inheritdoc/>
-public partial class LODGroupTweaksMod : ResoniteMod
+public class LODGroupTweaksMod : ResoniteMod
 {
     private static Assembly ModAssembly => typeof(LODGroupTweaksMod).Assembly;
 
