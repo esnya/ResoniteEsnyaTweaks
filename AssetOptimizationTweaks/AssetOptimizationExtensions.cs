@@ -26,7 +26,7 @@ internal static class AssetOptimizationExtensions
         var dictionary2 = Pool.BorrowDictionaryList<Type, IAssetProvider>();
         foreach (var provider in allProviders)
         {
-            if (IsProceduralAssetProvider(provider))
+            if (IsProceduralAssetProvider(provider) && IsNotDriven(provider) && provider.Slot.AllowOptimization())
             {
                 dictionary2.Add(provider.GetType(), provider);
             }
@@ -108,6 +108,12 @@ internal static class AssetOptimizationExtensions
 
         ResoniteMod.Msg($"{num} procedural asset providers deduplicated");
         return num;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsNotDriven(IAssetProvider provider)
+    {
+        return (provider as Component)?.SyncMembers.All(e => !e.IsDriven) ?? false;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
