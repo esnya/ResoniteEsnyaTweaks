@@ -19,6 +19,7 @@ public class AssetOptimizationTweaksModTests
 
         // Assert
         name.Should().NotBeNullOrEmpty();
+        name.Should().NotBe("Unknown");
     }
 
     [Fact]
@@ -32,6 +33,7 @@ public class AssetOptimizationTweaksModTests
 
         // Assert
         author.Should().NotBeNullOrEmpty();
+        author.Should().NotBe("Unknown");
     }
 
     [Fact]
@@ -45,6 +47,8 @@ public class AssetOptimizationTweaksModTests
 
         // Assert
         version.Should().NotBeNullOrEmpty();
+        version.Should().NotBe("Unknown");
+        version.Should().NotBe("0.0.0");
     }
 
     [Fact]
