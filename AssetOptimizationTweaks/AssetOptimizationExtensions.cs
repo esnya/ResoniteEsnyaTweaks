@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.UIX;
+using FrooxEngine.Undo;
 using ResoniteModLoader;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks;
@@ -42,6 +44,8 @@ internal static class AssetOptimizationExtensions
 
         Pool.Return(ref allProviders);
 
+        var undoManager = root.World.GetUndoManager();
+        undoManager?.BeginBatch("[Mod] Deduplicate Procedural Asset Providers");
         foreach (var item2 in dictionary2)
         {
             for (var i = 0; i < item2.Value.Count; i++)
@@ -55,6 +59,18 @@ internal static class AssetOptimizationExtensions
                         ResoniteMod.DebugFunc(() =>
                             $"Deduplicating procedural asset provider {component2} in favor of {component}"
                         );
+                        foreach (var (e2, e1) in component2.SyncMembers.Zip(component.SyncMembers, (e2, e1) => (e2, e1)))
+                        {
+                            if (e2 == null || e1 == null)
+                            {
+                                continue;
+                            }
+
+                            ResoniteMod.DebugFunc(() =>
+                                $"Redirecting reference from {e2} to {e1}"
+                            );
+                            dictionary.Add(e2, e1);
+                        }
                         dictionary.Add(component2, component);
                         item2.Value.RemoveAt(num2);
                         num++;
@@ -77,14 +93,16 @@ internal static class AssetOptimizationExtensions
 
         foreach (var item3 in dictionary)
         {
-            if (((IAssetProvider)item3.Key).AssetReferenceCount <= 0)
+            if (item3.Key is Component component3)
             {
                 ResoniteMod.DebugFunc(() =>
-                    $"Destroying procedural asset provider {item3.Key} with no references"
+                    $"Redirecting references from {item3.Key} to {item3.Value} in {component3.Slot}"
                 );
-                ((Component)item3.Key).Destroy();
+
+                component3?.UndoableDestroy();
             }
         }
+        undoManager?.EndBatch();
 
         Pool.Return(ref dictionary);
 
