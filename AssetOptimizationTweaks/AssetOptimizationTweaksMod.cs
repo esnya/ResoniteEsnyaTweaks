@@ -55,7 +55,7 @@ public class AssetOptimizationTweaksMod : ResoniteMod
             .First(meta => meta.Key == "RepositoryUrl")
             .Value;
 
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
+    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName().Name}";
 
     private static readonly Harmony harmony = new(HarmonyId);
 
