@@ -11,6 +11,7 @@ public static class LODGroupTweaksModTests
     {
         var mod = new LODGroupTweaksMod();
         mod.Name.Should().Be("EsnyaTweaks.LODGroupTweaks");
+        mod.Name.Should().NotBe("Unknown");
     }
 
     [Fact]
@@ -18,6 +19,7 @@ public static class LODGroupTweaksModTests
     {
         var mod = new LODGroupTweaksMod();
         mod.Author.Should().Be("esnya");
+        mod.Author.Should().NotBe("Unknown");
     }
 
     [Fact]
@@ -25,6 +27,8 @@ public static class LODGroupTweaksModTests
     {
         var mod = new LODGroupTweaksMod();
         mod.Version.Should().MatchRegex(@"^\d+\.\d+\.\d+(?:\+[A-Za-z][A-Za-z0-9]*)?$");
+        mod.Version.Should().NotBe("Unknown");
+        mod.Version.Should().NotBe("0.0.0");
     }
 
     [Fact]

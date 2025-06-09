@@ -8,14 +8,17 @@ using ResoniteModLoader;
 using ResoniteHotReloadLib;
 #endif
 
-[assembly: InternalsVisibleTo("EsnyaTweaks.FluxLoopTweaks.Tests")]
+[assembly: InternalsVisibleTo("EsnyaTweaks.AssetOptimizationTweaks.Tests")]
 
-namespace EsnyaTweaks.FluxLoopTweaks;
+namespace EsnyaTweaks.AssetOptimizationTweaks;
 
-/// <inheritdoc/>
-public class FluxLoopTweaksMod : ResoniteMod
+/// <summary>
+/// Asset optimization mod with advanced deduplication capabilities for Resonite.
+/// Provides utilities to optimize assets by removing duplicates and improving memory usage.
+/// </summary>
+public class AssetOptimizationTweaksMod : ResoniteMod
 {
-    private static Assembly ModAssembly => typeof(FluxLoopTweaksMod).Assembly;
+    private static Assembly ModAssembly => typeof(AssetOptimizationTweaksMod).Assembly;
 
     /// <inheritdoc/>
     public override string Name =>
@@ -52,22 +55,9 @@ public class FluxLoopTweaksMod : ResoniteMod
             .First(meta => meta.Key == "RepositoryUrl")
             .Value;
 
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
+    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName().Name}";
 
-    private static ModConfiguration? config;
     private static readonly Harmony harmony = new(HarmonyId);
-
-    [AutoRegisterConfigKey]
-    private static readonly ModConfigurationKey<int> timeoutKey = new(
-        "Timeout",
-        "Timeout for in milliseconds.",
-        computeDefault: () => 30_000
-    );
-
-    /// <summary>
-    /// Gets the timeout value in milliseconds for loop operations.
-    /// </summary>
-    public static int TimeoutMs => config?.GetValue(timeoutKey) ?? 30_000;
 
     /// <inheritdoc/>
     public override void OnEngineInit()
@@ -79,10 +69,9 @@ public class FluxLoopTweaksMod : ResoniteMod
 #endif
     }
 
-    private static void Init(ResoniteMod modInstance)
+    private static void Init(ResoniteMod _)
     {
         harmony.PatchAll();
-        config = modInstance?.GetConfiguration();
     }
 
 #if DEBUG

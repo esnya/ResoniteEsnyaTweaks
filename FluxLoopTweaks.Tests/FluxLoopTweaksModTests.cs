@@ -21,6 +21,7 @@ public static class FluxLoopTweaksModTests
         // Assert
         name.Should().NotBeNullOrEmpty();
         name.Should().Be("EsnyaTweaks.FluxLoopTweaks");
+        name.Should().NotBe("Unknown");
     }
 
     [Fact]
@@ -35,6 +36,7 @@ public static class FluxLoopTweaksModTests
         // Assert
         author.Should().NotBeNullOrEmpty();
         author.Should().Be("esnya");
+        author.Should().NotBe("Unknown");
     }
 
     [Fact]
@@ -48,6 +50,8 @@ public static class FluxLoopTweaksModTests
 
         // Assert
         version.Should().NotBeNullOrEmpty();
+        version.Should().NotBe("Unknown");
+        version.Should().NotBe("0.0.0");
         version
             .Should()
             .MatchRegex(
