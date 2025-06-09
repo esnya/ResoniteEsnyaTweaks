@@ -17,6 +17,43 @@ A collection of small [ResoniteModLoader](https://github.com/resonite-modding-gr
 3. Place them into your `rml_mods` folder. This folder should be located at `C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods` for a standard installation. You can create it if it's missing, or if you start the game once with the ResoniteModLoader installed it will create this folder for you.
 4. Launch the game. Check your Resonite logs if you want to confirm that the mods are loaded.
 
-## Development Requirements
+## Development
 
 For development, you will need the [ResoniteHotReloadLib](https://github.com/Nytra/ResoniteHotReloadLib) to be able to hot reload your mod with DEBUG build.
+
+### Testing and Code Coverage
+
+This project includes automated testing with code coverage reporting.
+
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with code coverage collection
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+### Generating Coverage Reports
+
+After running tests with coverage collection, you can generate HTML coverage reports:
+
+```bash
+# Generate HTML coverage report
+dotnet tool run reportgenerator "-reports:TestResults\**\coverage.cobertura.xml" "-targetdir:TestResults\html" "-reporttypes:Html;HtmlSummary;Badges;TextSummary"
+```
+
+The generated HTML report will be available at `TestResults\html\index.html`.
+
+### Code Formatting
+
+This project uses CSharpier for code formatting:
+
+```bash
+# Check formatting
+dotnet csharpier check .
+
+# Apply formatting
+dotnet csharpier format .
+```
