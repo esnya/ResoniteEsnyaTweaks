@@ -86,8 +86,8 @@ jobs:
 
       - name: Download RML
         run: |
-          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll ${{ steps.setup_resonite_env.outputs.libraries-path }}/ResoniteModLoader.dll
-          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll ${{ steps.setup_resonite_env.outputs.libraries-path }}/../rml_libs/0Harmony.dll
+          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll -o ${{ steps.setup_resonite_env.outputs.libraries-path }}/ResoniteModLoader.dll
+          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll -o ${{ steps.setup_resonite_env.outputs.libraries-path }}/../rml_libs/0Harmony.dll
 
       - name: Build RML mod
         run: |
