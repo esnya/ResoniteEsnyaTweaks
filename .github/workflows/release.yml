@@ -23,32 +23,32 @@ jobs:
     permissions:
       contents: read
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Get version from Directory.Build.props
-      id: get_version
-      run: |
-        VERSION=$(grep -o '<Version>[^<]*</Version>' Directory.Build.props | sed -e 's/<Version>//' -e 's/<\/Version>//')
-        echo "Version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Get version from Directory.Build.props
+        id: get_version
+        run: |
+          VERSION=$(grep -o '<Version>[^<]*</Version>' Directory.Build.props | sed -e 's/<Version>//' -e 's/<\/Version>//')
+          echo "Version=$VERSION" >> $GITHUB_OUTPUT
 
-    - name: Debug version info
-      run: |
-        echo "Found version: ${{ steps.get_version.outputs.Version }}"
+      - name: Debug version info
+        run: |
+          echo "Found version: ${{ steps.get_version.outputs.Version }}"
 
-    - name: Pull tags
-      run: git fetch --tags
+      - name: Pull tags
+        run: git fetch --tags
 
-    - name: Check if tag exists
-      id: check_tag
-      run: |
-        if [ -z "$(git tag -l "v${{ steps.get_version.outputs.Version }}")" ]; then
-          echo "TagExists=false" >> $GITHUB_OUTPUT
-        else
-          echo "TagExists=true" >> $GITHUB_OUTPUT
-        fi
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if [ -z "$(git tag -l "v${{ steps.get_version.outputs.Version }}")" ]; then
+            echo "TagExists=false" >> $GITHUB_OUTPUT
+          else
+            echo "TagExists=true" >> $GITHUB_OUTPUT
+          fi
     outputs:
       should_release: ${{ steps.check_tag.outputs.TagExists == 'false' }}
       version: ${{ steps.get_version.outputs.Version }}
@@ -68,8 +68,6 @@ jobs:
             artifact: EsnyaTweaks.LODGroupTweaks.dll
           - project: PhotonDustTweaks
             artifact: EsnyaTweaks.PhotonDustTweaks.dll
-          - project: SystemHelperTweaks
-            artifact: EsnyaTweaks.SystemHelperTweaks.dll
           - project: UniLogTweaks
             artifact: EsnyaTweaks.UniLogTweaks.dll
     steps:
@@ -135,4 +133,3 @@ jobs:
             **/*.dll
           generate_release_notes: true
           tag_name: v${{ needs.prepare-release.outputs.version }}
-

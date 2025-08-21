@@ -8,7 +8,6 @@ A collection of small [ResoniteModLoader](https://github.com/resonite-modding-gr
 - **FluxLoopTweaks**: Adds timeout functionality to `While` and `AsyncWhile` loops.
 - **LODGroupTweaks**: Sets `LODGroup` update order to 1000 and provides inspector buttons to manage child LOD levels.
 - **PhotonDustTweaks**: Adds inspector utilities for modules on parent `ParticleStyle` objects.
-- **SystemHelperTweaks**: Adds timeout and restart functionality to `SystemHelper` initialization.
 - **UniLogTweaks**: Provides options to control stack traces for UniLog messages.
 
 ## Installation
