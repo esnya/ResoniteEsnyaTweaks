@@ -77,11 +77,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Resonite environment
+      - id: setup_resonite_env
+        name: Setup Resonite environment
         uses: resonite-modding-group/setup-resonite-env-action@v0.1.0
         with:
           steam-user: ${{ secrets.STEAMUSER }}
           steam-password: ${{ secrets.STEAMPASS }}
+
+      - name: Download RML
+        run: |
+          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll ${{ steps.setup_resonite_env.outputs.libraries-path }}/ResoniteModLoader.dll
+          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll ${{ steps.setup_resonite_env.outputs.libraries-path }}/../rml_libs/0Harmony.dll
 
       - name: Build RML mod
         run: |
