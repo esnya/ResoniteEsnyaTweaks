@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxLoopTweaks", "FluxLoopT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniLogTweaks", "UniLogTweaks\UniLogTweaks.csproj", "{5BE9D059-0227-4322-B73D-54F422E7DDA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemHelperTweaks", "SystemHelperTweaks\SystemHelperTweaks.csproj", "{D0282062-760B-452B-8C78-0F0E15858EF5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonDustTweaks", "PhotonDustTweaks\PhotonDustTweaks.csproj", "{A7A0326B-D757-4E2C-ACD6-426B0F3F18E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxLoopTweaks.Tests", "FluxLoopTweaks.Tests\FluxLoopTweaks.Tests.csproj", "{9A0AF87D-F102-448F-8B75-B9696D5159AA}"
@@ -17,8 +15,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LODGroupTweaks.Tests", "LODGroupTweaks.Tests\LODGroupTweaks.Tests.csproj", "{DA0D4E6F-9A71-4251-A4E6-37CA4BB13687}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonDustTweaks.Tests", "PhotonDustTweaks.Tests\PhotonDustTweaks.Tests.csproj", "{9454CEF3-8C34-4C50-A510-9CE3479FB3BE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemHelperTweaks.Tests", "SystemHelperTweaks.Tests\SystemHelperTweaks.Tests.csproj", "{7E5AABEA-B222-4C9A-AADD-4759DFED57FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniLogTweaks.Tests", "UniLogTweaks.Tests\UniLogTweaks.Tests.csproj", "{4E41E71E-8262-4051-8319-11387B4FD592}"
 EndProject
