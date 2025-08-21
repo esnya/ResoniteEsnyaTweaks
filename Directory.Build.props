@@ -94,10 +94,6 @@
       <HintPath>$(ResonitePath)ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
-    <Reference Include="SystemHelperClient">
-      <HintPath>$(ResonitePath)SystemHelperClient.dll</HintPath>
-      <Private>$(IsTestProject)</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup Condition="$(IsTestProject) == 'true'">
     <PackageReference Include="xunit.v3" />
