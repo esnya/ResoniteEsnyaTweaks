@@ -4,7 +4,7 @@
     <RepositoryUrl>https://github.com/esnya/EsnyaTweaks</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Resonite,Mod,ResoniteModLoader</PackageTags>
-    <Version>0.2.0</Version>
+    <Version>1.0.0-beta.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Product>$(AssemblyTitle)</Product>
     <RootNamespace Condition="'$(RootNamespace)'==''"
@@ -16,7 +16,7 @@
     <Copyright>Copyright (c) 2025 $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
@@ -71,15 +71,15 @@
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="FrooxEngine">
-      <HintPath>$(ResonitePath)Resonite_Data\Managed\FrooxEngine.dll</HintPath>
+      <HintPath>$(ResonitePath)FrooxEngine.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="Elements.Core">
-      <HintPath>$(ResonitePath)Resonite_Data\Managed\Elements.Core.dll</HintPath>
+      <HintPath>$(ResonitePath)Elements.Core.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>$(ResonitePath)Resonite_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(ResonitePath)Newtonsoft.Json.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="ResoniteHotReloadLib" Condition="'$(Configuration)'=='Debug'">
@@ -87,15 +87,15 @@
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="ProtoFlux.Core">
-      <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Core.dll</HintPath>
+      <HintPath>$(ResonitePath)ProtoFlux.Core.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="ProtoFlux.Nodes.FrooxEngine">
-      <HintPath>$(ResonitePath)Resonite_Data\Managed\ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
+      <HintPath>$(ResonitePath)ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="SystemHelperClient">
-      <HintPath>$(ResonitePath)Resonite_Data\Managed\SystemHelperClient.dll</HintPath>
+      <HintPath>$(ResonitePath)SystemHelperClient.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
   </ItemGroup>

@@ -56,7 +56,7 @@ jobs:
   build:
     if: always() && (needs.prepare-release.result == 'success' || needs.prepare-release.result == 'skipped') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     needs: [prepare-release]
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     strategy:
@@ -79,30 +79,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET 9.0
-        uses: actions/setup-dotnet@v4
+      - name: Setup Resonite environment
+        uses: resonite-modding-group/setup-resonite-env-action@v0.1.0
         with:
-          dotnet-version: '9.0.x'
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup RML environment
-        uses: esnya/setup-rml-env@v2
-        with:
-          steam-login: ${{ secrets.STEAMLOGIN }}
+          steam-user: ${{ secrets.STEAMUSER }}
+          steam-password: ${{ secrets.STEAMPASS }}
 
       - name: Build RML mod
-        shell: pwsh
         run: |
           dotnet restore
-          dotnet build ${{ matrix.project }} --configuration Release --output ${{ github.workspace }}/${{ matrix.project }}/bin/Release/net472
+          dotnet build ${{ matrix.project }} --configuration Release
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.project }}/bin/Release/net472/${{ matrix.artifact }}
+          path: ${{ matrix.project }}/bin/Release/net9.0/${{ matrix.artifact }}
 
   release:
     if: needs.prepare-release.outputs.should_release == 'true'
