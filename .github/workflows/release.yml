@@ -77,18 +77,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - id: setup_resonite_env
-        name: Setup Resonite environment
+      - name: Setup Resonite environment
+        id: build-env
         uses: resonite-modding-group/setup-resonite-env-action@v0.1.0
         with:
           steam-user: ${{ secrets.STEAMUSER }}
           steam-password: ${{ secrets.STEAMPASS }}
 
-      - name: Download RML
+      - name: Install ResoniteModLoader and Harmony
         run: |
-          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll -o ${{ steps.setup_resonite_env.outputs.libraries-path }}/ResoniteModLoader.dll
-          mkdir -p ${{ steps.setup_resonite_env.outputs.libraries-path }}/../rml_libs
-          wget https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll -o ${{ steps.setup_resonite_env.outputs.libraries-path }}/../rml_libs/0Harmony.dll
+          set -euo pipefail
+          LIBS_PATH="${{ steps.build-env.outputs.libraries-path }}"
+          RESONITE_DIR="$(dirname "${LIBS_PATH}")"
+          echo "Libraries: ${LIBS_PATH}"
+          echo "Resonite dir: ${RESONITE_DIR}"
+          mkdir -p "${LIBS_PATH}"
+          mkdir -p "${RESONITE_DIR}/rml_libs"
+          # Download RML
+          curl -fsSL -o "${LIBS_PATH}/ResoniteModLoader.dll" \
+            https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll
+          # Download Harmony DLL. Try rml_libs, fallback to root if needed
+          if ! curl -fsSL -o "${RESONITE_DIR}/rml_libs/0Harmony.dll" \
+            https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll; then
+            echo "Falling back to placing 0Harmony.dll in Resonite root"
+            curl -fsSL -o "${RESONITE_DIR}/0Harmony.dll" \
+              https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll
+          fi
 
       - name: Build RML mod
         run: |

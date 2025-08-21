@@ -7,13 +7,13 @@
       ContinueOnError="true"
     />
     <Message
-      Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods\HotReloadMods"
+      Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods/HotReloadMods"
       Importance="high"
       Condition="'$(Configuration)'=='Debug'"
     />
     <Copy
       SourceFiles="$(TargetDir)$(TargetFileName)"
-      DestinationFolder="$(ResonitePath)rml_mods\HotReloadMods"
+      DestinationFolder="$(ResonitePath)rml_mods/HotReloadMods"
       ContinueOnError="true"
       Condition="'$(Configuration)'=='Debug'"
     />
