@@ -35,27 +35,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(ResonitePath)'==''">
     <ResonitePath>$(MSBuildThisFileDirectory)Resonite/</ResonitePath>
-    <ResonitePath Condition="Exists('$(MSBuildProjectDirectory)\Resonite\')"
-    >
-      $(MSBuildProjectDirectory)\Resonite\</ResonitePath>
-    <ResonitePath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')"
-    >C:\Program
-      Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath>
-    <ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')"
-    >
-      $(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath>
-    <ResonitePath Condition="Exists('C:\Program Files\Steam\steamapps\common\Resonite\')"
-    >C:\Program
-      Files\Steam\steamapps\common\Resonite\</ResonitePath>
-    <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')"
-    >
-      $(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath>
-    <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')"
-    >
-      $(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
-    <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')"
-    >
-      /home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('$(MSBuildProjectDirectory)\Resonite\')">$(MSBuildProjectDirectory)\Resonite\</ResonitePath>
+    <ResonitePath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')">C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath>
+    <ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')">$(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('C:\Program Files\Steam\steamapps\common\Resonite\')">C:\Program Files\Steam\steamapps\common\Resonite\</ResonitePath>
+    <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')">$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath>
+    <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ResoniteModLoader">
