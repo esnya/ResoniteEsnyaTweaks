@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.UIX;
@@ -18,6 +21,8 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     private const string ADD_LABEL = "[Mod] Add LOD Level from children";
     private const string SETUP_LABEL = "[Mod] Setup LOD Levels by parts";
     private const string REMOVE_LABEL = "[Mod] Remove LODGroups from children";
+    private const string SCAN_LABEL = "[Mod] Scan LOD issues & spawn report";
+    private const string FIX_LABEL = "[Mod] Fix issues by sorting (no epsilon) (Not Undoable)";
 
     private static void Postfix(Worker worker, UIBuilder ui)
     {
@@ -73,19 +78,262 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         Button(ui, ADD_LABEL, button => SetupFromChildren(button, lodGroup));
         Button(ui, SETUP_LABEL, button => SetupByParts(button, lodGroup));
         Button(ui, REMOVE_LABEL, button => RemoveFromChildren(button, lodGroup));
+        Button(ui, SCAN_LABEL, _ => ScanAllLODGroupsAndSpawnReport(lodGroup));
+        Button(ui, FIX_LABEL, _ => FixLODGroupsBySortingAndShowResult(lodGroup));
     }
 
-    private static void Button(UIBuilder ui, string text, System.Action<Button> onClick)
+    // (moved) Use Slot.PositionInFrontOfUser extension
+
+    private static void Button(UIBuilder ui, string text, Action<Button> onClick)
     {
         var button = ui.Button(text);
-        button.IsPressed.OnValueChange += (value) =>
+        button.LocalPressed += (_, __) =>
         {
-            if (value)
-            {
-                onClick(button);
-            }
+            onClick(button);
         };
     }
+
+    private static void Button(UIBuilder ui, string text, ButtonEventHandler onLocalPress)
+    {
+        var button = ui.Button(text);
+        button.LocalPressed += onLocalPress;
+    }
+
+    private static void ScanAllLODGroupsAndSpawnReport(LODGroup context)
+    {
+        var world = context.Slot.World;
+        var root = world.RootSlot;
+
+        var groups = Pool.BorrowList<LODGroup>();
+        var problematic = Pool.BorrowList<(LODGroup Group, float[] Heights, int[] Violations)>();
+        try
+        {
+            root.GetComponentsInChildren(groups);
+
+            foreach (var g in groups)
+            {
+                if (g.LODs.Count <= 1)
+                {
+                    continue;
+                }
+
+                var heights = g.LODs
+                    .Select(l => l.ScreenRelativeTransitionHeight.Value)
+                    .ToArray();
+
+                var violations = new List<int>();
+                for (var i = 0; i < heights.Length - 1; i++)
+                {
+                    // Report strictly ascending and equal values as issues.
+                    if (heights[i] <= heights[i + 1])
+                    {
+                        violations.Add(i);
+                    }
+                }
+
+                if (violations.Count > 0)
+                {
+                    problematic.Add((g, heights, violations.ToArray()));
+                }
+            }
+
+            var sb = new StringBuilder();
+            sb.AppendLine("LOD issues report (ascending or equal threshold issues)");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Scanned: {groups.Count}, Problems: {problematic.Count}");
+
+            foreach (var (group, heights, violations) in problematic)
+            {
+                var slot = group.Slot;
+                var slotName = slot.Name;
+                // Build path manually from root
+                var names = new Stack<string>();
+                for (var s = slot; s != null; s = s.Parent)
+                {
+                    names.Push(s.Name);
+                }
+                var path = string.Join('/', names);
+
+                var heightsText = string.Join(
+                    ", ",
+                    heights.Select(h => h.ToString("F6", CultureInfo.InvariantCulture))
+                );
+                var idxText = string.Join(", ", violations);
+                sb.AppendLine(CultureInfo.InvariantCulture, $"- {slotName} ({path})");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"  Heights: [{heightsText}]");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"  Violations at indices: [{idxText}] (h[i] <= h[i+1])");
+            }
+
+            var report = sb.ToString();
+            if (problematic.Count == 0)
+            {
+                ResoniteMod.Msg("[LODGroupTweaks] No LOD issues found.");
+            }
+            else
+            {
+                ResoniteMod.Msg($"[LODGroupTweaks] Found {problematic.Count} LODGroup issues. Report spawned under {context.Slot}");
+            }
+            var parentForReport = world.LocalUserSpace;
+            if (parentForReport == null)
+            {
+                ResoniteMod.Warn("[LODGroupTweaks] LocalUserSpace not available. Report will not be spawned (no fallback).");
+                return;
+            }
+            var container = parentForReport.AddSlot("[LODGroupTweaks] LOD issues report");
+            container.PositionInFrontOfUser();
+
+            // Spawn text via UniversalImporter inside the container
+            UniversalImporter.SpawnText(
+                container,
+                "[LODGroupTweaks] LOD issues report",
+                report,
+                16f,
+                null,
+                allowRTF: false
+            );
+
+            // No fix button here; fix is available as a separate inspector button
+        }
+        finally
+        {
+            Pool.Return(ref problematic);
+            Pool.Return(ref groups);
+        }
+    }
+
+    // Sort-only fix across all LODGroups; equal values are considered OK and won't be modified.
+    private static void FixLODGroupsBySortingAndShowResult(LODGroup context, Slot container)
+    {
+        var world = context.Slot.World;
+        var root = world.RootSlot;
+
+        var groups = Pool.BorrowList<LODGroup>();
+        try
+        {
+            root.GetComponentsInChildren(groups);
+
+            var changedCount = 0;
+            var attempted = 0;
+
+            // Note: Not undoable (list/ordering changes aren't undo-tracked reliably)
+            foreach (var g in groups)
+            {
+                if (g.LODs.Count <= 1)
+                {
+                    continue;
+                }
+
+                attempted++;
+                if (ReorderBySortingOnly(g))
+                {
+                    changedCount++;
+                }
+            }
+
+            // Re-scan to compute remaining issues (strictly ascending only)
+            var remainingIssues = 0;
+            foreach (var g in groups)
+            {
+                if (g.LODs.Count <= 1)
+                {
+                    continue;
+                }
+
+                var heights = g.LODs.Select(l => l.ScreenRelativeTransitionHeight.Value).ToArray();
+                for (var i = 0; i < heights.Length - 1; i++)
+                {
+                    if (heights[i] <= heights[i + 1])
+                    {
+                        remainingIssues++;
+                        break;
+                    }
+                }
+            }
+
+            var summary = $"Fixed groups: {changedCount} / {attempted}; Remaining problematic groups: {remainingIssues}";
+            ResoniteMod.Msg($"[LODGroupTweaks] {summary}");
+
+            // Spawn a summary text into the provided container only if available (no fallback)
+            if (container != null)
+            {
+                UniversalImporter.SpawnText(
+                    container,
+                    "[LODGroupTweaks] LOD fix result",
+                    summary,
+                    16f,
+                    null,
+                    allowRTF: false
+                );
+            }
+            else
+            {
+                ResoniteMod.Warn("[LODGroupTweaks] LocalUserSpace not available. Fix result will not be spawned (no fallback).");
+            }
+        }
+        finally
+        {
+            Pool.Return(ref groups);
+        }
+    }
+
+    // Overload for inspector button: create a result container automatically
+    private static void FixLODGroupsBySortingAndShowResult(LODGroup context)
+    {
+        var parent = context.Slot.World.LocalUserSpace;
+        if (parent == null)
+        {
+            ResoniteMod.Warn("[LODGroupTweaks] LocalUserSpace not available. Fix result will not be spawned (no fallback).");
+            return;
+        }
+        var container = parent.AddSlot("[LODGroupTweaks] LOD fix result");
+        container.PositionInFrontOfUser();
+        FixLODGroupsBySortingAndShowResult(context, container);
+    }
+
+    private static bool ReorderBySortingOnly(LODGroup g)
+    {
+        try
+        {
+            var lods = g.LODs;
+
+            var items = lods.ToArray();
+            var heights = items.Select(l => l.ScreenRelativeTransitionHeight.Value).ToArray();
+            var sorted = heights.OrderByDescending(v => v).ToArray();
+
+            var changed = false;
+            for (var i = 0; i < heights.Length; i++)
+            {
+                if (heights[i] != sorted[i])
+                {
+                    changed = true;
+                    break;
+                }
+            }
+            if (!changed)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < items.Length; i++)
+            {
+                if (heights[i] != sorted[i])
+                {
+                    items[i].ScreenRelativeTransitionHeight.Value = sorted[i];
+                }
+            }
+
+            ResoniteMod.DebugFunc(() =>
+                $"[LODGroupTweaks] Sorted LOD heights on {g.Slot}. Before: [{string.Join(", ", heights.Select(h => h.ToString("F6", CultureInfo.InvariantCulture)))}], After: [{string.Join(", ", sorted.Select(h => h.ToString("F6", CultureInfo.InvariantCulture)))}]"
+            );
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ResoniteMod.Warn($"[LODGroupTweaks] Failed to reorder LODGroup by sorting: {ex}");
+            return false;
+        }
+    }
+
+    // (removed wrapper)
 
     private static void SetupFromChildren(Button _, LODGroup lodGroup)
     {

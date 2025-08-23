@@ -32,6 +32,8 @@
     <OutputType>Exe</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TreatWarningsAsErrors Condition="'$(Configuration)'=='Release'">true</TreatWarningsAsErrors>
+  <!-- Test projects expose public types for test discovery; suppress CA1515 recommendation -->
+  <NoWarn>$(NoWarn);CA1515</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(ResonitePath)'==''">
     <ResonitePath>$(MSBuildThisFileDirectory)Resonite/</ResonitePath>

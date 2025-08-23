@@ -30,13 +30,13 @@ public class LODGroupTweaksMod : ResoniteMod
             var informationalVersion = ModAssembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion;
-            if (informationalVersion != null)
+            if (!string.IsNullOrEmpty(informationalVersion))
             {
                 // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+');
+                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
                 return plusIndex >= 0
-                    ? informationalVersion.Substring(0, plusIndex)
-                    : informationalVersion;
+                    ? informationalVersion![..plusIndex]
+                    : informationalVersion!;
             }
             return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
         }
@@ -46,8 +46,8 @@ public class LODGroupTweaksMod : ResoniteMod
     public override string Link =>
         ModAssembly
             .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .First(meta => meta.Key == "RepositoryUrl")
-            .Value;
+            .FirstOrDefault(meta => meta.Key == "RepositoryUrl")?.Value
+        ?? "";
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
 
