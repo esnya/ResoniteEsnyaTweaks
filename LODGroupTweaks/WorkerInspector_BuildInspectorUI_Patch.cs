@@ -22,7 +22,8 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     private const string SETUP_LABEL = "[Mod] Setup LOD Levels by parts";
     private const string REMOVE_LABEL = "[Mod] Remove LODGroups from children";
     private const string SCAN_LABEL = "[Mod] Scan LOD issues & spawn report";
-    private const string FIX_LABEL = "[Mod] Fix issues by sorting (no epsilon) (Not Undoable)";
+    private const string FIX_LABEL = "[Mod] Fix LOD issues by sorting";
+    private const string OPEN_INSPECTORS_LABEL = "[Mod] Open inspectors for violating LODGroups";
 
     private static void Postfix(Worker worker, UIBuilder ui)
     {
@@ -35,44 +36,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         }
     }
 
-    private static void PatchSliderUI(LODGroup lodGroup, UIBuilder ui)
-    {
-        var root = ui.Root;
-        foreach (var listEditor in ui.Canvas.Slot.GetComponentsInChildren<ListEditor>())
-        {
-            lodGroup.StartTask(
-                async delegate
-                {
-                    var sliders = Pool.BorrowList<SliderMemberEditor>();
-
-                    try
-                    {
-                        while (!root.IsDestroyed)
-                        {
-                            root.GetComponentsInChildren(sliders);
-
-                            if (sliders.Count > 0)
-                            {
-                                foreach (var slider in sliders)
-                                {
-                                    slider.TextFormat = "F4";
-                                }
-
-                                return;
-                            }
-
-                            await default(NextUpdate);
-                        }
-                    }
-                    finally
-                    {
-                        Pool.Return(ref sliders);
-                    }
-                }
-            );
-        }
-    }
-
     private static void BuildInspectorUI(LODGroup lodGroup, UIBuilder ui)
     {
         Button(ui, ADD_LABEL, button => SetupFromChildren(button, lodGroup));
@@ -80,9 +43,8 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         Button(ui, REMOVE_LABEL, button => RemoveFromChildren(button, lodGroup));
         Button(ui, SCAN_LABEL, _ => ScanAllLODGroupsAndSpawnReport(lodGroup));
         Button(ui, FIX_LABEL, _ => FixLODGroupsBySortingAndShowResult(lodGroup));
+        Button(ui, OPEN_INSPECTORS_LABEL, _ => OpenInspectorsForViolatingLODGroups(lodGroup));
     }
-
-    // (moved) Use Slot.PositionInFrontOfUser extension
 
     private static void Button(UIBuilder ui, string text, Action<Button> onClick)
     {
@@ -117,14 +79,11 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
                     continue;
                 }
 
-                var heights = g.LODs
-                    .Select(l => l.ScreenRelativeTransitionHeight.Value)
-                    .ToArray();
+                var heights = GetHeights(g);
 
                 var violations = new List<int>();
                 for (var i = 0; i < heights.Length - 1; i++)
                 {
-                    // Report strictly ascending and equal values as issues.
                     if (heights[i] <= heights[i + 1])
                     {
                         violations.Add(i);
@@ -143,22 +102,13 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
 
             foreach (var (group, heights, violations) in problematic)
             {
-                var slot = group.Slot;
-                var slotName = slot.Name;
-                // Build path manually from root
-                var names = new Stack<string>();
-                for (var s = slot; s != null; s = s.Parent)
-                {
-                    names.Push(s.Name);
-                }
-                var path = string.Join('/', names);
-
+                var path = GetSlotPath(group.Slot);
                 var heightsText = string.Join(
                     ", ",
                     heights.Select(h => h.ToString("F6", CultureInfo.InvariantCulture))
                 );
                 var idxText = string.Join(", ", violations);
-                sb.AppendLine(CultureInfo.InvariantCulture, $"- {slotName} ({path})");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"- {group.Slot.Name} ({path})");
                 sb.AppendLine(CultureInfo.InvariantCulture, $"  Heights: [{heightsText}]");
                 sb.AppendLine(CultureInfo.InvariantCulture, $"  Violations at indices: [{idxText}] (h[i] <= h[i+1])");
             }
@@ -166,22 +116,20 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             var report = sb.ToString();
             if (problematic.Count == 0)
             {
-                ResoniteMod.Msg("[LODGroupTweaks] No LOD issues found.");
+                ResoniteMod.Msg("No LOD issues found.");
             }
             else
             {
-                ResoniteMod.Msg($"[LODGroupTweaks] Found {problematic.Count} LODGroup issues. Report spawned under {context.Slot}");
+                ResoniteMod.Msg($"Found {problematic.Count} LODGroup issues. Report spawned under {context.Slot}");
             }
-            var parentForReport = world.LocalUserSpace;
-            if (parentForReport == null)
+            var reportParent = world.LocalUserSpace;
+            if (reportParent == null)
             {
-                ResoniteMod.Warn("[LODGroupTweaks] LocalUserSpace not available. Report will not be spawned (no fallback).");
+                ResoniteMod.Warn("LocalUserSpace not available. Report will not be spawned (no fallback).");
                 return;
             }
-            var container = parentForReport.AddSlot("[LODGroupTweaks] LOD issues report");
+            var container = reportParent.AddSlot("[LODGroupTweaks] LOD issues report");
             container.PositionInFrontOfUser();
-
-            // Spawn text via UniversalImporter inside the container
             UniversalImporter.SpawnText(
                 container,
                 "[LODGroupTweaks] LOD issues report",
@@ -190,8 +138,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
                 null,
                 allowRTF: false
             );
-
-            // No fix button here; fix is available as a separate inspector button
         }
         finally
         {
@@ -199,141 +145,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             Pool.Return(ref groups);
         }
     }
-
-    // Sort-only fix across all LODGroups; equal values are considered OK and won't be modified.
-    private static void FixLODGroupsBySortingAndShowResult(LODGroup context, Slot container)
-    {
-        var world = context.Slot.World;
-        var root = world.RootSlot;
-
-        var groups = Pool.BorrowList<LODGroup>();
-        try
-        {
-            root.GetComponentsInChildren(groups);
-
-            var changedCount = 0;
-            var attempted = 0;
-
-            // Note: Not undoable (list/ordering changes aren't undo-tracked reliably)
-            foreach (var g in groups)
-            {
-                if (g.LODs.Count <= 1)
-                {
-                    continue;
-                }
-
-                attempted++;
-                if (ReorderBySortingOnly(g))
-                {
-                    changedCount++;
-                }
-            }
-
-            // Re-scan to compute remaining issues (strictly ascending only)
-            var remainingIssues = 0;
-            foreach (var g in groups)
-            {
-                if (g.LODs.Count <= 1)
-                {
-                    continue;
-                }
-
-                var heights = g.LODs.Select(l => l.ScreenRelativeTransitionHeight.Value).ToArray();
-                for (var i = 0; i < heights.Length - 1; i++)
-                {
-                    if (heights[i] <= heights[i + 1])
-                    {
-                        remainingIssues++;
-                        break;
-                    }
-                }
-            }
-
-            var summary = $"Fixed groups: {changedCount} / {attempted}; Remaining problematic groups: {remainingIssues}";
-            ResoniteMod.Msg($"[LODGroupTweaks] {summary}");
-
-            // Spawn a summary text into the provided container only if available (no fallback)
-            if (container != null)
-            {
-                UniversalImporter.SpawnText(
-                    container,
-                    "[LODGroupTweaks] LOD fix result",
-                    summary,
-                    16f,
-                    null,
-                    allowRTF: false
-                );
-            }
-            else
-            {
-                ResoniteMod.Warn("[LODGroupTweaks] LocalUserSpace not available. Fix result will not be spawned (no fallback).");
-            }
-        }
-        finally
-        {
-            Pool.Return(ref groups);
-        }
-    }
-
-    // Overload for inspector button: create a result container automatically
-    private static void FixLODGroupsBySortingAndShowResult(LODGroup context)
-    {
-        var parent = context.Slot.World.LocalUserSpace;
-        if (parent == null)
-        {
-            ResoniteMod.Warn("[LODGroupTweaks] LocalUserSpace not available. Fix result will not be spawned (no fallback).");
-            return;
-        }
-        var container = parent.AddSlot("[LODGroupTweaks] LOD fix result");
-        container.PositionInFrontOfUser();
-        FixLODGroupsBySortingAndShowResult(context, container);
-    }
-
-    private static bool ReorderBySortingOnly(LODGroup g)
-    {
-        try
-        {
-            var lods = g.LODs;
-
-            var items = lods.ToArray();
-            var heights = items.Select(l => l.ScreenRelativeTransitionHeight.Value).ToArray();
-            var sorted = heights.OrderByDescending(v => v).ToArray();
-
-            var changed = false;
-            for (var i = 0; i < heights.Length; i++)
-            {
-                if (heights[i] != sorted[i])
-                {
-                    changed = true;
-                    break;
-                }
-            }
-            if (!changed)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < items.Length; i++)
-            {
-                if (heights[i] != sorted[i])
-                {
-                    items[i].ScreenRelativeTransitionHeight.Value = sorted[i];
-                }
-            }
-
-            ResoniteMod.DebugFunc(() =>
-                $"[LODGroupTweaks] Sorted LOD heights on {g.Slot}. Before: [{string.Join(", ", heights.Select(h => h.ToString("F6", CultureInfo.InvariantCulture)))}], After: [{string.Join(", ", sorted.Select(h => h.ToString("F6", CultureInfo.InvariantCulture)))}]"
-            );
-            return true;
-        }
-        catch (Exception ex)
-        {
-            ResoniteMod.Warn($"[LODGroupTweaks] Failed to reorder LODGroup by sorting: {ex}");
-            return false;
-        }
-    }
-
-    // (removed wrapper)
 
     private static void SetupFromChildren(Button _, LODGroup lodGroup)
     {
@@ -378,7 +189,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         var totalSize = GetBoundingMagnitude(space);
         var sizeThreshold = totalSize * 0.3333f;
 
-        var largeRanderers = Pool.BorrowList<KeyValuePair<MeshRenderer, float>>();
+        var largeRenderers = Pool.BorrowList<KeyValuePair<MeshRenderer, float>>();
         var rendererWithScore = Pool.BorrowList<KeyValuePair<MeshRenderer, float>>();
         var renderers = Pool.BorrowList<MeshRenderer>();
         try
@@ -394,7 +205,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
                 orderby p.Value descending
                 select p
             );
-
             if (ResoniteMod.IsDebugEnabled())
             {
                 foreach (var pair in rendererWithScore)
@@ -405,9 +215,9 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             var thresholdIndex = rendererWithScore.FindLastIndex(p => p.Value > sizeThreshold);
             if (thresholdIndex > 0)
             {
-                largeRanderers.AddRange(rendererWithScore.Take(thresholdIndex));
+                largeRenderers.AddRange(rendererWithScore.Take(thresholdIndex));
                 AddLOD(lodGroup, 0.005f * totalSize, rendererWithScore);
-                AddLOD(lodGroup, 0.005f * totalSize, largeRanderers);
+                AddLOD(lodGroup, 0.005f * totalSize, largeRenderers);
             }
             else
             {
@@ -418,7 +228,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         {
             Pool.Return(ref renderers);
             Pool.Return(ref rendererWithScore);
-            Pool.Return(ref largeRanderers);
+            Pool.Return(ref largeRenderers);
         }
     }
 
@@ -433,5 +243,135 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         }
 
         button.LabelText = $"{REMOVE_LABEL} (Removed {count} groups)";
+    }
+
+    private static void FixLODGroupsBySortingAndShowResult(LODGroup lodGroup)
+    {
+        var lods = lodGroup.LODs;
+        if (lods == null || lods.Count <= 1)
+        {
+            ResoniteMod.Msg("Nothing to fix (no or single LOD level).");
+            return;
+        }
+
+        // Snapshot current heights
+        var before = lods.Select(l => l?.ScreenRelativeTransitionHeight.Value ?? 0f).ToArray();
+
+        // Build descending, strictly decreasing target sequence
+        var target = before.OrderByDescending(h => h).ToArray();
+        if (target.Length > 0)
+        {
+            // Enforce strict descending by nudging ties downward by 1 ULP
+            var prev = float.PositiveInfinity;
+            for (var i = 0; i < target.Length; i++)
+            {
+                var h = target[i];
+                if (h >= prev)
+                {
+                    h = MathF.BitDecrement(prev);
+                }
+                if (h < 0f)
+                {
+                    h = 0f;
+                }
+                target[i] = h;
+                prev = h;
+            }
+        }
+
+        // Apply back to components in their current order
+        for (var i = 0; i < lods.Count && i < target.Length; i++)
+        {
+            var l = lods[i];
+            if (l != null)
+            {
+                l.ScreenRelativeTransitionHeight.Value = target[i];
+            }
+        }
+
+        var after = lods.Select(l => l?.ScreenRelativeTransitionHeight.Value ?? 0f).ToArray();
+
+        if (ResoniteMod.IsDebugEnabled())
+        {
+            var bh = string.Join(", ", before.Select(h => h.ToString("F6", CultureInfo.InvariantCulture)));
+            var ah = string.Join(", ", after.Select(h => h.ToString("F6", CultureInfo.InvariantCulture)));
+            ResoniteMod.Debug($"LOD thresholds fixed (descending).\nBefore: [{bh}]\nAfter : [{ah}]");
+        }
+        ResoniteMod.Msg("LOD thresholds normalized to descending order.");
+    }
+
+    private static void OpenInspectorsForViolatingLODGroups(LODGroup context)
+    {
+        var world = context.Slot.World;
+        var root = world.RootSlot;
+
+        var groups = Pool.BorrowList<LODGroup>();
+        var violating = Pool.BorrowList<LODGroup>();
+        try
+        {
+            root.GetComponentsInChildren(groups);
+
+            foreach (var g in groups)
+            {
+                if (g == null || g.LODs == null || g.LODs.Count <= 1)
+                {
+                    continue;
+                }
+                var heights = GetHeights(g);
+                if (HasViolation(heights))
+                {
+                    violating.Add(g);
+                }
+            }
+
+            foreach (var g in violating)
+            {
+                g.OpenInspectorForTarget(context.Slot, openWorkerOnly: true);
+            }
+
+            if (violating.Count == 0)
+            {
+                ResoniteMod.Msg("No violating LODGroups found.");
+            }
+            else
+            {
+                ResoniteMod.Msg($"Opened inspectors for {violating.Count} violating LODGroup(s).");
+            }
+        }
+        finally
+        {
+            Pool.Return(ref violating);
+            Pool.Return(ref groups);
+        }
+    }
+
+    private static float[] GetHeights(LODGroup group)
+    {
+        var heights = group.LODs
+            .Select(l => l?.ScreenRelativeTransitionHeight.Value ?? 0f)
+            .ToArray();
+        return heights;
+    }
+
+    private static string GetSlotPath(Slot slot)
+    {
+        var names = new Stack<string>();
+        for (var s = slot; s != null; s = s.Parent)
+        {
+            names.Push(s.Name);
+        }
+        return string.Join('/', names);
+    }
+
+    private static bool HasViolation(float[] heights)
+    {
+        for (var i = 0; i < heights.Length - 1; i++)
+        {
+            if (heights[i] <= heights[i + 1])
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
