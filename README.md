@@ -48,12 +48,12 @@ The generated HTML report will be available at `TestResults\html\index.html`.
 
 ### Code Formatting
 
-This project uses CSharpier for code formatting:
+This project uses dotnet format for code formatting and style:
 
 ```bash
-# Check formatting
-dotnet csharpier check .
+# Check formatting & style (fails if changes are needed)
+dotnet format --verify-no-changes
 
-# Apply formatting
-dotnet csharpier format .
+# Apply formatting & style fixes
+dotnet format
 ```
