@@ -124,10 +124,26 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
             .Where(i => i.Expression.ToString() == "Button")
             .ToArray();
 
-        invocations.Should().HaveCount(3);
+        invocations.Should().HaveCount(6);
 
-        var labels = new[] { "ADD_LABEL", "SETUP_LABEL", "REMOVE_LABEL" };
-        var handlers = new[] { "SetupFromChildren", "SetupByParts", "RemoveFromChildren" };
+        var labels = new[]
+        {
+            "ADD_LABEL",
+            "SETUP_LABEL",
+            "REMOVE_LABEL",
+            "SCAN_LABEL",
+            "FIX_LABEL",
+            "OPEN_INSPECTORS_LABEL",
+        };
+        var handlers = new[]
+        {
+            "SetupFromChildren",
+            "SetupByParts",
+            "RemoveFromChildren",
+            "ScanAllLODGroupsAndSpawnReport",
+            "FixLODGroupsBySortingAndShowResult",
+            "OpenInspectorsForViolatingLODGroups",
+        };
 
         for (var i = 0; i < invocations.Length; i++)
         {
@@ -169,7 +185,9 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
             .OfType<IfStatementSyntax>()
             .Any(i =>
                 i.Condition.ToString() == "lodGroup.UpdateOrder == 0"
-                && i.Statement.ToString().Contains("lodGroup.UpdateOrder = 1000")
+                && i.Statement
+                    .ToString()
+                    .Contains("lodGroup.UpdateOrder = 1000", System.StringComparison.Ordinal)
             )
             .Should()
             .BeTrue();
@@ -208,7 +226,9 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
             .OfType<AssignmentExpressionSyntax>()
             .Any(a =>
                 a.Left.ToString() == "button.LabelText"
-                && a.Right.ToString().Contains("REMOVE_LABEL")
+                && a.Right
+                    .ToString()
+                    .Contains("REMOVE_LABEL", System.StringComparison.Ordinal)
             )
             .Should()
             .BeTrue();
