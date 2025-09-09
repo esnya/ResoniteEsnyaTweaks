@@ -126,21 +126,20 @@ internal static class LODIssuesReport
         ui.PushStyle();
         ui.Style.MinHeight = 64.0f;
 
-        // Section container (vertical stacking)
-        ui.VerticalLayout(8f);
 
         // Header row
         ui.Text("Order violations (h[i] <= h[i+1])");
 
         // Content list
+        ui.Style.ForceExpandHeight = false;
         ui.VerticalLayout(8f);
         ui.Style.MinHeight = RadiantUI_Constants.GRID_CELL_SIZE;
+        ui.Style.ForceExpandHeight = true;
         ui.Style.ForceExpandWidth = true;
         foreach (var (group, heights, violations) in problematic)
         {
             var row = ui.Panel();
             row.Slot.Name = group.Slot.Name;
-            ui.NestInto(row.Slot);
             ui.VerticalLayout(6f);
 
             // Top line: refs + actions
@@ -160,6 +159,7 @@ internal static class LODIssuesReport
             ui.HorizontalLayout(4f, 0f, Alignment.MiddleLeft);
             ui.Text("Heights: [" + string.Join(", ", heights.Select(h => h.ToString("F6", CultureInfo.InvariantCulture))) + "]  Violations: [" + string.Join(", ", violations) + "]");
             ui.NestOut();
+            ui.NestOut();
 
             ui.NestOut(); // row
         }
@@ -176,8 +176,6 @@ internal static class LODIssuesReport
         ui.PushStyle();
         ui.Style.MinHeight = 64.0f;
 
-        // Section container (vertical stacking)
-        ui.VerticalLayout(8f);
 
         // Header row
         ui.Text("Duplicate renderer registrations");
