@@ -90,7 +90,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
                 ResoniteMod.Msg("No eligible MeshRenderer found under this LODGroup.");
                 return;
             }
-            lodGroup.AddLOD(0.01f, [.. renderers]);
+            lodGroup.AddLOD(0.01f, renderers.ToArray());
         }
         finally
         {
@@ -117,7 +117,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     )
     {
         var levelSize = rendererWithBounds.Last().Value;
-        lodGroup.AddLOD(baseThreshold / levelSize, [.. rendererWithBounds.Select(p => p.Key)]);
+        lodGroup.AddLOD(baseThreshold / levelSize, rendererWithBounds.Select(p => p.Key).ToArray());
     }
 
     private static void SetupByParts(Button _, LODGroup lodGroup)
