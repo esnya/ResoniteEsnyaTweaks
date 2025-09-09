@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using Elements.Core;
@@ -39,13 +40,11 @@ public sealed class UniLogTweaksMod : ResoniteMod
             var informationalVersion = ModAssembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion;
-            if (informationalVersion != null)
+            if (!string.IsNullOrEmpty(informationalVersion))
             {
                 // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+');
-                return plusIndex >= 0
-                    ? informationalVersion.Substring(0, plusIndex)
-                    : informationalVersion;
+                var plusIndex = informationalVersion.IndexOf('+', StringComparison.Ordinal);
+                return plusIndex >= 0 ? informationalVersion![..plusIndex] : informationalVersion!;
             }
             return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
         }
@@ -57,8 +56,8 @@ public sealed class UniLogTweaksMod : ResoniteMod
     public override string Link =>
         ModAssembly
             .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .First(meta => meta.Key == "RepositoryUrl")
-            .Value;
+            .FirstOrDefault(meta => meta.Key == "RepositoryUrl")?.Value
+        ?? "";
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
 

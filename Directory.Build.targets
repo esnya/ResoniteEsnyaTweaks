@@ -1,10 +1,11 @@
 <Project>
-  <Target Name="Install">
+  <Target Name="Install" Condition="'$(IsTestProject)' != 'true'">
     <Message Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods" Importance="high" />
     <Copy
       SourceFiles="$(TargetDir)$(TargetFileName)"
       DestinationFolder="$(ResonitePath)rml_mods"
       ContinueOnError="true"
+      Condition="$([System.String]::Copy('$(TargetFileName)').EndsWith('.Tests.dll')) == 'False'"
     />
     <Message
       Text="Installing $(TargetFileName) to $(ResonitePath)rml_mods/HotReloadMods"
@@ -15,7 +16,7 @@
       SourceFiles="$(TargetDir)$(TargetFileName)"
       DestinationFolder="$(ResonitePath)rml_mods/HotReloadMods"
       ContinueOnError="true"
-      Condition="'$(Configuration)'=='Debug'"
+      Condition="'$(Configuration)'=='Debug' and $([System.String]::Copy('$(TargetFileName)').EndsWith('.Tests.dll')) == 'False'"
     />
   </Target>
 </Project>
