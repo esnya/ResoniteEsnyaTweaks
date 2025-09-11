@@ -44,7 +44,11 @@
     <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
   </PropertyGroup>
-  <ItemGroup Condition="Exists('$(ResonitePath)FrooxEngine.dll')">
+  <PropertyGroup>
+    <FrooxEnginePresent Condition="Exists('$(ResonitePath)FrooxEngine.dll')">true</FrooxEnginePresent>
+    <FrooxEnginePresent Condition="'$(FrooxEnginePresent)'==''">false</FrooxEnginePresent>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'=='true'">
     <Reference Include="ResoniteModLoader">
       <HintPath Condition="Exists('$(ResonitePath)Libraries/ResoniteModLoader.dll')">$(ResonitePath)Libraries/ResoniteModLoader.dll</HintPath>
       <HintPath Condition="Exists('$(ResonitePath)ResoniteModLoader.dll')">$(ResonitePath)ResoniteModLoader.dll</HintPath>
@@ -71,6 +75,10 @@
       <HintPath>$(ResonitePath)rml_libs/ResoniteHotReloadLib.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
+    <Reference Include="ResoniteHotReloadLibCore" Condition="'$(Configuration)'=='Debug'">
+      <HintPath>$(ResonitePath)rml_libs/ResoniteHotReloadLibCore.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
     <Reference Include="ProtoFlux.Core">
       <HintPath>$(ResonitePath)ProtoFlux.Core.dll</HintPath>
       <Private>$(IsTestProject)</Private>
@@ -81,7 +89,7 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup Condition="!Exists('$(ResonitePath)FrooxEngine.dll')">
+  <ItemGroup Condition="'$(FrooxEnginePresent)'!='true'">
     <PackageReference Include="Resonite.GameLibs" />
     <Reference Include="ResoniteModLoader">
       <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteModLoader.dll</HintPath>
@@ -89,6 +97,16 @@
     </Reference>
     <Reference Include="HarmonyLib">
       <HintPath>$(MSBuildThisFileDirectory)Resonite/0Harmony.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'!='true' and '$(Configuration)'=='Debug'">
+    <Reference Include="ResoniteHotReloadLib">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLib.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+    <Reference Include="ResoniteHotReloadLibCore">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLibCore.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
   </ItemGroup>

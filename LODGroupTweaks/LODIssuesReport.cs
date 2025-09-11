@@ -107,7 +107,7 @@ internal static class LODIssuesReport
         var mainArea = ui.VerticalLayout(4f, childAlignment: Alignment.TopCenter, forceExpandHeight: false).Slot;
 
         ui.NestInto(mainArea);
-        BuildOrderViolationsSection(ui, context, problematic);
+        BuildOrderViolationsSection(ui, problematic);
 
         ui.NestInto(mainArea);
         BuildDuplicateRenderersSection(ui, context, duplicates);
@@ -119,7 +119,6 @@ internal static class LODIssuesReport
 
     private static void BuildOrderViolationsSection(
         UIBuilder ui,
-        LODGroup context,
         List<(LODGroup Group, float[] Heights, int[] Violations)> problematic
     )
     {
