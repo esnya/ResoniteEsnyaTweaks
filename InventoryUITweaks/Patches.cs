@@ -50,7 +50,17 @@ internal static class ReflectionCache
     );
 
     // Fields for runtime checks
-    internal static readonly FieldInfo InventoryItemUI_Directory = AccessTools.Field(typeof(InventoryItemUI), "Directory");
+    internal static readonly FieldInfo InventoryItemUI_Directory;
+
+    static ReflectionCache()
+    {
+        InventoryItemUI_Directory = AccessTools.Field(typeof(InventoryItemUI), "Directory");
+        if (InventoryItemUI_Directory == null)
+        {
+            Console.WriteLine("[InventoryUITweaks] Error: Could not find field 'Directory' on InventoryItemUI. Reflection access failed.");
+            throw new MissingFieldException(nameof(InventoryItemUI), "Directory");
+        }
+    }
 
     // FavoriteEntity reflection (type and method)
     internal static readonly Type FavoriteEntityType = AccessTools.TypeByName("SkyFrost.Base.FavoriteEntity");
@@ -96,7 +106,7 @@ internal static class BrowserItem_Pressed_Patch
         // Single-click open only for folders (InventoryItemUI with non-null Directory)
         if (__instance is InventoryItemUI inv)
         {
-            var dir = ReflectionCache.InventoryItemUI_Directory?.GetValue(inv);
+            var dir = ReflectionCache.InventoryItemUI_Directory.GetValue(inv);
             if (dir != null)
             {
                 inv.Browser.Target.SelectedItem.Target = null!;
@@ -119,7 +129,7 @@ internal static class InventoryBrowser_ProcessItem_Postfix
         {
             return;
         }
-        var isDirectory = ReflectionCache.InventoryItemUI_Directory?.GetValue(item) != null;
+        var isDirectory = ReflectionCache.InventoryItemUI_Directory.GetValue(item) != null;
         var slot = item.Slot;
         if (slot == null || slot.IsDestroyed)
         {
@@ -231,7 +241,7 @@ internal static class InventoryBrowser_OnItemSelected_Postfix
         __instance.Slot.GetComponentsInChildren(items);
         foreach (var it in items)
         {
-            var isDir = ReflectionCache.InventoryItemUI_Directory?.GetValue(it) != null;
+            var isDir = ReflectionCache.InventoryItemUI_Directory.GetValue(it) != null;
             if (!isDir)
                 continue;
             var helperSlot = it.Slot.FindChild("ET_SelectFolderButton");

@@ -36,8 +36,8 @@ public class InventoryUITweaksMod : ResoniteMod
             {
                 var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
                 return plusIndex >= 0
-                    ? informationalVersion![..plusIndex]
-                    : informationalVersion!;
+                    ? informationalVersion[..plusIndex]
+                    : informationalVersion;
             }
             return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
         }
