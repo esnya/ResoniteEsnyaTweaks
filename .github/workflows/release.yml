@@ -70,6 +70,8 @@ jobs:
             artifact: EsnyaTweaks.PhotonDustTweaks.dll
           - project: UniLogTweaks
             artifact: EsnyaTweaks.UniLogTweaks.dll
+          - project: InventoryUITweaks
+            artifact: EsnyaTweaks.InventoryUITweaks.dll
     steps:
       - id: checkout
         name: Checkout

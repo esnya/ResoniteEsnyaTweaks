@@ -238,6 +238,9 @@ ClientBin/
 *.dbmdl
 *.dbproj.schemaview
 *.jfm
+
+# Local working area (do not commit)
+.local/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
