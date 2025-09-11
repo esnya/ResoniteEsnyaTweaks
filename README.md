@@ -6,6 +6,7 @@ A collection of small [ResoniteModLoader](https://github.com/resonite-modding-gr
 
 - **AssetOptimizationTweaks**: Advanced asset deduplication and memory optimization utilities. Provides powerful duplicate detection algorithms, hash-based asset comparison, and procedural asset optimization. Adds a "[Mod] Deduplicate Procedural Assets" button to the AssetOptimizationWizard for enhanced asset management.
 - **FluxLoopTweaks**: Adds timeout functionality to `While` and `AsyncWhile` loops.
+- **InventoryUITweaks**: Streamlines the inventory browser with single-click folder/back navigation and keeps toolbar buttons consistently ordered using disabled placeholders.
 - **LODGroupTweaks**: Sets `LODGroup` update order to 1000 and provides inspector buttons to manage child LOD levels.
 - **PhotonDustTweaks**: Adds inspector utilities for modules on parent `ParticleStyle` objects.
 - **UniLogTweaks**: Provides options to control stack traces for UniLog messages.
