@@ -55,21 +55,19 @@ internal static class ReflectionCache
         "CA1303:Do not pass literals as localized parameters",
         Justification = "Mod logs are not localized"
     )]
-    private static FieldInfo GetInventoryItemUIDirectoryField()
+    private static FieldInfo? GetInventoryItemUIDirectoryField()
     {
         var field = AccessTools.Field(typeof(InventoryItemUI), "Directory");
-        if (field != null)
+        if (field == null)
         {
-            return field;
+            ResoniteMod.Msg(
+                "[InventoryUITweaks] Error: Could not find field 'Directory' on InventoryItemUI. Reflection access failed."
+            );
         }
-
-        ResoniteMod.Msg(
-            "[InventoryUITweaks] Error: Could not find field 'Directory' on InventoryItemUI. Reflection access failed."
-        );
-        throw new MissingFieldException(nameof(InventoryItemUI), "Directory");
+        return field;
     }
 
-    internal static readonly FieldInfo InventoryItemUI_Directory = GetInventoryItemUIDirectoryField();
+    internal static readonly FieldInfo? InventoryItemUI_Directory = GetInventoryItemUIDirectoryField();
 
     // FavoriteEntity reflection (type and method)
     internal static readonly Type FavoriteEntityType = AccessTools.TypeByName("SkyFrost.Base.FavoriteEntity");
@@ -115,8 +113,8 @@ internal static class BrowserItem_Pressed_Patch
         // Single-click open only for folders (InventoryItemUI with non-null Directory)
         if (__instance is InventoryItemUI inv)
         {
-            var dir = ReflectionCache.InventoryItemUI_Directory.GetValue(inv);
-            if (dir != null)
+            var dirField = ReflectionCache.InventoryItemUI_Directory;
+            if (dirField?.GetValue(inv) != null)
             {
                 inv.Browser.Target.SelectedItem.Target = null!;
                 inv.Open();
@@ -139,7 +137,8 @@ internal static class InventoryBrowser_ProcessItem_Postfix
         {
             return;
         }
-        var isDirectory = ReflectionCache.InventoryItemUI_Directory.GetValue(item) != null;
+        var dirField = ReflectionCache.InventoryItemUI_Directory;
+        var isDirectory = dirField != null && dirField.GetValue(item) != null;
         var slot = item.Slot;
         if (slot == null || slot.IsDestroyed)
         {
@@ -254,9 +253,10 @@ internal static class InventoryBrowser_OnItemSelected_Postfix
         var selected = currentItem as InventoryItemUI;
         var items = Pool.BorrowList<InventoryItemUI>();
         __instance.Slot.GetComponentsInChildren(items);
+        var dirField = ReflectionCache.InventoryItemUI_Directory;
         foreach (var it in items)
         {
-            var isDir = ReflectionCache.InventoryItemUI_Directory.GetValue(it) != null;
+            var isDir = dirField != null && dirField.GetValue(it) != null;
             if (!isDir)
             {
                 continue;
@@ -269,7 +269,7 @@ internal static class InventoryBrowser_OnItemSelected_Postfix
             }
             var isSelected = ReferenceEquals(it, selected);
             helper.BaseColor.Value = isSelected ? InventoryBrowser.SELECTED_COLOR : RadiantUI_Constants.BUTTON_COLOR;
-            var checkImg = helperSlot.FindChild("ET_SelectFolderCheck")?.GetComponent<Image>();
+            var checkImg = helperSlot?.FindChild("ET_SelectFolderCheck")?.GetComponent<Image>();
             if (checkImg != null)
             {
                 checkImg.Tint.Value = isSelected ? colorX.White : ((colorX)checkImg.Tint).SetA(0f);

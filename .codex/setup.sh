@@ -8,6 +8,7 @@ fi
 
 env_file="$(dirname "$0")/dotnet-env.sh"
 source "$env_file"
+source "$(dirname "$0")/hotreload-lib.sh"
 
 if [ -n "${GITHUB_PATH:-}" ]; then
   {
@@ -38,12 +39,5 @@ if [ ! -f "$RES_DIR/FrooxEngine.dll" ]; then
       curl -L "$url" -o "$RES_DIR/$asset"
     done
   fi
-  if [ ! -f "$RES_DIR/ResoniteHotReloadLib.dll" ] || [ ! -f "$RES_DIR/ResoniteHotReloadLibCore.dll" ]; then
-    release_json="$(curl -s https://api.github.com/repos/Nytra/ResoniteHotReloadLib/releases/latest)"
-    url="$(echo "$release_json" | jq -r '.assets[] | select(.name | endswith("RML.zip")) | .browser_download_url')"
-    tmp_zip="$RES_DIR/HotReloadLib.RML.zip"
-    curl -L "$url" -o "$tmp_zip"
-    unzip -j -o "$tmp_zip" ResoniteHotReloadLib.dll ResoniteHotReloadLibCore.dll -d "$RES_DIR"
-    rm "$tmp_zip"
-  fi
+  ensure_hot_reload_libs "$RES_DIR"
 fi
