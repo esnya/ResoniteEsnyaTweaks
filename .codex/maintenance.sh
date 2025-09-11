@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-export PATH="$PATH:$HOME/.dotnet/tools"
+source "$(dirname "$0")/dotnet-env.sh"
 
 # Refresh local tools
 if command -v dotnet >/dev/null; then
