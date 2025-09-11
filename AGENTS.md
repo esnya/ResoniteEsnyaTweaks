@@ -2,6 +2,12 @@
 
 The CI workflow uses static checks that do not require Resonite assemblies.
 
+## Environment Setup
+
+- Target .NET SDK 9.0.
+- `.codex/setup.sh` installs the SDK and restores tools and dependencies.
+- `.codex/maintenance.sh` refreshes tools and dependencies after cache restoration.
+
 ## Coding Standards
 
 - Stay DRY, but avoid premature abstraction.
