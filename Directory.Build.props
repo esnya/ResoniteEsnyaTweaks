@@ -44,9 +44,10 @@
     <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="Exists('$(ResonitePath)FrooxEngine.dll')">
     <Reference Include="ResoniteModLoader">
-      <HintPath>$(ResonitePath)Libraries/ResoniteModLoader.dll</HintPath>
+      <HintPath Condition="Exists('$(ResonitePath)Libraries/ResoniteModLoader.dll')">$(ResonitePath)Libraries/ResoniteModLoader.dll</HintPath>
+      <HintPath Condition="Exists('$(ResonitePath)ResoniteModLoader.dll')">$(ResonitePath)ResoniteModLoader.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="HarmonyLib">
@@ -76,6 +77,18 @@
     </Reference>
     <Reference Include="ProtoFlux.Nodes.FrooxEngine">
       <HintPath>$(ResonitePath)ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('$(ResonitePath)FrooxEngine.dll')">
+    <PackageReference Include="Resonite.GameLibs" />
+    <Reference Include="ResoniteModLoader">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteModLoader.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+    <Reference Include="HarmonyLib">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/0Harmony.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
   </ItemGroup>

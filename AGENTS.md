@@ -7,6 +7,7 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Target .NET SDK 9.0.
 - `.codex/setup.sh` installs the SDK and restores tools and dependencies.
 - `.codex/maintenance.sh` refreshes tools and dependencies after cache restoration.
+- `Resonite.GameLibs` package and `ResoniteModLoader` + `0Harmony` assemblies fetched from upstream releases allow builds without a local Resonite install.
 - `.codex/dotnet-env.sh` defines `DOTNET_ROOT` and `PATH` for both scripts.
 
 ## Coding Standards
