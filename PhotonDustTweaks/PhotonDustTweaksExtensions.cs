@@ -4,6 +4,7 @@ using FrooxEngine;
 using FrooxEngine.PhotonDust;
 using FrooxEngine.UIX;
 using ResoniteModLoader;
+using EsnyaTweaks.UIX;
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 
@@ -19,16 +20,6 @@ internal static class PhotonDustTweaksExtensions
     {
         ui.LocalButton(ADD_TO_LABEL, (button, _) => module.AddToStyle(button));
         ui.LocalButton(REMOVE_FROM_LABEL, (button, _) => module.RemoveFromStyle(button));
-    }
-
-    public static void LocalButton(
-        this UIBuilder ui,
-        in string label,
-        ButtonEventHandler localAction
-    )
-    {
-        var button = ui.Button(label);
-        button.LocalPressed += localAction;
     }
 
     public static void AddToStyle(this IParticleSystemSubsystem module, IButton button)

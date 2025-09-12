@@ -1,1 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk"></Project>
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Compile Include="../UIX/UIBuilderExtensions.cs" Link="UIBuilderExtensions.cs" />
+  </ItemGroup>
+</Project>

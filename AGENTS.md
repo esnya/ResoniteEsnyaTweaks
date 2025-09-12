@@ -14,6 +14,7 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 ## Coding Standards
 
 - Stay DRY, but avoid premature abstraction.
+- For UIBuilder buttons with local actions, use `UIX/UIBuilderExtensions.LocalButton` instead of defining per-project helpers.
 - Prefer pure functions, immutability, and declarative style.
 - Good naming & structure > comments; comment only non-obvious WHY
 - Keep code self-explanatory.

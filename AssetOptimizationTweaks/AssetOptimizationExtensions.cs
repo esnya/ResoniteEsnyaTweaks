@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Elements.Core;
 using FrooxEngine;
-using FrooxEngine.UIX;
 using ResoniteModLoader;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks;
@@ -220,14 +219,4 @@ internal static class AssetOptimizationExtensions
         return false;
     }
 
-    public static Button LocalButton(
-        this UIBuilder ui,
-        string label,
-        ButtonEventHandler localAction
-    )
-    {
-        var button = ui.Button(label);
-        button.LocalPressed += localAction;
-        return button;
-    }
 }
