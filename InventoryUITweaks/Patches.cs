@@ -1,10 +1,9 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using HarmonyLib;
+using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.UIX;
-using Elements.Core;
+using HarmonyLib;
 using ResoniteModLoader;
 
 namespace EsnyaTweaks.InventoryUITweaks;
@@ -12,42 +11,6 @@ namespace EsnyaTweaks.InventoryUITweaks;
 internal static class ReflectionCache
 {
     internal static readonly MethodInfo BrowserDialog_GoUp = AccessTools.Method(typeof(BrowserDialog), "GoUp", [typeof(int)]);
-    internal static readonly MethodInfo BrowserDialog_BeginGenerateToolPanel = AccessTools.Method(typeof(BrowserDialog), "BeginGenerateToolPanel", Type.EmptyTypes);
-
-    internal static readonly MethodInfo InventoryBrowser_ClassifyItem = AccessTools.Method(typeof(InventoryBrowser), "ClassifyItem", [typeof(InventoryItemUI)]);
-    internal static readonly MethodInfo InventoryBrowser_GetItemWorldUri = AccessTools.Method(typeof(InventoryBrowser), "GetItemWorldUri", [typeof(InventoryItemUI)]);
-
-    internal static readonly MethodInfo InventoryBrowser_ShowInventoryOwners = AccessTools.Method(typeof(InventoryBrowser), "ShowInventoryOwners", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_Share = AccessTools.Method(typeof(InventoryBrowser), "Share", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_Unshare = AccessTools.Method(typeof(InventoryBrowser), "Unshare", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_CopyURL = AccessTools.Method(typeof(InventoryBrowser), "CopyURL", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_DeleteItem = AccessTools.Method(typeof(InventoryBrowser), "DeleteItem", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_AddCurrentAvatar = AccessTools.Method(typeof(InventoryBrowser), "AddCurrentAvatar", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_AddNew = AccessTools.Method(typeof(InventoryBrowser), "AddNew", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_OnOpenWorld = AccessTools.Method(typeof(InventoryBrowser), "OnOpenWorld", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_OnEquipAvatar = AccessTools.Method(typeof(InventoryBrowser), "OnEquipAvatar", [typeof(IButton), typeof(ButtonEventData)]);
-    internal static readonly MethodInfo InventoryBrowser_OnSpawnFacet = AccessTools.Method(typeof(InventoryBrowser), "OnSpawnFacet", [typeof(IButton), typeof(ButtonEventData)]);
-
-    // Toolbar button field refs
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_AddNewButtonRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_addNewButton");
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_DeleteButtonRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_deleteButton");
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_InventoriesButtonRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_inventoriesButton");
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_ShareButtonRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_shareButton");
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_UnshareButtonRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_unshareButton");
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_CopyLinkRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_copyLink");
-    internal static readonly AccessTools.FieldRef<InventoryBrowser, SyncRef<Button>> InventoryBrowser_AddCurrentAvatarRef
-        = AccessTools.FieldRefAccess<InventoryBrowser, SyncRef<Button>>("_addCurrentAvatar");
-
-    // BrowserDialog protected helpers
-    internal static readonly MethodInfo BrowserDialog_GenerateContent = AccessTools.Method(
-        typeof(BrowserDialog), "GenerateContent", [typeof(SlideSwapRegion.Slide), typeof(GridLayout).MakeByRefType(), typeof(GridLayout).MakeByRefType(), typeof(bool)]
-    );
 
     // Fields for runtime checks
     [SuppressMessage(
@@ -68,19 +31,6 @@ internal static class ReflectionCache
     }
 
     internal static readonly FieldInfo? InventoryItemUI_Directory = GetInventoryItemUIDirectoryField();
-
-    // FavoriteEntity reflection (type and method)
-    internal static readonly Type FavoriteEntityType = AccessTools.TypeByName("SkyFrost.Base.FavoriteEntity");
-    internal static readonly MethodInfo InventoryBrowser_OnSetFavorite = AccessTools.Method(
-        typeof(InventoryBrowser),
-        "OnSetFavorite",
-        [typeof(IButton), typeof(ButtonEventData), FavoriteEntityType]
-    );
-
-    internal static T InvokeInstance<T>(this MethodInfo method, object instance, params object[] args)
-    {
-        return (T)method.Invoke(instance, args)!;
-    }
 }
 
 // 1) Disable double-click requirement for the Back/Up button (always single press)
