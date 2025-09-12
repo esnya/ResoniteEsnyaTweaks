@@ -82,7 +82,7 @@ internal static class AssetOptimizationExtensions
             foreach (var (original, duplicate) in duplicatePairs)
             {
                 AddSyncMemberRedirections(redirectionMap, duplicate, original);
-                redirectionMap.Add(duplicate, original);
+                redirectionMap.TryAdd(duplicate, original);
             }
         }
     }
@@ -132,7 +132,13 @@ internal static class AssetOptimizationExtensions
                 ResoniteMod.DebugFunc(() =>
                     $"Redirecting reference from {duplicateMember} to {originalMember}"
                 );
-                redirectionMap.Add(duplicateMember, originalMember);
+                if (!redirectionMap.TryAdd(duplicateMember, originalMember)
+                    && redirectionMap[duplicateMember] != originalMember)
+                {
+                    ResoniteMod.DebugFunc(() =>
+                        $"Duplicate redirection detected for {duplicateMember}; existing target {redirectionMap[duplicateMember]} kept over {originalMember}"
+                    );
+                }
             }
         }
     }

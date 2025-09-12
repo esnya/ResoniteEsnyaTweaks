@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentAssertions;
 using FrooxEngine;
+using Moq;
 using Xunit;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks.Tests;
@@ -235,6 +236,59 @@ public sealed class AssetOptimizationExtensionsTests
         var result = (bool)method.Invoke(null, [type])!;
 
         result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void AddSyncMemberRedirections_ShouldIgnoreDuplicateKeys()
+    {
+        var map = new Dictionary<IWorldElement, IWorldElement>();
+        var duplicateMemberMock = new Mock<ISyncMember>();
+        var originalMemberMock = new Mock<ISyncMember>();
+        var duplicateMember = duplicateMemberMock.As<IWorldElement>().Object;
+        var originalMember = originalMemberMock.As<IWorldElement>().Object;
+
+        var duplicate = new Mock<Component>();
+        var original = new Mock<Component>();
+
+        duplicate.Setup(c => c.SyncMembers).Returns([duplicateMemberMock.Object]);
+        original.Setup(c => c.SyncMembers).Returns([originalMemberMock.Object]);
+
+        AssetOptimizationExtensions.AddSyncMemberRedirections(map, duplicate.Object, original.Object);
+        AssetOptimizationExtensions.AddSyncMemberRedirections(map, duplicate.Object, original.Object);
+
+        map.Should().ContainSingle().Which.Should().Be(
+            new KeyValuePair<IWorldElement, IWorldElement>(duplicateMember, originalMember)
+        );
+    }
+
+    [Fact]
+    public void BuildRedirectionMap_ShouldIgnoreDuplicateComponentEntries()
+    {
+        var duplicateMemberMock = new Mock<ISyncMember>();
+        var originalMemberMock = new Mock<ISyncMember>();
+        var duplicateMember = duplicateMemberMock.As<IWorldElement>().Object;
+        var originalMember = originalMemberMock.As<IWorldElement>().Object;
+
+        var original = new Mock<Component>().As<IAssetProvider>();
+        var duplicate = new Mock<Component>().As<IAssetProvider>();
+
+        original.As<Component>().Setup(c => c.SyncMembers).Returns([originalMemberMock.Object]);
+        duplicate.As<Component>().Setup(c => c.SyncMembers).Returns([duplicateMemberMock.Object]);
+
+        var grouped = new Dictionary<Type, List<IAssetProvider>>
+        {
+            {
+                typeof(IAssetProvider),
+                [original.Object, duplicate.Object, duplicate.Object]
+            }
+        };
+        var map = new Dictionary<IWorldElement, IWorldElement>();
+
+        AssetOptimizationExtensions.BuildRedirectionMap(grouped, map);
+
+        map.Should().ContainSingle().Which.Should().Be(
+            new KeyValuePair<IWorldElement, IWorldElement>(duplicateMember, originalMember)
+        );
     }
 
     private static MethodInfo GetPrivateMethod(string methodName)
