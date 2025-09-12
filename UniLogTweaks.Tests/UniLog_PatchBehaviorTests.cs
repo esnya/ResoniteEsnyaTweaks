@@ -39,4 +39,18 @@ public static class UniLog_PatchBehaviorTests
         args[0].Should().Be(original);
         args[1].Should().Be(true);
     }
+
+    [Fact]
+    public static void Patch_Should_Handle_Null_Message()
+    {
+        var patch = GetPatchType()
+            .GetMethod("Patch", BindingFlags.Static | BindingFlags.NonPublic)!;
+        object?[] args = [null, true, true];
+
+        var act = () => patch.Invoke(null, args);
+
+        act.Should().NotThrow();
+        args[0].Should().Be(string.Empty);
+        args[1].Should().Be(true);
+    }
 }
