@@ -5,7 +5,7 @@ Allow development environments lacking a Resonite installation to compile mods w
 
 ## Boundaries
 - Applies only when `FrooxEngine.dll` is missing.
-- Downloads `ResoniteHotReloadLib.dll` and `ResoniteHotReloadLibCore.dll` from the latest `Nytra/ResoniteHotReloadLib` release.
+- Downloads `ResoniteHotReloadLib.dll` and `ResoniteHotReloadLibCore.dll` from the latest `Nytra/ResoniteHotReloadLib` release's `HotReloadLib.*.RML.zip` asset.
 - Extraction occurs into `Resonite/` alongside other fetched assemblies.
 
 ## Public API
