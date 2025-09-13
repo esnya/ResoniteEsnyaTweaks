@@ -19,11 +19,30 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Good naming & structure > comments; comment only non-obvious WHY
 - Keep code self-explanatory.
 
+## UIBuilder Guidelines (Must)
+
+- Style-first: set `PreferredSize`, `MinSize`, and layout style before adding content.
+- Containers: wrap scrollable content in `ScrollArea` and enable `FitContent` where appropriate for natural sizing.
+- Fixed-width cells: prefer explicit widths for list/table-like rows to avoid layout thrash.
+- Slot-attached elements: create UI under an explicit `Slot` when elements must persist or be addressed; avoid anonymous, floating elements.
+- Local actions: use `UIX/UIBuilderExtensions.LocalButton` for local button handlers instead of per-project helpers.
+
+## Shared Code Structure (Must)
+
+- Use a shared project via `.projitems` (and/or `.shproj`) to include cross-project source files.
+- Selection criteria: only include the minimum actually used by multiple projects (YAGNI/DRY). Do not preemptively add helpers.
+- Tests can import the same `.projitems` directly to exercise pure helpers without depending on any mod project.
+- Avoid hard-coded paths or project-specific references in shared code; keep it framework-agnostic.
+
 ## Checklist for Agents
 
 - Formatting is enforced with `dotnet format`.
 - Before committing, run `dotnet format --verify-no-changes` to verify formatting and code style.
 - Use `dotnet format` (optionally with `style`/`whitespace` scopes) to apply formatting fixes.
+
+### Continuous Guideline Updates (Must)
+- When we learn a repo-wide convention (e.g., UIBuilder style-first sizing, shared project (.projitems) usage), reflect it in this AGENTS.md in the same PR. Do not defer.
+- Treat AGENTS.md as living documentation. If the change affects multiple repos, leave a TODO link to the canonical guideline.
 
 ## Required Workflow (Must)
 
@@ -41,12 +60,17 @@ The CI workflow uses static checks that do not require Resonite assemblies.
   - Avoid altering public APIs; keep surface area minimal.
 
 - Warnings policy:
-  - Fix warnings introduced by your changes (style/analysis). If suppression is required for Harmony signatures, add targeted SuppressMessage with justification.
-  - Do not attempt to refactor unrelated code solely to zero out legacy warnings.
+  - Zero-warnings baseline（Must）: ビルド時の警告は許容しない。既存・新規とも修正し、抑制は最小限（やむを得ないシグネチャのみ）。
 
 - Commit hygiene:
   - Use Conventional Commit + gitmoji. One concise subject line per commit.
   - Group formatting-only changes separately when practical.
+
+## CI Simplification (Proposal)
+
+- Build/test at solution level: `dotnet format --verify-no-changes --no-restore`, `dotnet build -c Release -v:minimal`, `dotnet test -c Release -v:minimal`.
+- Avoid hardcoding project matrices; collect artifacts via glob: `**/bin/Release/net*/EsnyaTweaks.*.dll` excluding `**/*.Tests/**`.
+- Keep Resonite references via shim approach already configured; do not bake paths into csproj.
 
 ## Local Notes
 
@@ -65,3 +89,20 @@ The CI workflow uses static checks that do not require Resonite assemblies.
   into independent modules (no engine dependencies) so they can be unit‑tested.
 - Keep patches thin: delegate to testable helpers; verify helpers with unit tests.
 - Do not mock engine internals unnecessarily. If not feasible, limit tests to the pure parts.
+
+## Rule Docs Index
+
+- Root rules: AGENTS.md (this file)
+- Local rules: `.local/AGENTS.md`（ローカル環境・言語ポリシー）
+- UIX note (Local): `.local/ResoniteReferences/ui-builder-local-button.md`
+- 追加のディレクトリ単位ルールは、各ディレクトリの `AGENTS.md` を参照（パターン: `**/AGENTS.md`）
+
+## Naming Rules (Must)
+
+- Avoid reserved-keyword segments in namespaces（例: `Shared`, `Mod` は不可）。
+- 代替例: `Common`, `Modding`。
+
+## Release Artifacts (Must)
+
+- Publish only mod binaries matching `EsnyaTweaks.*.dll`.
+- Exclude: test binaries（`*.Tests*`）、外部DLL（RML/Harmony 等）、`obj/`・`ref/` 生成物。

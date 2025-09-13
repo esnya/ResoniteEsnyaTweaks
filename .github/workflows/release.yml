@@ -59,19 +59,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    strategy:
-      matrix:
-        include:
-          - project: FluxLoopTweaks
-            artifact: EsnyaTweaks.FluxLoopTweaks.dll
-          - project: LODGroupTweaks
-            artifact: EsnyaTweaks.LODGroupTweaks.dll
-          - project: PhotonDustTweaks
-            artifact: EsnyaTweaks.PhotonDustTweaks.dll
-          - project: UniLogTweaks
-            artifact: EsnyaTweaks.UniLogTweaks.dll
-          - project: InventoryUITweaks
-            artifact: EsnyaTweaks.InventoryUITweaks.dll
     steps:
       - id: checkout
         name: Checkout
@@ -79,43 +66,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Resonite environment
-        id: build-env
-        uses: resonite-modding-group/setup-resonite-env-action@v0.1.0
-        with:
-          steam-user: ${{ secrets.STEAMUSER }}
-          steam-password: ${{ secrets.STEAMPASS }}
+      - name: .NET format
+        run: |
+          dotnet format --verify-no-changes --no-restore
 
-      - name: Install ResoniteModLoader and Harmony
+      - name: Build solution
+        run: |
+          dotnet build -c Release -v:minimal
+
+      - name: Test solution
+        run: |
+          dotnet test -c Release -v:minimal
+
+      - name: Collect artifacts (EsnyaTweaks.* only, excluding tests)
         run: |
           set -euo pipefail
-          LIBS_PATH="${{ steps.build-env.outputs.libraries-path }}"
-          RESONITE_DIR="$(dirname "${LIBS_PATH}")"
-          echo "Libraries: ${LIBS_PATH}"
-          echo "Resonite dir: ${RESONITE_DIR}"
-          mkdir -p "${LIBS_PATH}"
-          mkdir -p "${RESONITE_DIR}/rml_libs"
-          # Download RML
-          curl -fsSL -o "${LIBS_PATH}/ResoniteModLoader.dll" \
-            https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll
-          # Download Harmony DLL. Try rml_libs, fallback to root if needed
-          if ! curl -fsSL -o "${RESONITE_DIR}/rml_libs/0Harmony.dll" \
-            https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll; then
-            echo "Falling back to placing 0Harmony.dll in Resonite root"
-            curl -fsSL -o "${RESONITE_DIR}/0Harmony.dll" \
-              https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll
-          fi
-
-      - name: Build RML mod
-        run: |
-          dotnet restore
-          dotnet build ${{ matrix.project }} --configuration Release
+          mkdir -p artifacts
+          find . -type f -path "*/bin/Release/*" -name "EsnyaTweaks.*.dll" \
+            | grep -v -E "(\\.Tests|/Tests/|/Shared.Tests/|/obj/|/ref/)" \
+            | xargs -I{} cp -v "{}" artifacts/
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.project }}/bin/Release/net9.0/${{ matrix.artifact }}
+          name: dll-artifacts
+          path: artifacts/*
 
   release:
     if: needs.prepare-release.outputs.should_release == 'true'
@@ -152,7 +127,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            **/*.dll
+          files: artifacts/*
           generate_release_notes: true
           tag_name: v${{ needs.prepare-release.outputs.version }}
