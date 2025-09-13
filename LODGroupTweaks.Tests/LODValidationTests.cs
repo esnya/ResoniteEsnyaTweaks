@@ -1,6 +1,4 @@
-using FluentAssertions;
 using FrooxEngine;
-using Xunit;
 
 namespace EsnyaTweaks.LODGroupTweaks.Tests;
 
@@ -27,3 +25,5 @@ public sealed class LODValidationTests
         LODValidation.GetHeights(g).Should().NotBeNull();
     }
 }
+using Xunit;
+using FluentAssertions;

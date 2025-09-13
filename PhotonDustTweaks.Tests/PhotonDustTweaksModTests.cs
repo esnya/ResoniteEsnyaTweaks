@@ -1,6 +1,6 @@
 using System.Reflection;
-using FluentAssertions;
 using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.PhotonDustTweaks.Tests;
 

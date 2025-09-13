@@ -1,9 +1,9 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using AutoFixture;
-using FluentAssertions;
 using Xunit;
+using FluentAssertions;
+using AutoFixture;
 
 namespace EsnyaTweaks.FluxLoopTweaks.Tests;
 

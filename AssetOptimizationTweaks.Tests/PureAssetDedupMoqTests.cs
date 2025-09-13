@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using EsnyaTweaks.AssetOptimizationTweaks.Internal;
-using FluentAssertions;
 using FrooxEngine;
-using Moq;
 using Xunit;
+using FluentAssertions;
+using Moq;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks.Tests;
 
@@ -32,8 +32,8 @@ public sealed class PureAssetDedupMoqTests
 
         var map = new Dictionary<IWorldElement, IWorldElement>();
 
-        PureAssetDedup.AddRedirections(map, new[] { dup1, dup2 }, new[] { orig1, orig2 });
-        PureAssetDedup.AddRedirections(map, new[] { dup1, dup2 }, new[] { orig1, orig2 });
+        PureAssetDedup.AddRedirections(map, [dup1, dup2], [orig1, orig2]);
+        PureAssetDedup.AddRedirections(map, [dup1, dup2], [orig1, orig2]);
 
         map.Should().HaveCount(2);
         map[dup1].Should().Be(orig1);

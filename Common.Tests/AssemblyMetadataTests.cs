@@ -1,6 +1,6 @@
 using EsnyaTweaks.Common.Reflection;
-using FluentAssertions;
 using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.Common.Tests;
 

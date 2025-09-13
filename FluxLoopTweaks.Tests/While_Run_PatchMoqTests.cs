@@ -1,8 +1,8 @@
 using System.Reflection;
-using FluentAssertions;
 using HarmonyLib;
 using ProtoFlux.Runtimes.Execution.Nodes; // for While type
 using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.FluxLoopTweaks.Tests;
 

@@ -1,8 +1,6 @@
 using System.Reflection;
 using Elements.Core;
-using FluentAssertions;
 using HarmonyLib;
-using Xunit;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
@@ -57,3 +55,5 @@ public static class UniLog_PatchTests
         method!.IsStatic.Should().BeTrue();
     }
 }
+using Xunit;
+using FluentAssertions;

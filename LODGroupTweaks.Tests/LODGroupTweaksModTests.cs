@@ -1,6 +1,4 @@
 using System.Reflection;
-using FluentAssertions;
-using Xunit;
 
 namespace EsnyaTweaks.LODGroupTweaks.Tests;
 
@@ -51,3 +49,5 @@ public static class LODGroupTweaksModTests
         mod.Should().BeAssignableTo<ResoniteModLoader.ResoniteMod>();
     }
 }
+using Xunit;
+using FluentAssertions;

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using EsnyaTweaks.SceneAuditor.Rules;
-using FluentAssertions;
-using Xunit;
 
 namespace EsnyaTweaks.SceneAuditor.Tests;
 
@@ -36,3 +34,5 @@ public sealed class DetectionPrimitivesTests
         index[c].Should().HaveCount(2);
     }
 }
+using Xunit;
+using FluentAssertions;

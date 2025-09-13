@@ -1,6 +1,3 @@
-using FluentAssertions;
-using Xunit;
-
 namespace EsnyaTweaks.AssetOptimizationTweaks.Tests;
 
 /// <summary>
@@ -65,3 +62,5 @@ public class AssetOptimizationTweaksModTests
         link.Should().StartWith("https://");
     }
 }
+using Xunit;
+using FluentAssertions;

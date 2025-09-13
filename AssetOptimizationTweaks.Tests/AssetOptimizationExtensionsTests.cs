@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using FluentAssertions;
 using FrooxEngine;
-using Xunit;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks.Tests;
 
@@ -259,13 +257,13 @@ public sealed class PureAssetDedupTests
         var duplicates = new[] { 1 };
         var originals = new[] { 2 };
 
-        EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.AddRedirections(
+        Internal.PureAssetDedup.AddRedirections(
             map,
             duplicates,
             originals
         );
         // Call again to simulate duplicate processing
-        EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.AddRedirections(
+        Internal.PureAssetDedup.AddRedirections(
             map,
             duplicates,
             originals
@@ -281,7 +279,7 @@ public sealed class PureAssetDedupTests
         var duplicates = new[] { 1 };
         var originals = new[] { 2 };
 
-        EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.AddRedirections(
+        Internal.PureAssetDedup.AddRedirections(
             map,
             duplicates,
             originals
@@ -294,7 +292,7 @@ public sealed class PureAssetDedupTests
     public void FindDuplicatePairs_ShouldReturnPairsUsingComparer_Pure()
     {
         var items = new[] { "a", "b", "a" };
-        var pairs = EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.FindDuplicatePairs(
+        var pairs = Internal.PureAssetDedup.FindDuplicatePairs(
             items,
             static (x, y) => x == y
         );
@@ -304,3 +302,5 @@ public sealed class PureAssetDedupTests
         pairs[0].Duplicate.Should().Be("a");
     }
 }
+using Xunit;
+using FluentAssertions;
