@@ -16,6 +16,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prepare-release:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/ci' || startsWith(github.ref, 'refs/heads/ci/'))
@@ -66,17 +70,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+          cache: true
+
       - name: .NET format
         run: |
           dotnet format --verify-no-changes --no-restore
 
       - name: Build solution
         run: |
-          dotnet build -c Release -v:minimal
+          dotnet build -c Release -v:minimal -warnaserror -bl:build.binlog
 
       - name: Test solution
         run: |
-          dotnet test -c Release -v:minimal
+          dotnet test -c Release -v:minimal -warnaserror --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics
+          path: |
+            **/*.binlog
+            **/TestResults/*.trx
 
       - name: Collect artifacts (EsnyaTweaks.* only, excluding tests)
         run: |
