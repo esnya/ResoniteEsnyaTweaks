@@ -106,6 +106,17 @@ jobs:
           echo "Listing Resonite/ contents"
           ls -la Resonite || true
 
+      - name: Restore with explicit ResonitePath
+        run: |
+          dotnet restore -v:minimal -p:ResonitePath="${{ github.workspace }}/Resonite/"
+
+      - name: Verify Resonite.GameLibs is referenced
+        run: |
+          echo "Listing packages for AssetOptimizationTweaks (transitive included)"
+          dotnet list AssetOptimizationTweaks/AssetOptimizationTweaks.csproj package --include-transitive | tee packages.txt
+          echo "Check Resonite.GameLibs presence"
+          grep -i "Resonite.GameLibs" packages.txt || (echo "Resonite.GameLibs not found in package list" && exit 1)
+
       - name: .NET format
         run: |
           dotnet format --verify-no-changes --no-restore
