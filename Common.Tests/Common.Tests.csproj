@@ -3,6 +3,6 @@
     <RootNamespace>EsnyaTweaks.Common.Tests</RootNamespace>
     <AssemblyName>EsnyaTweaks.Common.Tests</AssemblyName>
     <AssemblyTitle>EsnyaTweaks.Common.Tests</AssemblyTitle>
-  </PropertyGroup>
+      </PropertyGroup>
   <Import Project="..\Common\Common.projitems" Label="Shared" />
 </Project>

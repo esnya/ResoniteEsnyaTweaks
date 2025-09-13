@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Elements.Core;
 using FrooxEngine;
 using ResoniteModLoader;
+using EsnyaTweaks.Common.LOD;
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
@@ -25,14 +26,7 @@ internal static class LODValidation
 
     public static bool HasOrderViolation(IReadOnlyList<float> heights)
     {
-        for (var i = 0; i < heights.Count - 1; i++)
-        {
-            if (heights[i] <= heights[i + 1])
-            {
-                return true;
-            }
-        }
-        return false;
+        return OrderValidation.HasNonDescending(heights);
     }
 
     public static IEnumerable<MeshRenderer> EnumerateRenderers(LODGroup group)

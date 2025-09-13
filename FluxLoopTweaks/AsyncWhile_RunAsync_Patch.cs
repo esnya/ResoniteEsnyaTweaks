@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using EsnyaTweaks.Common.Flux;
 using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
@@ -58,10 +59,9 @@ internal static class AsyncWhile_RunAsync_Patch
             {
                 stopwatch.Restart();
             }
-            else if (stopwatch.ElapsedMilliseconds > timeout || context.AbortExecution)
+            else if (LoopTimeoutPolicy.ShouldAbort(previousTick, currentTick, stopwatch.ElapsedMilliseconds, timeout, context.AbortExecution))
             {
-                ResoniteMod.Warn(
-                    $"AsyncWhile Timedout: {instance} ({stopwatch.ElapsedMilliseconds}ms)");
+                ResoniteMod.Warn($"AsyncWhile Timedout: {instance} ({stopwatch.ElapsedMilliseconds}ms)");
                 context.AbortExecution = true;
                 throw new ExecutionAbortedException(
                     instance.Runtime as IExecutionRuntime,

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Flux\**\*.cs">
+      <Link>Common\Flux\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)LOD\**\*.cs">
+      <Link>Common\LOD\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\**\*.cs">
+      <Link>Common\Logging\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssemblyMetadata.cs">
+      <Link>Common\Helpers\AssemblyMetadata.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
+

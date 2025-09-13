@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>EsnyaTweaks.Common.PureTests</RootNamespace>
+    <AssemblyName>EsnyaTweaks.Common.PureTests</AssemblyName>
+    <AssemblyTitle>EsnyaTweaks.Common.PureTests</AssemblyTitle>
+    <ExcludeEngineAssemblies>true</ExcludeEngineAssemblies>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <Import Project="..\Common\Common.Pure.projitems" Label="Shared" />
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.v3.runner.inproc.console" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+</Project>
+

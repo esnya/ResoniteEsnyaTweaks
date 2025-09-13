@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using Elements.Core;
 using HarmonyLib;
+using EsnyaTweaks.Common.Logging;
 
 namespace EsnyaTweaks.UniLogTweaks;
 
@@ -31,10 +32,7 @@ internal static class UniLog_Patch
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Patch(ref string message, ref bool stackTrace, bool allowStackTrace)
     {
-        if (UniLogTweaksMod.AddIndent)
-        {
-            message = message is null ? string.Empty : message.Replace("\n", "\n\t", System.StringComparison.Ordinal);
-        }
+        message = LogMessageTransform.ApplyIndent(message, UniLogTweaksMod.AddIndent);
 
         if (!allowStackTrace)
         {
