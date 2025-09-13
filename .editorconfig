@@ -70,6 +70,7 @@ dotnet_diagnostic.CA1707.severity = none  # test classes often don't follow nami
 # StyleCop: configure per rule (base off)
 dotnet_analyzer_diagnostic.category-StyleCop.severity = none
 dotnet_diagnostic.SA1649.severity = error
+dotnet_diagnostic.SA1111.severity = warning
 
 # StyleCop exclusions (repo policy)
 # - File header/element docs are not required; keep code concise
@@ -87,7 +88,6 @@ dotnet_diagnostic.SA1107.severity = none  # multiple statements on one line
 dotnet_diagnostic.SA1202.severity = none  # member order rules
 dotnet_diagnostic.SA1311.severity = none  # static readonly fields casing
 dotnet_diagnostic.SA1009.severity = none  # closing parenthesis spacing
-dotnet_diagnostic.SA1111.severity = none  # closing parenthesis should be on line of last parameter
 dotnet_diagnostic.SA1512.severity = none  # single-line comments should not be followed by blank line
 dotnet_diagnostic.SA1402.severity = none  # file may only contain a single type
 dotnet_diagnostic.SA1516.severity = none  # elements should be separated by blank line

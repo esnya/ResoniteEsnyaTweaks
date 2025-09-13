@@ -11,27 +11,14 @@ namespace EsnyaTweaks.PhotonDustTweaks;
 /// <inheritdoc/>
 public class PhotonDustTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ThisAssembly => typeof(PhotonDustTweaksMod).Assembly;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    //private static ModConfiguration? config;
-    private static readonly Harmony harmony = new(HarmonyId);
-
     /// <inheritdoc/>
     public override void OnEngineInit()
     {
-        Init(this);
+        Init();
 
 #if DEBUG
         HotReloader.RegisterForHotReload(this);
 #endif
-    }
-#pragma warning disable IDE0060 // Remove unused parameter
-    private static void Init(ResoniteMod modInstance)
-    {
-        harmony.PatchAll();
-        //config = modInstance?.GetConfiguration();
     }
 
 #if DEBUG
@@ -42,9 +29,20 @@ public class PhotonDustTweaksMod : EsnyaResoniteMod
     }
 
     /// <inheritdoc/>
-    public static void OnHotReload(ResoniteMod modInstance)
+    public static void OnHotReload(ResoniteMod _)
     {
-        Init(modInstance);
+        Init();
     }
 #endif
+
+    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
+
+    private static Assembly ThisAssembly => typeof(PhotonDustTweaksMod).Assembly;
+
+    private static readonly Harmony harmony = new(HarmonyId);
+
+    private static void Init()
+    {
+        harmony.PatchAll();
+    }
 }

@@ -38,4 +38,3 @@ public static class AssemblyMetadata
         return (name, author, version!, link);
     }
 }
-
