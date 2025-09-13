@@ -19,7 +19,7 @@ public class FluxLoopTweaksMod : EsnyaResoniteMod
     [AutoRegisterConfigKey]
     private static readonly ModConfigurationKey<int> TimeoutKey = new(
         "Timeout",
-        "Timeout for in milliseconds.",
+        "Timeout in milliseconds.",
         computeDefault: () => 30_000);
 
     private static ModConfiguration? config;
