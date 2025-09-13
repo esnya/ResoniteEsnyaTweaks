@@ -25,6 +25,7 @@
     <AnalysisLevel>latest-all</AnalysisLevel>
     <WarningLevel>9999</WarningLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <!-- Opt-in gate for StyleCop analyzers; default off to avoid network restore in restricted env -->
     <UseStyleCopAnalyzers Condition="'$(UseStyleCopAnalyzers)'==''">true</UseStyleCopAnalyzers>
   </PropertyGroup>
@@ -108,11 +109,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(FrooxEnginePresent)'!='true' and '$(Configuration)'=='Debug'">
-    <Reference Include="ResoniteHotReloadLib" Condition="Exists('$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLib.dll')">
+    <Reference Include="ResoniteHotReloadLib">
       <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLib.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
-    <Reference Include="ResoniteHotReloadLibCore" Condition="Exists('$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLibCore.dll')">
+    <Reference Include="ResoniteHotReloadLibCore">
       <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLibCore.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
