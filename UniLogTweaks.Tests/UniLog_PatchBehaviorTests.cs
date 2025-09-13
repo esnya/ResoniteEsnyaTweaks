@@ -1,5 +1,7 @@
 using System;
 using System.Reflection;
+using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
@@ -52,5 +54,3 @@ public static class UniLog_PatchBehaviorTests
         args[1].Should().Be(true);
     }
 }
-using Xunit;
-using FluentAssertions;

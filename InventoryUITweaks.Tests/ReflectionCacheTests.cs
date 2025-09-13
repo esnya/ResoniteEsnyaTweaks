@@ -1,3 +1,6 @@
+using Xunit;
+using FluentAssertions;
+
 namespace EsnyaTweaks.InventoryUITweaks.Tests;
 
 public class ReflectionCacheTests
@@ -8,5 +11,3 @@ public class ReflectionCacheTests
         Assert.NotNull(ReflectionCache.InventoryItemUI_Directory);
     }
 }
-using Xunit;
-using FluentAssertions;

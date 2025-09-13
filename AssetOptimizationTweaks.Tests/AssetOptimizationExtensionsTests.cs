@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using FrooxEngine;
+using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks.Tests;
 
@@ -302,5 +304,3 @@ public sealed class PureAssetDedupTests
         pairs[0].Duplicate.Should().Be("a");
     }
 }
-using Xunit;
-using FluentAssertions;

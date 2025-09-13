@@ -1,4 +1,6 @@
 using System.Reflection;
+using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
@@ -49,5 +51,3 @@ public static class UniLogTweaksModTests
         mod.Should().BeAssignableTo<ResoniteModLoader.ResoniteMod>();
     }
 }
-using Xunit;
-using FluentAssertions;
