@@ -11,9 +11,9 @@ namespace EsnyaTweaks.LODGroupTweaks;
 /// <inheritdoc/>
 public class LODGroupTweaksMod : EsnyaResoniteMod
 {
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
     private static Assembly ThisAssembly => typeof(LODGroupTweaksMod).Assembly;
+
+    private static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
 
     private static Harmony Harmony { get; } = new(HarmonyId);
 
