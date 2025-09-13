@@ -14,7 +14,7 @@ indent_size = 4
 [*.cs]
 
 # 'using' directive preferences
-csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_namespace_declarations = file_scoped:error
 
 # Wrapping preferences
 csharp_preserve_single_line_statements = false:warning
@@ -47,7 +47,11 @@ dotnet_diagnostic.CA2007.severity = none     # ConfigureAwait for .NET Framework
 # IDE-specific overrides
 dotnet_diagnostic.IDE0058.severity = none    # Allow implicit discard of expression values
 
+# Enforce namespace matches folder structure
+dotnet_diagnostic.IDE0130.severity = error
+
 dotnet_diagnostic.CA1031.severity = none  # Mod should not throw exceptions to keep game running
+
 
 # Tests Overrides
 [*Tests.cs]
