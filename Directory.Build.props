@@ -26,7 +26,7 @@
     <WarningLevel>9999</WarningLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Opt-in gate for StyleCop analyzers; default off to avoid network restore in restricted env -->
-    <UseStyleCopAnalyzers Condition="'$(UseStyleCopAnalyzers)'==''">false</UseStyleCopAnalyzers>
+    <UseStyleCopAnalyzers Condition="'$(UseStyleCopAnalyzers)'==''">true</UseStyleCopAnalyzers>
   </PropertyGroup>
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <IsPackable>false</IsPackable>
