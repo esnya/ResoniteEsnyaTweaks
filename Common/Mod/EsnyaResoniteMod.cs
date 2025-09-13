@@ -20,6 +20,7 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 
     // Auto-unregister registry keyed by HarmonyId
     private static readonly ConcurrentDictionary<string, List<Action>> AutoUnregisters = new();
+
     /// <inheritdoc/>
     public override string Name => AssemblyMetadata.Read(ModAssembly).Name;
 
@@ -38,11 +39,8 @@ public abstract class EsnyaResoniteMod : ResoniteMod
     protected Assembly ModAssembly => GetType().Assembly;
 
     /// <summary>
-    /// Gets the Harmony ID used for patching. Defaults to "com.nekometer.esnya.{AssemblyName}" with
-    /// the full AssemblyName string to preserve existing behavior. Override to customize per-mod.
-    /// </summary>
-    /// <summary>
-    /// Gets the full Harmony ID used for patching. Computed as "{Prefix}.{AssemblyName}".
+    /// Gets the full Harmony ID used for patching.
+    /// Computed as "com.nekometer.esnya.{AssemblyName}" by default.
     /// </summary>
     protected virtual string HarmonyId => $"{DefaultHarmonyIdPrefix}.{ModAssembly.GetName()}";
 
@@ -73,13 +71,23 @@ public abstract class EsnyaResoniteMod : ResoniteMod
         var harmony = new Harmony(harmonyId);
         harmony.PatchAll(modInstance.GetType().Assembly);
 
-        var config = modInstance.GetConfiguration();
+        ModConfiguration? config;
+        try
+        {
+            // Acquire configuration if available; in test environments this may throw.
+            config = modInstance.GetConfiguration();
+        }
+        catch
+        {
+            config = null;
+        }
+
+        if (modInstance is EsnyaResoniteMod baseMod)
+        {
+            baseMod.OnAfterHotReload(config);
+        }
         if (config != null)
         {
-            if (modInstance is EsnyaResoniteMod baseMod)
-            {
-                baseMod.OnAfterHotReload(config);
-            }
             afterPatched?.Invoke(config);
         }
     }
@@ -123,9 +131,12 @@ public abstract class EsnyaResoniteMod : ResoniteMod
     /// Called after hot reload patching. Default behavior defers to <see cref="OnInit(ModConfiguration)"/>.
     /// </summary>
     /// <param name="config">Mod configuration instance.</param>
-    protected virtual void OnAfterHotReload(ModConfiguration config)
+    protected virtual void OnAfterHotReload(ModConfiguration? config)
     {
-        OnInit(config);
+        if (config != null)
+        {
+            OnInit(config);
+        }
     }
 
     /// <summary>
@@ -149,7 +160,7 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 #if DEBUG
             try
             {
-                ResoniteHotReloadLib.HotReloader.RemoveMenuOption(category, optionName);
+                HotReloader.RemoveMenuOption(category, optionName);
             }
             catch
             {
@@ -158,6 +169,8 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 #endif
         }
 
+        // Suppress IDE0028 suggestion to keep compatibility across analyzers and language levels.
+#pragma warning disable IDE0028
         AutoUnregisters.AddOrUpdate(
             HarmonyId,
             _ => new List<Action> { Unregister },
@@ -189,6 +202,7 @@ public abstract class EsnyaResoniteMod : ResoniteMod
                 list.Add(unregister);
                 return list;
             });
+#pragma warning restore IDE0028
     }
 
     private static void RunAutoUnregisters(string harmonyId)
