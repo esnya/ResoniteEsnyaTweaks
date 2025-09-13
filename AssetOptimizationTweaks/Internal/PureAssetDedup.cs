@@ -12,10 +12,13 @@ internal static class PureAssetDedup
     /// <summary>
     /// Finds duplicate pairs using the provided equality comparer.
     /// </summary>
+    /// <typeparam name="T">Item type.</typeparam>
+    /// <param name="items">Sequence to evaluate.</param>
+    /// <param name="equals">Equality comparison.</param>
+    /// <returns>Pairs of original and duplicate items.</returns>
     public static (T Original, T Duplicate)[] FindDuplicatePairs<T>(
         IReadOnlyList<T> items,
-        Func<T, T, bool> equals
-    )
+        Func<T, T, bool> equals)
         where T : notnull
     {
         List<(T, T)> pairs = [];
@@ -39,11 +42,14 @@ internal static class PureAssetDedup
     /// <summary>
     /// Adds redirections from duplicates to originals in order, ignoring duplicates and keeping existing entries.
     /// </summary>
+    /// <typeparam name="TKey">Key type.</typeparam>
+    /// <param name="map">Redirection dictionary.</param>
+    /// <param name="duplicates">Duplicate keys.</param>
+    /// <param name="originals">Original keys.</param>
     public static void AddRedirections<TKey>(
         IDictionary<TKey, TKey> map,
         IEnumerable<TKey> duplicates,
-        IEnumerable<TKey> originals
-    )
+        IEnumerable<TKey> originals)
         where TKey : notnull
     {
         foreach (var (dup, orig) in duplicates.Zip(originals, (d, o) => (d, o)))

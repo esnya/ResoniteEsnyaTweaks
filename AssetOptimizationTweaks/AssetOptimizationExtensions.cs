@@ -11,7 +11,7 @@ namespace EsnyaTweaks.AssetOptimizationTweaks;
 
 internal static class AssetOptimizationExtensions
 {
-    private static readonly ConcurrentDictionary<Type, bool> _proceduralAssetProviderCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> ProceduralAssetProviderCache = new();
 
     public static int DeduplicateProceduralAssets(this Slot root, Slot? replaceRoot = null)
     {
@@ -48,16 +48,14 @@ internal static class AssetOptimizationExtensions
 
     internal static void GroupProceduralAssetProviders(
         List<IAssetProvider> providers,
-        Dictionary<Type, List<IAssetProvider>> grouped
-    )
+        Dictionary<Type, List<IAssetProvider>> grouped)
     {
         foreach (var provider in providers)
         {
             if (
                 IsProceduralAssetProvider(provider)
                 && IsNotDriven(provider)
-                && provider.Slot.AllowOptimization()
-            )
+                && provider.Slot.AllowOptimization())
             {
                 if (!grouped.TryGetValue(provider.GetType(), out var list))
                 {
@@ -71,8 +69,7 @@ internal static class AssetOptimizationExtensions
 
     internal static void BuildRedirectionMap(
         Dictionary<Type, List<IAssetProvider>> groupedProviders,
-        Dictionary<IWorldElement, IWorldElement> redirectionMap
-    )
+        Dictionary<IWorldElement, IWorldElement> redirectionMap)
     {
         foreach (var providerGroup in groupedProviders)
         {
@@ -87,14 +84,12 @@ internal static class AssetOptimizationExtensions
     }
 
     internal static (Component Original, Component Duplicate)[] FindDuplicatePairs(
-        List<IAssetProvider> providers
-    )
+        List<IAssetProvider> providers)
     {
         var components = providers.Cast<Component>().ToList();
         var pairs = Internal.PureAssetDedup.FindDuplicatePairs(
             components,
-            static (a, b) => a.PublicMembersEqual(b)
-        );
+            static (a, b) => a.PublicMembersEqual(b));
         foreach (var (original, candidate) in pairs)
         {
             ResoniteMod.DebugFunc(() => $"Found duplicate: {candidate} matches {original}");
@@ -105,14 +100,12 @@ internal static class AssetOptimizationExtensions
     internal static void AddSyncMemberRedirections(
         Dictionary<IWorldElement, IWorldElement> redirectionMap,
         Component duplicate,
-        Component original
-    )
+        Component original)
     {
         Internal.PureAssetDedup.AddRedirections(
             redirectionMap,
             duplicate.SyncMembers.OfType<IWorldElement>(),
-            original.SyncMembers.OfType<IWorldElement>()
-        );
+            original.SyncMembers.OfType<IWorldElement>());
     }
 
     private static void LogGroupedProviders(Dictionary<Type, List<IAssetProvider>> groupedProviders)
@@ -122,8 +115,7 @@ internal static class AssetOptimizationExtensions
             foreach (var group in groupedProviders)
             {
                 ResoniteMod.Debug(
-                    $"Found {group.Value.Count} procedural asset providers of type {group.Key.Name}"
-                );
+                    $"Found {group.Value.Count} procedural asset providers of type {group.Key.Name}");
             }
         }
     }
@@ -131,30 +123,26 @@ internal static class AssetOptimizationExtensions
     private static void ApplyRedirections(
         Slot root,
         Dictionary<IWorldElement, IWorldElement> redirectionMap,
-        Slot? replaceRoot
-    )
+        Slot? replaceRoot)
     {
         if (ResoniteMod.IsDebugEnabled())
         {
             var componentCount = redirectionMap.Count(kvp => kvp.Key is Component);
             ResoniteMod.DebugFunc(() =>
-                $"{componentCount} procedural asset providers will be deduplicated"
-            );
+                $"{componentCount} procedural asset providers will be deduplicated");
         }
 
         root.World.ReplaceReferenceTargets(
             redirectionMap,
             nullIfIncompatible: false,
-            replaceRoot ?? root.World.RootSlot
-        );
+            replaceRoot ?? root.World.RootSlot);
 
         foreach (var kvp in redirectionMap)
         {
             if (kvp.Key is Component component)
             {
                 ResoniteMod.DebugFunc(() =>
-                    $"Destroying duplicate component {kvp.Key} (redirected to {kvp.Value}) in {component.Slot}"
-                );
+                    $"Destroying duplicate component {kvp.Key} (redirected to {kvp.Value}) in {component.Slot}");
                 component.Destroy();
             }
         }
@@ -171,10 +159,9 @@ internal static class AssetOptimizationExtensions
     {
         var type = provider.GetType();
 
-        return _proceduralAssetProviderCache.GetOrAdd(
+        return ProceduralAssetProviderCache.GetOrAdd(
             type,
-            static t => CheckInheritanceHierarchy(t)
-        );
+            static t => CheckInheritanceHierarchy(t));
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -197,5 +184,4 @@ internal static class AssetOptimizationExtensions
         }
         return false;
     }
-
 }

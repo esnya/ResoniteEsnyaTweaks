@@ -10,16 +10,16 @@ namespace EsnyaTweaks.PhotonDustTweaks;
 
 internal static class PhotonDustTweaksExtensions
 {
-    private const string ADD_FROM_LABEL = "[Mod] Add modules from children";
-    private const string REPLACE_FROM_LABEL = "[Mod] Replace modules from children";
-    private const string DEDUPLICATE_LABEL = "[Mod] Deduplicate modules";
-    private const string ADD_TO_LABEL = "[Mod] Add to parent ParticleStyle";
-    private const string REMOVE_FROM_LABEL = "[Mod] Remove from parent ParticleStyle";
+    private const string ADDFROMLABEL = "[Mod] Add modules from children";
+    private const string REPLACEFROMLABEL = "[Mod] Replace modules from children";
+    private const string DEDUPLICATELABEL = "[Mod] Deduplicate modules";
+    private const string ADDTOLABEL = "[Mod] Add to parent ParticleStyle";
+    private const string REMOVEFROMLABEL = "[Mod] Remove from parent ParticleStyle";
 
     public static void BuildInspectorUI(this IParticleSystemSubsystem module, UIBuilder ui)
     {
-        ui.LocalButton(ADD_TO_LABEL, (button, _) => module.AddToStyle(button));
-        ui.LocalButton(REMOVE_FROM_LABEL, (button, _) => module.RemoveFromStyle(button));
+        ui.LocalButton(ADDTOLABEL, (button, _) => module.AddToStyle(button));
+        ui.LocalButton(REMOVEFROMLABEL, (button, _) => module.RemoveFromStyle(button));
     }
 
     public static void AddToStyle(this IParticleSystemSubsystem module, IButton button)
@@ -27,7 +27,7 @@ internal static class PhotonDustTweaksExtensions
         if (module.Slot.GetComponentInParents<ParticleStyle>() is ParticleStyle style)
         {
             style.Modules.Add(module);
-            button.LabelText = $"{ADD_TO_LABEL} (Added {module} to {style.Slot.Name}.{style.Name})";
+            button.LabelText = $"{ADDTOLABEL} (Added {module} to {style.Slot.Name}.{style.Name})";
             ResoniteMod.DebugFunc(() => $"Added {module} to {style}");
         }
     }
@@ -43,7 +43,7 @@ internal static class PhotonDustTweaksExtensions
             if (removed > 0)
             {
                 button.LabelText =
-                    $"{REMOVE_FROM_LABEL} (Removed {removed} items from {style.Slot.Name}.{style.Name})";
+                    $"{REMOVEFROMLABEL} (Removed {removed} items from {style.Slot.Name}.{style.Name})";
                 ResoniteMod.DebugFunc(() => $"Removed {removed} module(s) from {style}");
             }
         }
@@ -51,18 +51,16 @@ internal static class PhotonDustTweaksExtensions
 
     public static void BuildInspectorUI(this ParticleStyle style, UIBuilder ui)
     {
-        ui.LocalButton(ADD_FROM_LABEL, (button, _) => style.AddFromStyle(button));
-        ui.LocalButton(REPLACE_FROM_LABEL, (button, _) => style.ReplaceFromStyle(button));
-        ui.LocalButton(DEDUPLICATE_LABEL, (button, _) => style.DeduplicateStyle(button));
+        ui.LocalButton(ADDFROMLABEL, (button, _) => style.AddFromStyle(button));
+        ui.LocalButton(REPLACEFROMLABEL, (button, _) => style.ReplaceFromStyle(button));
+        ui.LocalButton(DEDUPLICATELABEL, (button, _) => style.DeduplicateStyle(button));
     }
 
     public static List<IParticleSystemSubsystem> GetParticleModulesInChildren(
-        this ParticleStyle style
-    )
+        this ParticleStyle style)
     {
         return style.Slot.GetComponentsInChildren<IParticleSystemSubsystem>(c =>
-            c != style && c is not ParticleEmitter
-        );
+            c != style && c is not ParticleEmitter);
     }
 
     public static void AddFromStyle(this ParticleStyle style, IButton button)
@@ -74,7 +72,7 @@ internal static class PhotonDustTweaksExtensions
         var count = style.Modules.Count - prevCount;
 
         button.LabelText =
-            $"{ADD_FROM_LABEL} (Added {count} items to {style.Slot.Name}.{style.Name})";
+            $"{ADDFROMLABEL} (Added {count} items to {style.Slot.Name}.{style.Name})";
         ResoniteMod.DebugFunc(() => $"Added {count} module(s) to {style}");
     }
 
@@ -85,7 +83,7 @@ internal static class PhotonDustTweaksExtensions
         style.Modules.AddRange(modules);
         var count = modules.Count;
         button.LabelText =
-            $"{ADD_FROM_LABEL} (Replaced {count} items to {style.Slot.Name}.{style.Name})";
+            $"{ADDFROMLABEL} (Replaced {count} items to {style.Slot.Name}.{style.Name})";
         ResoniteMod.DebugFunc(() => $"Replaced {count} module(s) to {style}");
     }
 
@@ -97,7 +95,7 @@ internal static class PhotonDustTweaksExtensions
         style.Modules.AddRangeUnique(modules);
         var count = prevCount - style.Modules.Count;
         button.LabelText =
-            $"{DEDUPLICATE_LABEL} (Removed {count} items from {style.Slot.Name}.{style.Name})";
+            $"{DEDUPLICATELABEL} (Removed {count} items from {style.Slot.Name}.{style.Name})";
         ResoniteMod.DebugFunc(() => $"Deduplicated {count} module(s) from {style}");
     }
 }

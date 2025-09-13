@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
@@ -10,6 +11,7 @@ namespace EsnyaTweaks.AssetOptimizationTweaks;
 [HarmonyPatch(typeof(AssetOptimizationWizard), "OnAttach")]
 internal static class AssetOptimizationWizard_OnAttach_Patch
 {
+    [SuppressMessage("Style", "SA1313", Justification = "Harmony magic parameter")]
     public static void Postfix(AssetOptimizationWizard __instance)
     {
         var lastElement = __instance
@@ -39,9 +41,7 @@ internal static class AssetOptimizationWizard_OnAttach_Patch
 
                 var removedCount = root.DeduplicateProceduralAssets();
                 ResoniteMod.DebugFunc(() =>
-                    $"AssetOptimizationWizard: Deduplicated {removedCount} procedural assets"
-                );
-            }
-        );
+                    $"AssetOptimizationWizard: Deduplicated {removedCount} procedural assets");
+            });
     }
 }

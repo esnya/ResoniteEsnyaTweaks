@@ -15,13 +15,6 @@ internal static class SceneAuditorPanel
 {
     private const string PanelTitle = "Scene Auditor";
 
-    private sealed class RuleToggles
-    {
-        public bool CheckLODOrder = true;
-        public bool CheckLODDuplicates = true;
-        public bool CheckRequiredEditorFields = true;
-    }
-
     public static void Spawn(Slot context, Slot? initialRoot = null)
     {
         var world = context.World;
@@ -39,8 +32,7 @@ internal static class SceneAuditorPanel
             user: world.LocalUser,
             scale: false,
             checkOcclusion: true,
-            preserveUp: true
-        );
+            preserveUp: true);
         container.LocalScale = float3.One * 0.0005f;
 
         var size = new float2(1400f, 900f);
@@ -85,7 +77,7 @@ internal static class SceneAuditorPanel
         BuildResults(ui, resultsContainer, results, context);
     }
 
-    private static (Slot leftColumn, Slot rightResultsContainer) BuildSplit(UIBuilder ui)
+    private static (Slot LeftColumn, Slot RightResultsContainer) BuildSplit(UIBuilder ui)
     {
         // Use HorizontalLayout as the row container; create columns directly.
         ui.HorizontalLayout(8f);
@@ -116,11 +108,10 @@ internal static class SceneAuditorPanel
         return (leftColumn, rightResultsContainer);
     }
 
-    private static (Func<RuleToggles> getRules, Func<Slot?> resolveScanRoot, Button searchButton) BuildLeftPane(
+    private static (Func<RuleToggles> GetRules, Func<Slot?> ResolveScanRoot, Button SearchButton) BuildLeftPane(
         UIBuilder ui,
         Slot leftColumn,
-        Slot? initialRoot
-    )
+        Slot? initialRoot)
     {
         ui.NestInto(leftColumn);
 
@@ -280,8 +271,7 @@ internal static class SceneAuditorPanel
             if (toggles.CheckLODDuplicates)
             {
                 var index = DetectionPrimitives.BuildDuplicateOwnersIndex(
-                    groups.Select(g => (g, EnumerateRenderers(g)))
-                );
+                    groups.Select(g => (g, EnumerateRenderers(g))));
                 foreach (var (renderer, owners) in index)
                 {
                     if (owners.Count > 1)
@@ -345,7 +335,6 @@ internal static class SceneAuditorPanel
     }
 
     // No reflection helpers needed for public GetSyncMember access
-
     private static float[] GetHeights(LODGroup group)
     {
         var lods = group?.LODs;
@@ -399,5 +388,14 @@ internal static class SceneAuditorPanel
         }
         ui.Current.AttachComponent<RefEditor>().Setup(referenceRef);
         return editorSlot;
+    }
+
+    private sealed class RuleToggles
+    {
+        public bool CheckLODOrder { get; set; } = true;
+
+        public bool CheckLODDuplicates { get; set; } = true;
+
+        public bool CheckRequiredEditorFields { get; set; } = true;
     }
 }

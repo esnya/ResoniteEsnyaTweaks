@@ -1,17 +1,40 @@
-using System.Reflection;
 using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
-using ResoniteModLoader;
 #if DEBUG
 using ResoniteHotReloadLib;
 #endif
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 
-/// <inheritdoc/>
+/// <summary>
+/// Mod entry point for Photon Dust tweaks.
+/// </summary>
 public class PhotonDustTweaksMod : EsnyaResoniteMod
 {
-    /// <inheritdoc/>
+    internal static string HarmonyId =>
+        $"com.nekometer.esnya.{typeof(PhotonDustTweaksMod).Assembly.GetName()}";
+
+    internal static Harmony Harmony { get; } = new(HarmonyId);
+
+#if DEBUG
+    /// <summary>
+    /// Unpatches before hot reload.
+    /// </summary>
+    public static void BeforeHotReload()
+    {
+        Harmony.UnpatchAll(HarmonyId);
+    }
+
+    /// <summary>
+    /// Reapplies patches after hot reload.
+    /// </summary>
+    public static void OnHotReload()
+    {
+        Init();
+    }
+#endif
+
+    /// <inheritdoc />
     public override void OnEngineInit()
     {
         Init();
@@ -21,28 +44,8 @@ public class PhotonDustTweaksMod : EsnyaResoniteMod
 #endif
     }
 
-#if DEBUG
-    /// <inheritdoc/>
-    public static void BeforeHotReload()
-    {
-        harmony.UnpatchAll(HarmonyId);
-    }
-
-    /// <inheritdoc/>
-    public static void OnHotReload(ResoniteMod _)
-    {
-        Init();
-    }
-#endif
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    private static Assembly ThisAssembly => typeof(PhotonDustTweaksMod).Assembly;
-
-    private static readonly Harmony harmony = new(HarmonyId);
-
     private static void Init()
     {
-        harmony.PatchAll();
+        Harmony.PatchAll();
     }
 }

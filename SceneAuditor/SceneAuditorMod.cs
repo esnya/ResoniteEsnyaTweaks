@@ -1,21 +1,19 @@
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
+using EsnyaTweaks.SceneAuditor.Editor;
 #if DEBUG
 using ResoniteHotReloadLib;
 #endif
 
-[assembly: InternalsVisibleTo("EsnyaTweaks.AssetOptimizationTweaks.Tests")]
-
-namespace EsnyaTweaks.AssetOptimizationTweaks;
+namespace EsnyaTweaks.SceneAuditor;
 
 /// <summary>
-/// Mod entry point for asset optimization tweaks.
+/// Mod entry point for scene auditing utilities.
 /// </summary>
-public class AssetOptimizationTweaksMod : EsnyaResoniteMod
+public sealed class SceneAuditorMod : EsnyaResoniteMod
 {
     internal static string HarmonyId =>
-        $"com.nekometer.esnya.{typeof(AssetOptimizationTweaksMod).Assembly.GetName().Name}";
+        $"com.nekometer.esnya.{typeof(SceneAuditorMod).Assembly.GetName()}";
 
     private static Harmony Harmony { get; } = new(HarmonyId);
 
@@ -26,6 +24,7 @@ public class AssetOptimizationTweaksMod : EsnyaResoniteMod
     public static void BeforeHotReload()
     {
         Harmony.UnpatchAll(HarmonyId);
+        CreateNewRegistration.Unregister();
     }
 
     /// <summary>
@@ -50,5 +49,6 @@ public class AssetOptimizationTweaksMod : EsnyaResoniteMod
     private static void Init()
     {
         Harmony.PatchAll();
+        CreateNewRegistration.Register();
     }
 }

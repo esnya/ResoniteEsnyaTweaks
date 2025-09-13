@@ -1,4 +1,3 @@
-using System.Reflection;
 using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
@@ -14,43 +13,63 @@ namespace EsnyaTweaks.UniLogTweaks;
 /// </summary>
 public sealed class UniLogTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ThisAssembly => typeof(UniLogTweaksMod).Assembly;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    private static ModConfiguration? config;
-    private static readonly Harmony harmony = new(HarmonyId);
-    private static readonly ModConfigurationKey<bool> allowInfo = new(
-        "AllowInfo",
-        "Allow stack trace for Info log.",
-        computeDefault: () => false
-    );
-    private static readonly ModConfigurationKey<bool> allowWarning = new(
-        "AllowWarning",
-        "Allow stack trace for Warning log.",
-        computeDefault: () => false
-    );
-    private static readonly ModConfigurationKey<bool> allowError = new(
-        "AllowError",
-        "Allow stack trace for Error log.",
-        computeDefault: () => true
-    );
-
-    private static readonly ModConfigurationKey<bool> addIndent = new(
-        "AddIndent",
-        "Add indent to multi-line logs.",
-        computeDefault: () => true
-    );
+    internal static string HarmonyId =>
+        $"com.nekometer.esnya.{typeof(UniLogTweaksMod).Assembly.GetName()}";
 
     internal static bool AllowInfo =>
-        config?.TryGetValue(allowInfo, out var value) == true && value;
+        Config?.TryGetValue(AllowInfoKey, out var value) == true && value;
+
     internal static bool AllowWarning =>
-        config?.TryGetValue(allowWarning, out var value) == true && value;
+        Config?.TryGetValue(AllowWarningKey, out var value) == true && value;
+
     internal static bool AllowError =>
-        (config?.TryGetValue(allowError, out var value)) != true || value;
+        Config?.TryGetValue(AllowErrorKey, out var value) != true || value;
 
     internal static bool AddIndent =>
-        config?.TryGetValue(addIndent, out var value) != true || value;
+        Config?.TryGetValue(AddIndentKey, out var value) != true || value;
+
+    private static Harmony Harmony { get; } = new(HarmonyId);
+
+    private static ModConfigurationKey<bool> AllowInfoKey { get; } = new(
+        "AllowInfo",
+        "Allow stack trace for Info log.",
+        computeDefault: () => false);
+
+    private static ModConfigurationKey<bool> AllowWarningKey { get; } = new(
+        "AllowWarning",
+        "Allow stack trace for Warning log.",
+        computeDefault: () => false);
+
+    private static ModConfigurationKey<bool> AllowErrorKey { get; } = new(
+        "AllowError",
+        "Allow stack trace for Error log.",
+        computeDefault: () => true);
+
+    private static ModConfigurationKey<bool> AddIndentKey { get; } = new(
+        "AddIndent",
+        "Add indent to multi-line logs.",
+        computeDefault: () => true);
+
+    private static ModConfiguration? Config { get; set; }
+
+#if DEBUG
+    /// <summary>
+    /// Called before hot reload.
+    /// </summary>
+    public static void BeforeHotReload()
+    {
+        Harmony.UnpatchAll(HarmonyId);
+    }
+
+    /// <summary>
+    /// Called after hot reload.
+    /// </summary>
+    /// <param name="modInstance">Reloaded mod instance.</param>
+    public static void OnHotReload(ResoniteMod modInstance)
+    {
+        Init(modInstance);
+    }
+#endif
 
     /// <summary>
     /// Initializes the mod.
@@ -66,27 +85,7 @@ public sealed class UniLogTweaksMod : EsnyaResoniteMod
 
     private static void Init(ResoniteMod modInstance)
     {
-        harmony.PatchAll();
-        config = modInstance?.GetConfiguration() ?? config;
+        Harmony.PatchAll();
+        Config = modInstance?.GetConfiguration() ?? Config;
     }
-
-#if DEBUG
-
-    /// <summary>
-    /// Called before hot reload.
-    /// </summary>
-    public static void BeforeHotReload()
-    {
-        harmony.UnpatchAll(HarmonyId);
-    }
-
-    /// <summary>
-    /// Called after hot reload.
-    /// </summary>
-    /// <param name="modInstance"></param>
-    public static void OnHotReload(ResoniteMod modInstance)
-    {
-        Init(modInstance);
-    }
-#endif
 }
