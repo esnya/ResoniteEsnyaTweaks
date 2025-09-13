@@ -8,8 +8,7 @@ internal static class UIBuilderExtensions
     internal static Button LocalButton(
         this UIBuilder ui,
         string label,
-        ButtonEventHandler localAction
-    )
+        ButtonEventHandler localAction)
     {
         var button = ui.Button(label);
         button.LocalPressed += localAction;

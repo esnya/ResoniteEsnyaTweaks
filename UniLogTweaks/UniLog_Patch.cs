@@ -4,25 +4,9 @@ using HarmonyLib;
 
 namespace EsnyaTweaks.UniLogTweaks;
 
-#pragma warning disable IDE0060
-
 [HarmonyPatch(typeof(UniLog))]
 internal static class UniLog_Patch
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Patch(ref string message, ref bool stackTrace, bool allowStackTrace)
-    {
-        if (UniLogTweaksMod.AddIndent)
-        {
-            message = message is null ? string.Empty : message.Replace("\n", "\n\t", System.StringComparison.Ordinal);
-        }
-
-        if (!allowStackTrace)
-        {
-            stackTrace = false;
-        }
-    }
-
     [HarmonyPatch(nameof(UniLog.Log), [typeof(string), typeof(bool)])]
     [HarmonyPrefix]
     internal static void Log_Prefix(ref string message, ref bool stackTrace)
@@ -42,5 +26,19 @@ internal static class UniLog_Patch
     internal static void Error_Prefix(ref string message, ref bool stackTrace)
     {
         Patch(ref message, ref stackTrace, !UniLogTweaksMod.AllowError);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void Patch(ref string message, ref bool stackTrace, bool allowStackTrace)
+    {
+        if (UniLogTweaksMod.AddIndent)
+        {
+            message = message is null ? string.Empty : message.Replace("\n", "\n\t", System.StringComparison.Ordinal);
+        }
+
+        if (!allowStackTrace)
+        {
+            stackTrace = false;
+        }
     }
 }

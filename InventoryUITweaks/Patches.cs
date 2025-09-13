@@ -12,7 +12,8 @@ internal static class ReflectionCache
 {
     internal static readonly MethodInfo BrowserDialog_GoUp = AccessTools.Method(typeof(BrowserDialog), "GoUp", [typeof(int)]);
 
-    // Fields for runtime checks
+    internal static readonly FieldInfo? InventoryItemUI_Directory = GetInventoryItemUIDirectoryField();
+
     [SuppressMessage(
         "Globalization",
         "CA1303:Do not pass literals as localized parameters",
@@ -29,8 +30,6 @@ internal static class ReflectionCache
         }
         return field;
     }
-
-    internal static readonly FieldInfo? InventoryItemUI_Directory = GetInventoryItemUIDirectoryField();
 }
 
 // 1) Disable double-click requirement for the Back/Up button (always single press)
@@ -38,9 +37,7 @@ internal static class ReflectionCache
 [HarmonyPatch([typeof(UIBuilder), typeof(LocaleString)])]
 internal static class BrowserDialog_GenerateBackButton_Patch
 {
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony patch method")]
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Harmony patch signature")]
-    private static bool Prefix(BrowserDialog __instance, UIBuilder ui, LocaleString label)
+    internal static bool Prefix(BrowserDialog __instance, UIBuilder ui, LocaleString label)
     {
         // Recreate original button without SyncDelegate callback and handle locally to avoid data-model target requirement
         var btn = ui.Button(in label, RadiantUI_Constants.Sub.RED);
@@ -57,8 +54,7 @@ internal static class BrowserDialog_GenerateBackButton_Patch
 [HarmonyPatch(typeof(BrowserItem), nameof(BrowserItem.Pressed))]
 internal static class BrowserItem_Pressed_Patch
 {
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Harmony patch signature")]
-    private static bool Prefix(BrowserItem __instance, IButton button, ButtonEventData eventData)
+    internal static bool Prefix(BrowserItem __instance)
     {
         // Single-click open only for folders (InventoryItemUI with non-null Directory)
         if (__instance is InventoryItemUI inv)
@@ -80,8 +76,7 @@ internal static class BrowserItem_Pressed_Patch
 internal static class InventoryBrowser_ProcessItem_Postfix
 {
     [HarmonyPostfix]
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony patch method")]
-    private static void Postfix(InventoryItemUI item)
+    internal static void Postfix(InventoryItemUI item)
     {
         if (item == null)
         {
@@ -196,9 +191,7 @@ internal static class InventoryBrowser_ProcessItem_Postfix
 internal static class InventoryBrowser_OnItemSelected_Postfix
 {
     [HarmonyPostfix]
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony patch method")]
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Harmony patch signature")]
-    private static void Postfix(InventoryBrowser __instance, BrowserItem previousItem, BrowserItem currentItem)
+    internal static void Postfix(InventoryBrowser __instance, BrowserItem _, BrowserItem currentItem)
     {
         var selected = currentItem as InventoryItemUI;
         var items = Pool.BorrowList<InventoryItemUI>();
@@ -233,8 +226,7 @@ internal static class InventoryBrowser_OnItemSelected_Postfix
 [HarmonyPatch]
 internal static class InventoryBrowser_BeginGeneratingNewDirectory_Patch
 {
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony patch method")]
-    private static MethodInfo TargetMethod()
+    internal static MethodInfo TargetMethod()
     {
         return AccessTools.Method(
             typeof(InventoryBrowser),
@@ -249,8 +241,7 @@ internal static class InventoryBrowser_BeginGeneratingNewDirectory_Patch
     }
 
     [HarmonyPostfix]
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Harmony patch method")]
-    private static void Postfix(RecordDirectory directory, GridLayout folders)
+    internal static void Postfix(RecordDirectory directory, GridLayout folders)
     {
         if (directory != null || folders == null)
         {

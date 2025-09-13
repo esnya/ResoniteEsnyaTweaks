@@ -14,12 +14,6 @@ namespace EsnyaTweaks.InventoryUITweaks;
 /// <inheritdoc/>
 public class InventoryUITweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ThisAssembly => typeof(InventoryUITweaksMod).Assembly;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    private static readonly Harmony harmony = new(HarmonyId);
-
     /// <inheritdoc/>
     public override void OnEngineInit()
     {
@@ -38,11 +32,15 @@ public class InventoryUITweaksMod : EsnyaResoniteMod
     }
 
     /// <inheritdoc/>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Hot reload signature")]
-    public static void OnHotReload(ResoniteMod modInstance)
+    public static void OnHotReload(ResoniteMod _)
     {
         harmony.PatchAll();
     }
 #endif
 
+    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
+
+    private static Assembly ThisAssembly => typeof(InventoryUITweaksMod).Assembly;
+
+    private static readonly Harmony harmony = new(HarmonyId);
 }

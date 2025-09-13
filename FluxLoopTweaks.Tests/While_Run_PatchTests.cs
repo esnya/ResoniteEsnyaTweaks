@@ -41,8 +41,7 @@ public static class While_Run_PatchTests
     {
         var method = typeof(While_Run_Patch).GetMethod(
             "Prefix",
-            BindingFlags.Static | BindingFlags.NonPublic
-        );
+            BindingFlags.Static | BindingFlags.NonPublic);
         method.Should().NotBeNull();
         method!.ReturnType.Should().Be<bool>("Prefix method should return bool");
     }
