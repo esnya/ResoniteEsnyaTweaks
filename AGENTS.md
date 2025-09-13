@@ -39,6 +39,7 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Formatting is enforced with `dotnet format`.
 - Before committing, run `dotnet format --verify-no-changes` to verify formatting and code style.
 - Use `dotnet format` (optionally with `style`/`whitespace` scopes) to apply formatting fixes.
+ - MUST: `.local/AGENTS.md` が存在する場合は必ず参照し、指示（特にローカル環境・言語方針の上書き）に従う。
 
 ### Continuous Guideline Updates (Must)
 - When we learn a repo-wide convention (e.g., UIBuilder style-first sizing, shared project (.projitems) usage), reflect it in this AGENTS.md in the same PR. Do not defer.
@@ -96,6 +97,11 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Local rules: `.local/AGENTS.md`（ローカル環境・言語ポリシー）
 - UIX note (Local): `.local/ResoniteReferences/ui-builder-local-button.md`
 - 追加のディレクトリ単位ルールは、各ディレクトリの `AGENTS.md` を参照（パターン: `**/AGENTS.md`）
+
+## 言語ポリシー（本リポジトリ）
+
+- MUST: レポート・チャット・PR 本文などの対話・報告は日本語で記述する（既定）。
+- MAY: ユーザーから明示の指示がある場合のみ、別言語に切り替える。
 
 ## Naming Rules (Must)
 
