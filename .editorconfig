@@ -84,6 +84,14 @@ dotnet_diagnostic.SA1200.severity = none  # using directives should appear withi
 dotnet_diagnostic.SA1210.severity = none  # using directives should be ordered alphabetically
 dotnet_diagnostic.SA1101.severity = none  # this. prefix
 dotnet_diagnostic.SA1107.severity = none  # multiple statements on one line
+dotnet_diagnostic.SA1202.severity = none  # member order rules
+dotnet_diagnostic.SA1311.severity = none  # static readonly fields casing
+dotnet_diagnostic.SA1009.severity = none  # closing parenthesis spacing
+dotnet_diagnostic.SA1111.severity = none  # closing parenthesis should be on line of last parameter
+dotnet_diagnostic.SA1512.severity = none  # single-line comments should not be followed by blank line
+dotnet_diagnostic.SA1402.severity = none  # file may only contain a single type
+dotnet_diagnostic.SA1516.severity = none  # elements should be separated by blank line
+dotnet_diagnostic.SA1623.severity = none  # property doc text should begin with "Gets"
 
 [*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
 indent_size = 2
