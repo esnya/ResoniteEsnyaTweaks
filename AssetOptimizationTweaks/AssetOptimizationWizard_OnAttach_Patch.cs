@@ -3,7 +3,7 @@ using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
 using ResoniteModLoader;
-using EsnyaTweaks.UIX;
+using EsnyaTweaks.Common.UIX;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks;
 

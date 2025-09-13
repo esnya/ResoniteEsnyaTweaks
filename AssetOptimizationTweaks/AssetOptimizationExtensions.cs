@@ -90,27 +90,16 @@ internal static class AssetOptimizationExtensions
         List<IAssetProvider> providers
     )
     {
-        var pairs = Pool.BorrowList<(Component, Component)>();
-
-        for (var i = 0; i < providers.Count; i++)
+        var components = providers.Cast<Component>().ToList();
+        var pairs = Internal.PureAssetDedup.FindDuplicatePairs(
+            components,
+            static (a, b) => a.PublicMembersEqual(b)
+        );
+        foreach (var (original, candidate) in pairs)
         {
-            var original = (Component)providers[i];
-
-            for (var j = i + 1; j < providers.Count; j++)
-            {
-                var candidate = (Component)providers[j];
-
-                if (original.PublicMembersEqual(candidate))
-                {
-                    ResoniteMod.DebugFunc(() => $"Found duplicate: {candidate} matches {original}");
-                    pairs.Add((original, candidate));
-                }
-            }
+            ResoniteMod.DebugFunc(() => $"Found duplicate: {candidate} matches {original}");
         }
-
-        var result = pairs.ToArray();
-        Pool.Return(ref pairs);
-        return result;
+        return pairs;
     }
 
     internal static void AddSyncMemberRedirections(
@@ -119,27 +108,11 @@ internal static class AssetOptimizationExtensions
         Component original
     )
     {
-        foreach (
-            var (duplicateMember, originalMember) in duplicate.SyncMembers.Zip(
-                original.SyncMembers,
-                (d, o) => (d, o)
-            )
-        )
-        {
-            if (duplicateMember != null && originalMember != null)
-            {
-                ResoniteMod.DebugFunc(() =>
-                    $"Redirecting reference from {duplicateMember} to {originalMember}"
-                );
-                if (!redirectionMap.TryAdd(duplicateMember, originalMember)
-                    && redirectionMap[duplicateMember] != originalMember)
-                {
-                    ResoniteMod.DebugFunc(() =>
-                        $"Duplicate redirection detected for {duplicateMember}; existing target {redirectionMap[duplicateMember]} kept over {originalMember}"
-                    );
-                }
-            }
-        }
+        Internal.PureAssetDedup.AddRedirections(
+            redirectionMap,
+            duplicate.SyncMembers.OfType<IWorldElement>(),
+            original.SyncMembers.OfType<IWorldElement>()
+        );
     }
 
     private static void LogGroupedProviders(Dictionary<Type, List<IAssetProvider>> groupedProviders)

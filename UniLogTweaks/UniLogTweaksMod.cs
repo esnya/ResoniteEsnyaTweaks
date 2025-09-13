@@ -1,8 +1,6 @@
-using System;
-using System.Linq;
 using System.Reflection;
-using Elements.Core;
 using HarmonyLib;
+using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
 #if DEBUG
 using ResoniteHotReloadLib;
@@ -14,52 +12,11 @@ namespace EsnyaTweaks.UniLogTweaks;
 /// Represents the UniLogTweaksMod which is a sealed class inheriting from ResoniteMod.
 /// This class provides the necessary configurations and methods to initialize and manage the mod.
 /// </summary>
-public sealed class UniLogTweaksMod : ResoniteMod
+public sealed class UniLogTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ModAssembly => typeof(UniLogTweaksMod).Assembly;
+    private static Assembly ThisAssembly => typeof(UniLogTweaksMod).Assembly;
 
-    /// <summary>
-    /// Gets the name of the mod from the AssemblyTitle attribute of the assembly.
-    /// </summary>
-    public override string Name =>
-        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
-
-    /// <summary>
-    /// Gets the author of the mod from the AssemblyCompany attribute of the assembly.
-    /// </summary>
-    public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
-
-    /// <summary>
-    /// Gets the version of the mod from the AssemblyInformationalVersion attribute of the assembly.
-    /// </summary>
-    public override string Version
-    {
-        get
-        {
-            var informationalVersion = ModAssembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (!string.IsNullOrEmpty(informationalVersion))
-            {
-                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+', StringComparison.Ordinal);
-                return plusIndex >= 0 ? informationalVersion![..plusIndex] : informationalVersion!;
-            }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
-        }
-    }
-
-    /// <summary>
-    /// Gets the link to the repository of the mod from the AssemblyMetadata attribute of the assembly.
-    /// </summary>
-    public override string Link =>
-        ModAssembly
-            .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .FirstOrDefault(meta => meta.Key == "RepositoryUrl")?.Value
-        ?? "";
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
+    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
 
     private static ModConfiguration? config;
     private static readonly Harmony harmony = new(HarmonyId);

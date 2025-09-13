@@ -4,7 +4,7 @@ using FrooxEngine;
 using FrooxEngine.PhotonDust;
 using FrooxEngine.UIX;
 using ResoniteModLoader;
-using EsnyaTweaks.UIX;
+using EsnyaTweaks.Common.UIX;
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 

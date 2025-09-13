@@ -4,6 +4,8 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LODGroupTweaks", "LODGroupTweaks\LODGroupTweaks.csproj", "{1EDA767D-6E4F-4705-99C1-4AE8F455D46D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tests", "Common.Tests\Common.Tests.csproj", "{7E5AABEA-B222-4C9A-AADD-4759DFED57FD}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryUITweaks.Tests", "InventoryUITweaks.Tests\InventoryUITweaks.Tests.csproj", "{E35C9D65-690A-4E15-9C42-5C1B3C78F675}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxLoopTweaks", "FluxLoopTweaks\FluxLoopTweaks.csproj", "{0638E988-9BAC-4BEF-9089-2DA1357BF99C}"
@@ -30,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneAuditor", "SceneAudito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneAuditor.Tests", "SceneAuditor.Tests\SceneAuditor.Tests.csproj", "{7B4B3D0E-1EAC-4F2E-A1D2-9C8B5D2C6E90}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{A6E4A0F5-5C1E-4B56-9D54-2AF9D9C7E6C1}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "Common\Common.shproj", "{A6E4A0F5-5C1E-4B56-9D54-2AF9D9C7E6C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

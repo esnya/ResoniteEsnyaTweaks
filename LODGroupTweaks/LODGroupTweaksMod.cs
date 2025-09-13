@@ -1,7 +1,6 @@
-using System.Linq;
 using System.Reflection;
-using Elements.Core;
 using HarmonyLib;
+using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
 #if DEBUG
 using ResoniteHotReloadLib;
@@ -10,46 +9,11 @@ using ResoniteHotReloadLib;
 namespace EsnyaTweaks.LODGroupTweaks;
 
 /// <inheritdoc/>
-public class LODGroupTweaksMod : ResoniteMod
+public class LODGroupTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ModAssembly => typeof(LODGroupTweaksMod).Assembly;
+    private static Assembly ThisAssembly => typeof(LODGroupTweaksMod).Assembly;
 
-    /// <inheritdoc/>
-    public override string Name =>
-        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Version
-    {
-        get
-        {
-            var informationalVersion = ModAssembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (!string.IsNullOrEmpty(informationalVersion))
-            {
-                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
-                return plusIndex >= 0
-                    ? informationalVersion![..plusIndex]
-                    : informationalVersion!;
-            }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
-        }
-    }
-
-    /// <inheritdoc/>
-    public override string Link =>
-        ModAssembly
-            .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .FirstOrDefault(meta => meta.Key == "RepositoryUrl")?.Value
-        ?? "";
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
+    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
 
     private static readonly Harmony harmony = new(HarmonyId);
 

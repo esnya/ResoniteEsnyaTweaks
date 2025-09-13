@@ -1,7 +1,7 @@
 using FrooxEngine;
 using FrooxEngine.UIX;
 
-namespace EsnyaTweaks.UIX;
+namespace EsnyaTweaks.Common.UIX;
 
 internal static class UIBuilderExtensions
 {

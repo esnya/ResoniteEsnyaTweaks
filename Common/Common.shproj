@@ -4,6 +4,5 @@
     <ProjectGuid>{A6E4A0F5-5C1E-4B56-9D54-2AF9D9C7E6C1}</ProjectGuid>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
   </PropertyGroup>
-  <Import Project="Shared.projitems" Label="Shared" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildToolsPath)\Microsoft.Common.targets')" />
+  <Import Project="Common.projitems" Label="Shared" />
 </Project>

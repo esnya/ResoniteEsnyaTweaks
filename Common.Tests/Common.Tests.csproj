@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>EsnyaTweaks.Common.Tests</RootNamespace>
+    <AssemblyName>EsnyaTweaks.Common.Tests</AssemblyName>
+    <AssemblyTitle>EsnyaTweaks.Common.Tests</AssemblyTitle>
+  </PropertyGroup>
+  <Import Project="..\Common\Common.projitems" Label="Shared" />
+</Project>

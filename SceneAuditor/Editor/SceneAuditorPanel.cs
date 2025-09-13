@@ -6,7 +6,7 @@ using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.UIX;
 using ResoniteModLoader;
-using EsnyaTweaks.UIX;
+// using EsnyaTweaks.UIX; // not used
 using EsnyaTweaks.SceneAuditor.Rules;
 
 namespace EsnyaTweaks.SceneAuditor.Editor;
@@ -325,8 +325,7 @@ internal static class SceneAuditorPanel
                 if (c is PrimitiveMemberEditor pme)
                 {
                     // Use public sync accessor via GetSyncMember index 7 => _textEditor (SyncRef<TextEditor>)
-                    var teRef = pme.GetSyncMember(7) as SyncRef<TextEditor>;
-                    if (teRef == null)
+                    if (pme.GetSyncMember(7) is not SyncRef<TextEditor> teRef)
                     {
                         // Cannot evaluate; skip
                         continue;

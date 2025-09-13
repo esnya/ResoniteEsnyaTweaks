@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentAssertions;
 using FrooxEngine;
-using Moq;
 using Xunit;
 
 namespace EsnyaTweaks.AssetOptimizationTweaks.Tests;
@@ -238,58 +237,9 @@ public sealed class AssetOptimizationExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
-    public void AddSyncMemberRedirections_ShouldIgnoreDuplicateKeys()
-    {
-        var map = new Dictionary<IWorldElement, IWorldElement>();
-        var duplicateMemberMock = new Mock<ISyncMember>();
-        var originalMemberMock = new Mock<ISyncMember>();
-        var duplicateMember = duplicateMemberMock.As<IWorldElement>().Object;
-        var originalMember = originalMemberMock.As<IWorldElement>().Object;
+    // Removed: Engine-mocking test replaced by pure helper tests below.
 
-        var duplicate = new Mock<Component>();
-        var original = new Mock<Component>();
-
-        duplicate.Setup(c => c.SyncMembers).Returns([duplicateMemberMock.Object]);
-        original.Setup(c => c.SyncMembers).Returns([originalMemberMock.Object]);
-
-        AssetOptimizationExtensions.AddSyncMemberRedirections(map, duplicate.Object, original.Object);
-        AssetOptimizationExtensions.AddSyncMemberRedirections(map, duplicate.Object, original.Object);
-
-        map.Should().ContainSingle().Which.Should().Be(
-            new KeyValuePair<IWorldElement, IWorldElement>(duplicateMember, originalMember)
-        );
-    }
-
-    [Fact]
-    public void BuildRedirectionMap_ShouldIgnoreDuplicateComponentEntries()
-    {
-        var duplicateMemberMock = new Mock<ISyncMember>();
-        var originalMemberMock = new Mock<ISyncMember>();
-        var duplicateMember = duplicateMemberMock.As<IWorldElement>().Object;
-        var originalMember = originalMemberMock.As<IWorldElement>().Object;
-
-        var original = new Mock<Component>().As<IAssetProvider>();
-        var duplicate = new Mock<Component>().As<IAssetProvider>();
-
-        original.As<Component>().Setup(c => c.SyncMembers).Returns([originalMemberMock.Object]);
-        duplicate.As<Component>().Setup(c => c.SyncMembers).Returns([duplicateMemberMock.Object]);
-
-        var grouped = new Dictionary<Type, List<IAssetProvider>>
-        {
-            {
-                typeof(IAssetProvider),
-                [original.Object, duplicate.Object, duplicate.Object]
-            }
-        };
-        var map = new Dictionary<IWorldElement, IWorldElement>();
-
-        AssetOptimizationExtensions.BuildRedirectionMap(grouped, map);
-
-        map.Should().ContainSingle().Which.Should().Be(
-            new KeyValuePair<IWorldElement, IWorldElement>(duplicateMember, originalMember)
-        );
-    }
+    // Removed: Engine-mocking test replaced by pure helper tests below.
 
     private static MethodInfo GetPrivateMethod(string methodName)
     {
@@ -297,5 +247,60 @@ public sealed class AssetOptimizationExtensionsTests
                 methodName,
                 BindingFlags.NonPublic | BindingFlags.Static
             ) ?? throw new InvalidOperationException($"Method {methodName} not found");
+    }
+}
+
+public sealed class PureAssetDedupTests
+{
+    [Fact]
+    public void AddRedirections_ShouldIgnoreDuplicateKeys_Pure()
+    {
+        var map = new Dictionary<int, int>();
+        var duplicates = new[] { 1 };
+        var originals = new[] { 2 };
+
+        EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.AddRedirections(
+            map,
+            duplicates,
+            originals
+        );
+        // Call again to simulate duplicate processing
+        EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.AddRedirections(
+            map,
+            duplicates,
+            originals
+        );
+
+        map.Should().ContainSingle().Which.Should().Be(new KeyValuePair<int, int>(1, 2));
+    }
+
+    [Fact]
+    public void AddRedirections_ShouldKeepExistingDifferentTarget_Pure()
+    {
+        var map = new Dictionary<int, int> { { 1, 99 } };
+        var duplicates = new[] { 1 };
+        var originals = new[] { 2 };
+
+        EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.AddRedirections(
+            map,
+            duplicates,
+            originals
+        );
+
+        map.Should().ContainSingle().Which.Should().Be(new KeyValuePair<int, int>(1, 99));
+    }
+
+    [Fact]
+    public void FindDuplicatePairs_ShouldReturnPairsUsingComparer_Pure()
+    {
+        var items = new[] { "a", "b", "a" };
+        var pairs = EsnyaTweaks.AssetOptimizationTweaks.Internal.PureAssetDedup.FindDuplicatePairs(
+            items,
+            static (x, y) => x == y
+        );
+
+        pairs.Should().ContainSingle();
+        pairs[0].Original.Should().Be("a");
+        pairs[0].Duplicate.Should().Be("a");
     }
 }

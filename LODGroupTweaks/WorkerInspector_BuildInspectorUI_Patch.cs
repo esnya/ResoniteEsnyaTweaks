@@ -7,6 +7,7 @@ using FrooxEngine;
 using FrooxEngine.UIX;
 using HarmonyLib;
 using ResoniteModLoader;
+using EsnyaTweaks.LODGroupTweaks.Internal;
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
@@ -94,13 +95,13 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static float GetBoundingMagnitude(Slot space, MeshRenderer renderer)
     {
-        return renderer.GetBoundingBoxInSpace(space).Size.Magnitude;
+        return LODHelpers.GetBoundingMagnitude(space, renderer);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static float GetBoundingMagnitude(Slot slot)
     {
-        return slot.ComputeBoundingBox(filter: static c => c is MeshRenderer).Size.Magnitude;
+        return LODHelpers.GetBoundingMagnitude(slot);
     }
 
     private static void AddLOD(
@@ -150,7 +151,7 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             }
 
             // Exclude renderers already assigned to other LODGroups to prevent Unity warning
-            assignedElsewhere = LODValidation.CollectAssignedRenderersInOtherGroups(lodGroup);
+            assignedElsewhere = LODHelpers.CollectAssignedRenderersInOtherGroups(lodGroup);
             if (assignedElsewhere.Count > 0)
             {
                 var before = rendererWithScore.Count;
