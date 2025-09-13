@@ -28,6 +28,8 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <!-- Opt-in gate for StyleCop analyzers; default off to avoid network restore in restricted env -->
     <UseStyleCopAnalyzers Condition="'$(UseStyleCopAnalyzers)'==''">true</UseStyleCopAnalyzers>
+    <!-- Allow tests to disable engine assemblies while keeping ModLoader/Harmony references. -->
+    <ExcludeEngineAssemblies Condition="'$(ExcludeEngineAssemblies)'==''">false</ExcludeEngineAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <IsPackable>false</IsPackable>
@@ -67,6 +69,8 @@
       <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')">$(ResonitePath)0Harmony.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'=='true' and '$(ExcludeEngineAssemblies)'!='true'">
     <Reference Include="FrooxEngine">
       <HintPath>$(ResonitePath)FrooxEngine.dll</HintPath>
       <Private>$(IsTestProject)</Private>
@@ -98,7 +102,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(FrooxEnginePresent)'!='true'">
-    <PackageReference Include="Resonite.GameLibs" />
+    <PackageReference Include="Resonite.GameLibs" Condition="'$(ExcludeEngineAssemblies)'!='true'" />
     <Reference Include="ResoniteModLoader">
       <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteModLoader.dll</HintPath>
       <Private>$(IsTestProject)</Private>
