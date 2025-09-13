@@ -112,11 +112,11 @@ jobs:
 
       - name: Build solution
         run: |
-          dotnet build -c ${{ matrix.configuration }} -v:minimal -warnaserror -bl:build-${{ matrix.configuration }}.binlog
+          dotnet build -c ${{ matrix.configuration }} -v:minimal -warnaserror -bl:build-${{ matrix.configuration }}.binlog -p:ResonitePath="${{ github.workspace }}/Resonite/"
 
       - name: Test solution
         run: |
-          dotnet test -c ${{ matrix.configuration }} -v:minimal -warnaserror --logger "trx;LogFileName=test-results-${{ matrix.configuration }}.trx"
+          dotnet test -c ${{ matrix.configuration }} -v:minimal -warnaserror -p:ResonitePath="${{ github.workspace }}/Resonite/" --logger "trx;LogFileName=test-results-${{ matrix.configuration }}.trx"
 
 
       - name: Collect artifacts (EsnyaTweaks.* only, excluding tests)
