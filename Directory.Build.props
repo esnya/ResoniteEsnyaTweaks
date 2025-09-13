@@ -138,6 +138,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- Share global usings across all test projects -->
+    <Compile Include="$(MSBuildThisFileDirectory)Tests/GlobalUsings.cs" Link="GlobalUsings.cs" Condition="Exists('$(MSBuildThisFileDirectory)Tests/GlobalUsings.cs')" />
   </ItemGroup>
   <ItemGroup>
     <!-- Conditional StyleCop.Analyzers (opt-in via -p:UseStyleCopAnalyzers=true) -->
