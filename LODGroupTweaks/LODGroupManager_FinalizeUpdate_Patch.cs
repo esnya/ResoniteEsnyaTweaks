@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Reflection.Emit;
 using FrooxEngine;
 using HarmonyLib;
@@ -9,20 +8,11 @@ using ResoniteModLoader;
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(LODGroupManager), "FinalizeUpdate")]
 internal static class LODGroupManager_FinalizeUpdate_Patch
 {
-
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used by Harmony via reflection")]
-    [SuppressMessage("Performance", "CA1859", Justification = "Harmony requires MethodBase return type")]
-    private static MethodBase TargetMethod()
-    {
-        return AccessTools.Method(typeof(LODGroupManager), "FinalizeUpdate");
-    }
-
-    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used by Harmony via reflection")]
     [SuppressMessage("Performance", "CA1859", Justification = "Harmony requires IEnumerable signature for transpilers")]
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         var codes = new List<CodeInstruction>(instructions);
         try

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FrooxEngine.ProtoFlux;
 using HarmonyLib;
 using ProtoFlux.Core;
@@ -10,7 +11,11 @@ namespace EsnyaTweaks.FluxLoopTweaks;
 [HarmonyPatch(typeof(While), "Run")]
 internal static class While_Run_Patch
 {
-    internal static bool Prefix(While __instance, ExecutionContext context, ref IOperation __result)
+    [SuppressMessage("Style", "SA1313", Justification = "Harmony magic parameters")]
+    internal static bool Prefix(
+        While __instance,
+        ExecutionContext context,
+        ref IOperation __result)
     {
         if (context is not FrooxEngineContext)
         {
@@ -24,19 +29,16 @@ internal static class While_Run_Patch
         {
             if (
                 stopwatch.ElapsedMilliseconds > FluxLoopTweaksMod.TimeoutMs
-                || context.AbortExecution
-            )
+                || context.AbortExecution)
             {
                 ResoniteMod.Warn(
-                    $"While Timedout: {__instance} ({stopwatch.ElapsedMilliseconds}ms)"
-                );
+                    $"While Timedout: {__instance} ({stopwatch.ElapsedMilliseconds}ms)");
                 context.AbortExecution = true;
                 throw new ExecutionAbortedException(
                     __instance.Runtime as IExecutionRuntime,
                     __instance,
                     __instance.LoopIteration.Target,
-                    isAsync: false
-                );
+                    isAsync: false);
             }
 
             __instance.LoopIteration.Execute(context);

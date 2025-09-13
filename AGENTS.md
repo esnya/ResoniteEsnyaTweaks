@@ -18,6 +18,11 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Prefer pure functions, immutability, and declarative style.
 - Good naming & structure > comments; comment only non-obvious WHY
 - Keep code self-explanatory.
+- Order members from most to least accessible and ensure each file ends with exactly one trailing newline; place closing parentheses on the line of the last parameter.
+- Keep one type per file and place static members before instance members.
+- Avoid underscores in field or parameter names except for Harmony magic parameters.
+- Match file names with the first type name.
+- Use `<inheritdoc/>` only on members that override or implement base declarations.
 
 ## UIBuilder Guidelines (Must)
 
@@ -62,6 +67,9 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 
 - Warnings policy:
   - Zero-warnings baseline（Must）: ビルド時の警告は許容しない。既存・新規とも修正し、抑制は最小限（やむを得ないシグネチャのみ）。
+  - Prefer adjusting signatures or accessibility to eliminate warnings before using `SuppressMessage` or `#pragma`.
+  - Harmony magic parameter names (e.g., `__instance`, `__result`) may use `[SuppressMessage("Style", "SA1313")]` with justification.
+  - Globalization string warnings (`CA1303`) are disabled repository-wide; logs are English-only.
 
 - Commit hygiene:
   - Use Conventional Commit + gitmoji. One concise subject line per commit.

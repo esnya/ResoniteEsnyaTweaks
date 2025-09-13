@@ -8,41 +8,38 @@ using ResoniteHotReloadLib;
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
-/// <inheritdoc/>
+/// <summary>Mod entry point for LODGroup tweaks.</summary>
 public class LODGroupTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ThisAssembly => typeof(LODGroupTweaksMod).Assembly;
-
     internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
 
-    private static readonly Harmony harmony = new(HarmonyId);
+    private static Assembly ThisAssembly => typeof(LODGroupTweaksMod).Assembly;
+
+    private static Harmony Harmony { get; } = new(HarmonyId);
+
+#if DEBUG
+    /// <summary>Unpatches all Harmony hooks before hot reload.</summary>
+    public static void BeforeHotReload()
+    {
+        Harmony.UnpatchAll(HarmonyId);
+    }
+
+    /// <summary>Reapplies Harmony hooks after hot reload.</summary>
+    /// <param name="mod">Unused mod instance.</param>
+    public static void OnHotReload(ResoniteMod mod)
+    {
+        _ = mod;
+        Harmony.PatchAll();
+    }
+#endif
 
     /// <inheritdoc/>
     public override void OnEngineInit()
     {
-        Init();
+        Harmony.PatchAll();
 
 #if DEBUG
         HotReloader.RegisterForHotReload(this);
 #endif
     }
-
-    private static void Init()
-    {
-        harmony.PatchAll();
-    }
-
-#if DEBUG
-    /// <inheritdoc/>
-    public static void BeforeHotReload()
-    {
-        harmony.UnpatchAll(HarmonyId);
-    }
-
-    /// <inheritdoc/>
-    public static void OnHotReload(ResoniteMod _)
-    {
-        Init();
-    }
-#endif
 }

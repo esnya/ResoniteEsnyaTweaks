@@ -56,15 +56,13 @@ public static class FluxLoopTweaksModTests
             .Should()
             .MatchRegex(
                 @"^\d+\.\d+\.\d+(?:\+[A-Za-z][A-Za-z0-9]*)?$",
-                "Version must be x.y.z with an optional +alpha suffix (no +hash allowed)"
-            );
+                "Version must be x.y.z with an optional +alpha suffix (no +hash allowed)");
     }
 
     [Theory]
     [InlineData(30000)] // デフォルト値
     public static void TimeoutMs_Should_Return_Expected_Value_When_Config_Is_Null(
-        int expectedTimeout
-    )
+        int expectedTimeout)
     {
         // Act
         var timeout = FluxLoopTweaksMod.TimeoutMs;
@@ -138,7 +136,6 @@ public static class FluxLoopTweaksModTests
         attribute
             .Should()
             .NotBeNull(
-                "internals should be visible to the test assembly so that private members can be tested"
-            );
+                "internals should be visible to the test assembly so that private members can be tested");
     }
 }
