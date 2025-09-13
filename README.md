@@ -10,6 +10,19 @@ A collection of small [ResoniteModLoader](https://github.com/resonite-modding-gr
 - **LODGroupTweaks**: Sets `LODGroup` update order to 1000 and provides inspector buttons to manage child LOD levels.
 - **PhotonDustTweaks**: Adds inspector utilities for modules on parent `ParticleStyle` objects.
 - **UniLogTweaks**: Provides options to control stack traces for UniLog messages.
+- **SceneAuditor**: Editor-only diagnostics panel to identify sources of log spam and scene-state issues.
+
+### SceneAuditor
+
+- Purpose
+  - Identify sources of Player log spam related to LOD configuration (e.g., non-descending LOD thresholds, duplicate renderer ownership). There is a suspicion that excessive LOD-related spam may correlate with Renderite crashes (unconfirmed).
+  - Identify sources of normal Log spam related to PrimitiveMemberEditor misconfiguration (only flags missing TextEditor assignment; avoids false positives like missing IText).
+- Usage
+  - CreateNew: Editor / Scene Auditor (Mod)
+  - Set Search Root (initially null). Search becomes enabled once a root is assigned.
+  - Review results on the right pane; open target inspectors via the built‑in actions in RefEditor.
+- Notes
+  - UI is built with UIBuilder best practices: style-first sizing, ScrollArea + FitContent(Disabled, PreferredSize), fixed-width left cells (RefEditor) and single-line rows.
 
 ## Installation
 

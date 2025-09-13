@@ -195,6 +195,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
         button.LabelText = $"{REMOVE_LABEL} (Removed {count} groups)";
     }
 
-    
+
 
 }
