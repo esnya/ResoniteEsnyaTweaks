@@ -62,6 +62,16 @@ dotnet_diagnostic.CA1707.severity = none  # test classes often don't follow nami
 dotnet_analyzer_diagnostic.category-StyleCop.severity = warning
 dotnet_diagnostic.SA1649.severity = error
 
+# StyleCop exclusions (repo policy)
+# - File header/element docs are not required; keep code concise
+dotnet_diagnostic.SA1633.severity = none  # file header
+dotnet_diagnostic.SA1600.severity = none  # elements should be documented
+# - Bracing/blank-line churn in legacy patches is noisy; disable for now
+dotnet_diagnostic.SA1513.severity = none  # closing brace should be followed by blank line
+dotnet_diagnostic.SA1515.severity = none  # single-line comment should be preceded by blank line
+# - C# 12 collection expressions can trip SA1010; disable spacing rule
+dotnet_diagnostic.SA1010.severity = none  # opening square brackets should not be preceded by a space
+
 [*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
 indent_size = 2
 
