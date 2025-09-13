@@ -58,8 +58,8 @@ dotnet_diagnostic.CA1031.severity = none  # Mod should not throw exceptions to k
 dotnet_diagnostic.CS1591.severity = none  # test classes often don't have XML comments
 dotnet_diagnostic.CA1707.severity = none  # test classes often don't follow naming conventions
 
-# StyleCop: fully enable (start as warnings); tighten per-rule as needed
-dotnet_analyzer_diagnostic.category-StyleCop.severity = warning
+# StyleCop: configure per rule (base off)
+dotnet_analyzer_diagnostic.category-StyleCop.severity = none
 dotnet_diagnostic.SA1649.severity = error
 
 # StyleCop exclusions (repo policy)
