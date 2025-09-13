@@ -15,6 +15,15 @@ indent_size = 4
 
 # 'using' directive preferences
 csharp_style_namespace_declarations = file_scoped:error
+dotnet_diagnostic.SA1200.severity = none
+dotnet_diagnostic.SA1210.severity = none
+dotnet_diagnostic.SA1633.severity = none
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1513.severity = none
+dotnet_diagnostic.SA1515.severity = none
+dotnet_diagnostic.SA1010.severity = none
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1107.severity = none
 
 # Wrapping preferences
 csharp_preserve_single_line_statements = false:warning
