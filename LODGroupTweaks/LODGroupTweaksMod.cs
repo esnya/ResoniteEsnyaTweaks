@@ -8,7 +8,7 @@ using ResoniteHotReloadLib;
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
-/// <summary>Mod entry point for LODGroup tweaks.</summary>
+/// <inheritdoc/>
 public class LODGroupTweaksMod : EsnyaResoniteMod
 {
     internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
