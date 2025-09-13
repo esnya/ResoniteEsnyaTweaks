@@ -40,8 +40,8 @@ public static class DetectionPrimitives
     /// <param name="groups">Sequence of groups and their renderers.</param>
     /// <returns>Dictionary mapping each renderer to the groups that reference it.</returns>
     public static Dictionary<TRenderer, HashSet<TGroup>> BuildDuplicateOwnersIndex<TGroup, TRenderer>(
-        IEnumerable<(TGroup Group, IEnumerable<TRenderer> Renderers)> groups
-    ) where TRenderer : notnull
+        IEnumerable<(TGroup Group, IEnumerable<TRenderer> Renderers)> groups)
+        where TRenderer : notnull
     {
         ArgumentNullException.ThrowIfNull(groups);
         Dictionary<TRenderer, HashSet<TGroup>> index = [];

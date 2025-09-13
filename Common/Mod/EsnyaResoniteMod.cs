@@ -9,11 +9,6 @@ namespace EsnyaTweaks.Common.Modding;
 /// </summary>
 public abstract class EsnyaResoniteMod : ResoniteMod
 {
-    /// <summary>
-    /// The module assembly (derived type's assembly).
-    /// </summary>
-    protected Assembly ModAssembly => GetType().Assembly;
-
     /// <inheritdoc/>
     public override string Name => AssemblyMetadata.Read(ModAssembly).Name;
 
@@ -25,5 +20,9 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 
     /// <inheritdoc/>
     public override string Link => AssemblyMetadata.Read(ModAssembly).Link;
-}
 
+    /// <summary>
+    /// Gets the module assembly (derived type's assembly).
+    /// </summary>
+    protected Assembly ModAssembly => GetType().Assembly;
+}

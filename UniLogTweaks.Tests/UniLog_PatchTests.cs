@@ -12,8 +12,7 @@ public static class UniLog_PatchTests
     {
         return typeof(UniLogTweaksMod).Assembly.GetType(
             "EsnyaTweaks.UniLogTweaks.UniLog_Patch",
-            true
-        )!;
+            true)!;
     }
 
     [Fact]

@@ -12,51 +12,38 @@ using EsnyaTweaks.LODGroupTweaks.Internal;
 namespace EsnyaTweaks.LODGroupTweaks;
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
-internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
+internal static class WorkerInspectorBuildInspectorUIPatch
 {
-    internal const string CATEGORY = "LODGroup Inspector";
-    internal const string DESCRIPTION = "Add useful buttons to LODGroup inspector.";
+    internal const string Category = "LODGroup Inspector";
+    internal const string Description = "Add useful buttons to LODGroup inspector.";
 
-    private const string ADD_LABEL = "[Mod] Add LOD Level from children";
-    private const string SETUP_LABEL = "[Mod] Setup LOD Levels by parts";
-    private const string REMOVE_LABEL = "[Mod] Remove LODGroups from children";
+    private const string AddLabel = "[Mod] Add LOD Level from children";
+    private const string SetupLabel = "[Mod] Setup LOD Levels by parts";
+    private const string RemoveLabel = "[Mod] Remove LODGroups from children";
 
     private static void Postfix(Worker worker, UIBuilder ui)
     {
         if (worker is LODGroup lodGroup)
         {
-            ResoniteMod.DebugFunc(() =>
-                $"LODGroup on {lodGroup.Slot.Name} found. Building inspector UI..."
-            );
+            ResoniteMod.DebugFunc(() => $"LODGroup on {lodGroup.Slot.Name} found. Building inspector UI...");
             BuildInspectorUI(lodGroup, ui);
         }
     }
 
     private static void BuildInspectorUI(LODGroup lodGroup, UIBuilder ui)
     {
-        Button(ui, ADD_LABEL, button => SetupFromChildren(button, lodGroup));
-        Button(ui, SETUP_LABEL, button => SetupByParts(button, lodGroup));
-        Button(ui, REMOVE_LABEL, button => RemoveFromChildren(button, lodGroup));
+        Button(ui, AddLabel, _ => SetupFromChildren(lodGroup));
+        Button(ui, SetupLabel, _ => SetupByParts(lodGroup));
+        Button(ui, RemoveLabel, button => RemoveFromChildren(button, lodGroup));
     }
 
     private static void Button(UIBuilder ui, string text, Action<Button> onClick)
     {
         var button = ui.Button(text);
-        button.LocalPressed += (_, __) =>
-        {
-            onClick(button);
-        };
+        button.LocalPressed += (_, __) => onClick(button);
     }
 
-    private static void Button(UIBuilder ui, string text, ButtonEventHandler onLocalPress)
-    {
-        var button = ui.Button(text);
-        button.LocalPressed += onLocalPress;
-    }
-
-
-
-    private static void SetupFromChildren(Button _, LODGroup lodGroup)
+    private static void SetupFromChildren(LODGroup lodGroup)
     {
         if (lodGroup.UpdateOrder == 0)
         {
@@ -107,14 +94,13 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
     private static void AddLOD(
         LODGroup lodGroup,
         float baseThreshold,
-        in List<KeyValuePair<MeshRenderer, float>> rendererWithBounds
-    )
+        in List<KeyValuePair<MeshRenderer, float>> rendererWithBounds)
     {
         var levelSize = rendererWithBounds.Last().Value;
         lodGroup.AddLOD(baseThreshold / levelSize, [.. rendererWithBounds.Select(p => p.Key)]);
     }
 
-    private static void SetupByParts(Button _, LODGroup lodGroup)
+    private static void SetupByParts(LODGroup lodGroup)
     {
         if (lodGroup.UpdateOrder == 0)
         {
@@ -137,11 +123,9 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
                 from r in renderers
                 select new KeyValuePair<MeshRenderer, float>(
                     r,
-                    GetBoundingMagnitude(space, r)
-                ) into p
+                    GetBoundingMagnitude(space, r)) into p
                 orderby p.Value descending
-                select p
-            );
+                select p);
             if (ResoniteMod.IsDebugEnabled())
             {
                 foreach (var pair in rendererWithScore)
@@ -193,9 +177,6 @@ internal static class LODGroup_WorkerInspector_BuildInspectorUI_Patch
             count++;
         }
 
-        button.LabelText = $"{REMOVE_LABEL} (Removed {count} groups)";
+        button.LabelText = $"{RemoveLabel} (Removed {count} groups)";
     }
-
-
-
 }

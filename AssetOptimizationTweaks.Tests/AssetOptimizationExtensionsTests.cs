@@ -154,8 +154,7 @@ public sealed class AssetOptimizationExtensionsTests
     [InlineData(typeof(BoxMesh))]
     [InlineData(typeof(CylinderMesh))]
     public void CheckInheritanceHierarchy_ShouldReturnTrue_ForMoreProceduralAssetProviders(
-        Type type
-    )
+        Type type)
     {
         var method = GetPrivateMethod("CheckInheritanceHierarchy");
 
@@ -245,8 +244,7 @@ public sealed class AssetOptimizationExtensionsTests
     {
         return typeof(AssetOptimizationExtensions).GetMethod(
                 methodName,
-                BindingFlags.NonPublic | BindingFlags.Static
-            ) ?? throw new InvalidOperationException($"Method {methodName} not found");
+                BindingFlags.NonPublic | BindingFlags.Static) ?? throw new InvalidOperationException($"Method {methodName} not found");
     }
 }
 
@@ -262,14 +260,12 @@ public sealed class PureAssetDedupTests
         Internal.PureAssetDedup.AddRedirections(
             map,
             duplicates,
-            originals
-        );
+            originals);
         // Call again to simulate duplicate processing
         Internal.PureAssetDedup.AddRedirections(
             map,
             duplicates,
-            originals
-        );
+            originals);
 
         map.Should().ContainSingle().Which.Should().Be(new KeyValuePair<int, int>(1, 2));
     }
@@ -284,8 +280,7 @@ public sealed class PureAssetDedupTests
         Internal.PureAssetDedup.AddRedirections(
             map,
             duplicates,
-            originals
-        );
+            originals);
 
         map.Should().ContainSingle().Which.Should().Be(new KeyValuePair<int, int>(1, 99));
     }
@@ -296,8 +291,7 @@ public sealed class PureAssetDedupTests
         var items = new[] { "a", "b", "a" };
         var pairs = Internal.PureAssetDedup.FindDuplicatePairs(
             items,
-            static (x, y) => x == y
-        );
+            static (x, y) => x == y);
 
         pairs.Should().ContainSingle();
         pairs[0].Original.Should().Be("a");

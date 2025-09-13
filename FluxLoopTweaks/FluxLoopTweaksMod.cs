@@ -14,53 +14,53 @@ namespace EsnyaTweaks.FluxLoopTweaks;
 /// <inheritdoc/>
 public class FluxLoopTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ThisAssembly => typeof(FluxLoopTweaksMod).Assembly;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    private static ModConfiguration? config;
-    private static readonly Harmony harmony = new(HarmonyId);
+    private static readonly Harmony Harmony = new(HarmonyId);
 
     [AutoRegisterConfigKey]
-    private static readonly ModConfigurationKey<int> timeoutKey = new(
+    private static readonly ModConfigurationKey<int> TimeoutKey = new(
         "Timeout",
-        "Timeout for in milliseconds.",
-        computeDefault: () => 30_000
-    );
+        "Timeout in milliseconds.",
+        computeDefault: () => 30_000);
+
+    private static ModConfiguration? config;
 
     /// <summary>
     /// Gets the timeout value in milliseconds for loop operations.
     /// </summary>
-    public static int TimeoutMs => config?.GetValue(timeoutKey) ?? 30_000;
+    public static int TimeoutMs => config?.GetValue(TimeoutKey) ?? 30_000;
+
+    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
+
+    private static Assembly ThisAssembly => typeof(FluxLoopTweaksMod).Assembly;
+
+#if DEBUG
+    /// <summary>
+    /// Unpatches Harmony patches before hot reload.
+    /// </summary>
+    public static void BeforeHotReload()
+    {
+        Harmony.UnpatchAll(HarmonyId);
+    }
+
+    /// <summary>
+    /// Reapplies Harmony patches after hot reload.
+    /// </summary>
+    /// <param name="modInstance">The mod instance.</param>
+    public static void OnHotReload(ResoniteMod modInstance)
+    {
+        Harmony.PatchAll();
+        config = modInstance?.GetConfiguration();
+    }
+#endif
 
     /// <inheritdoc/>
     public override void OnEngineInit()
     {
-        Init(this);
+        Harmony.PatchAll();
+        config = GetConfiguration();
 
 #if DEBUG
         HotReloader.RegisterForHotReload(this);
 #endif
     }
-
-    private static void Init(ResoniteMod modInstance)
-    {
-        harmony.PatchAll();
-        config = modInstance?.GetConfiguration();
-    }
-
-#if DEBUG
-    /// <inheritdoc/>
-    public static void BeforeHotReload()
-    {
-        harmony.UnpatchAll(HarmonyId);
-    }
-
-    /// <inheritdoc/>
-    /// <param name="modInstance">The mod instance.</param>
-    public static void OnHotReload(ResoniteMod modInstance)
-    {
-        Init(modInstance);
-    }
-#endif
 }

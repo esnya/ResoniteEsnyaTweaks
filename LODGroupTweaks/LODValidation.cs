@@ -162,4 +162,3 @@ internal static class LODValidation
 
     // no helpers needed
 }
-
