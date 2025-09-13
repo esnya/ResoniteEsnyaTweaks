@@ -1,5 +1,3 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <Compile Include="../UIX/UIBuilderExtensions.cs" Link="UIBuilderExtensions.cs" />
-  </ItemGroup>
+  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
 </Project>

@@ -402,3 +402,13 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 Resonite/
+
+# Experimental local console projects (exclude from VCS)
+/FPOS/
+/FTP/
+/FX/
+/FX2/
+/FX3/
+/FX4/
+/I2/
+/LT/

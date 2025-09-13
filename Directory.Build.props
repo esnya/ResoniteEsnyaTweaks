@@ -43,6 +43,11 @@
     <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')">$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath>
     <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')">$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')">/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+    <!-- WSL2 mounts: Windows Steam under /mnt/* -->
+    <ResonitePath Condition="Exists('/mnt/c/Program Files (x86)/Steam/steamapps/common/Resonite/')">/mnt/c/Program Files (x86)/Steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('/mnt/c/Program Files/Steam/steamapps/common/Resonite/')">/mnt/c/Program Files/Steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('/mnt/c/SteamLibrary/steamapps/common/Resonite/')">/mnt/c/SteamLibrary/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('/mnt/d/SteamLibrary/steamapps/common/Resonite/')">/mnt/d/SteamLibrary/steamapps/common/Resonite/</ResonitePath>
   </PropertyGroup>
   <PropertyGroup>
     <FrooxEnginePresent Condition="Exists('$(ResonitePath)FrooxEngine.dll')">true</FrooxEnginePresent>
