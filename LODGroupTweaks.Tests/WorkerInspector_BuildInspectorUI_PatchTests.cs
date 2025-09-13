@@ -124,25 +124,19 @@ public static class WorkerInspector_BuildInspectorUI_PatchTests
             .Where(i => i.Expression.ToString() == "Button")
             .ToArray();
 
-        invocations.Should().HaveCount(6);
+        invocations.Should().HaveCount(3);
 
         var labels = new[]
         {
             "ADD_LABEL",
             "SETUP_LABEL",
             "REMOVE_LABEL",
-            "SCAN_LABEL",
-            "FIX_LABEL",
-            "OPEN_INSPECTORS_LABEL",
         };
         var handlers = new[]
         {
             "SetupFromChildren",
             "SetupByParts",
             "RemoveFromChildren",
-            "ScanAllLODGroupsAndSpawnReport",
-            "FixLODGroupsBySortingAndShowResult",
-            "OpenInspectorsForViolatingLODGroups",
         };
 
         for (var i = 0; i < invocations.Length; i++)

@@ -5,6 +5,7 @@
       SourceFiles="$(TargetDir)$(TargetFileName)"
       DestinationFolder="$(ResonitePath)rml_mods"
       ContinueOnError="true"
+      Retries="1"
       Condition="$([System.String]::Copy('$(TargetFileName)').EndsWith('.Tests.dll')) == 'False'"
     />
     <Message
@@ -16,6 +17,7 @@
       SourceFiles="$(TargetDir)$(TargetFileName)"
       DestinationFolder="$(ResonitePath)rml_mods/HotReloadMods"
       ContinueOnError="true"
+      Retries="1"
       Condition="'$(Configuration)'=='Debug' and $([System.String]::Copy('$(TargetFileName)').EndsWith('.Tests.dll')) == 'False'"
     />
   </Target>
