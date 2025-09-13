@@ -25,6 +25,8 @@
     <AnalysisLevel>latest-all</AnalysisLevel>
     <WarningLevel>9999</WarningLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Opt-in gate for StyleCop analyzers; default off to avoid network restore in restricted env -->
+    <UseStyleCopAnalyzers Condition="'$(UseStyleCopAnalyzers)'==''">false</UseStyleCopAnalyzers>
   </PropertyGroup>
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <IsPackable>false</IsPackable>
@@ -138,6 +140,8 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- Conditional StyleCop.Analyzers (opt-in via -p:UseStyleCopAnalyzers=true) -->
+    <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" IncludeAssets="analyzers" Condition="'$(UseStyleCopAnalyzers)'=='true'" />
     <EditorConfigFiles Remove="$(MSBuildThisFileDirectory)**\*.editorconfig" />
     <None Include="$(MSBuildThisFileDirectory)README.md" Link="README.md" />
     <None Include="$(MSBuildThisFileDirectory)LICENSE" Link="LICENSE" />

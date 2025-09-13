@@ -58,6 +58,10 @@ dotnet_diagnostic.CA1031.severity = none  # Mod should not throw exceptions to k
 dotnet_diagnostic.CS1591.severity = none  # test classes often don't have XML comments
 dotnet_diagnostic.CA1707.severity = none  # test classes often don't follow naming conventions
 
+# StyleCop baseline: disable by default; enable SA1649 only (opt-in analyzer package)
+dotnet_analyzer_diagnostic.category-StyleCop.severity = none
+dotnet_diagnostic.SA1649.severity = error
+
 [*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
 indent_size = 2
 
