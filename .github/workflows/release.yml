@@ -63,6 +63,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
     steps:
       - id: checkout
         name: Checkout
@@ -75,6 +79,11 @@ jobs:
         with:
           dotnet-version: '9.0.x'
           cache: true
+          cache-dependency-path: |
+            Directory.Packages.props
+            **/*.csproj
+            **/*.props
+            **/*.targets
 
       - name: .NET format
         run: |
@@ -82,11 +91,11 @@ jobs:
 
       - name: Build solution
         run: |
-          dotnet build -c Release -v:minimal -warnaserror -bl:build.binlog
+          dotnet build -c ${{ matrix.configuration }} -v:minimal -warnaserror -bl:build-${{ matrix.configuration }}.binlog
 
       - name: Test solution
         run: |
-          dotnet test -c Release -v:minimal -warnaserror --logger "trx;LogFileName=test-results.trx"
+          dotnet test -c ${{ matrix.configuration }} -v:minimal -warnaserror --logger "trx;LogFileName=test-results-${{ matrix.configuration }}.trx"
 
       - name: Upload diagnostics on failure
         if: failure()
@@ -98,6 +107,7 @@ jobs:
             **/TestResults/*.trx
 
       - name: Collect artifacts (EsnyaTweaks.* only, excluding tests)
+        if: matrix.configuration == 'Release'
         run: |
           set -euo pipefail
           mkdir -p artifacts
