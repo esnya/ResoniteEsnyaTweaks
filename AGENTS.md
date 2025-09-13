@@ -65,7 +65,8 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Format, build, and test are mandatory before task hand‑off.
   - Format: `dotnet format --verify-no-changes --no-restore`
   - Build (solution or project): `dotnet build -c Debug -v:minimal`
-- Test: `dotnet test -c Debug -v:minimal`
+- Test (CI): run Pure tests only: `dotnet test Common.PureTests/Common.PureTests.csproj -c Debug -v:minimal`
+- Test (Local full): run all tests when Resonite実体と参照が揃う環境で手元実行（CIでは実施しない）
 
 - Resonite assemblies are not required by CI, but local builds for mods may need them. Do not change project files to hard‑code paths. Pass the property at invocation time:
   - Build with refs: `dotnet build -c Debug -p:ResonitePath="<ResoniteRoot>/"`
@@ -76,11 +77,17 @@ The CI workflow uses static checks that do not require Resonite assemblies.
   - Avoid altering public APIs; keep surface area minimal.
 
 - Warnings policy:
-  - Zero-warnings baseline（Must）: ビルド時の警告は許容しない。既存・新規とも修正し、抑制は最小限（やむを得ないシグネチャのみ）。
+  - Zero-warnings baseline（Must）: タスク完了時は原則警告ゼロ。既存・新規とも修正し、抑制は最小限（やむを得ないシグネチャのみ）。
   - Prefer adjusting signatures or accessibility to eliminate warnings before using `SuppressMessage` or `#pragma`.
   - Harmony magic parameter names (e.g., `__instance`, `__result`) may use `[SuppressMessage("Style", "SA1313")]` with justification.
   - Globalization string warnings (`CA1303`) are disabled repository-wide; logs are English-only.
   - Condition debug-only `using` directives with `#if DEBUG` to avoid unused-using warnings in Release builds.
+
+## Pure Tests (Must)
+
+- Common の純粋ロジック（Engine非依存）は `Common/Flux`, `Common/LOD`, `Common/Logging` に集約し、`Common.PureTests` で検証する。
+- CI は `Common.PureTests` のみを実行し、高速・安定なベースラインを担保する。
+- Engine/Froox 結合のある `*.Tests` はローカルでのみフル実行する（Resonite実体が必要なため）。
 
 - Commit hygiene:
   - Use Conventional Commit + gitmoji. One concise subject line per commit.

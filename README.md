@@ -35,6 +35,42 @@ A collection of small [ResoniteModLoader](https://github.com/resonite-modding-gr
 
 For development, you will need the [ResoniteHotReloadLib](https://github.com/Nytra/ResoniteHotReloadLib) to be able to hot reload your mod with DEBUG build.
 
+### Structure
+
+- Each mod has its own test project (e.g., `*.Tests`).
+- Shared code lives under `Common/`.
+- Pure logic is extracted into `Common/Flux`, `Common/LOD`, `Common/Logging` and covered by `Common.PureTests` which does not reference FrooxEngine.
+
+### Mod base and Hot Reload
+
+All mods should inherit from `EsnyaTweaks.Common.Modding.EsnyaResoniteMod`. The base class:
+
+- Applies Harmony patches on `OnEngineInit` and registers Hot Reload (DEBUG).
+- Exposes `protected virtual void OnInit(ModConfiguration config)` and `protected virtual void OnAfterHotReload(ModConfiguration? config)`.
+- Provides helpers for Hot Reload shims:
+  - `EsnyaResoniteMod.BeforeHotReload(harmonyId)`
+  - `EsnyaResoniteMod.OnHotReload(mod, harmonyId)`
+
+### DevCreateNew registration (with auto-unregister)
+
+Use the base helper to register a DevCreateNew menu entry and automatically unregister it on hot reload (DEBUG):
+
+```
+protected override void OnInit(ModConfiguration config)
+{
+    RegisterDevCreateNew(
+        category: "Editor",
+        optionName: "My Tool",
+        register: () => FrooxEngine.DevCreateNewForm.AddAction(
+            "Editor", "My Tool", slot => /* spawn UI */ ));
+}
+
+#if DEBUG
+public static void BeforeHotReload() => BeforeHotReload("com.nekometer.esnya.<AssemblyName>");
+public static void OnHotReload(ResoniteModLoader.ResoniteMod mod) => OnHotReload(mod, "com.nekometer.esnya.<AssemblyName>");
+#endif
+```
+
 ### Testing and Code Coverage
 
 This project includes automated testing with code coverage reporting.
