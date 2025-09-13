@@ -82,6 +82,30 @@ jobs:
           cache-dependency-path: |
             **/packages.lock.json
 
+      - name: Fetch Resonite shim assemblies (RML/Harmony/HotReload)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p Resonite
+          echo "Downloading ResoniteModLoader + 0Harmony..."
+          # Try to download a release asset that contains RML and 0Harmony
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "RML*.zip" --dir Resonite --clobber || true
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "ResoniteModLoader*.zip" --dir Resonite --clobber || true
+          if compgen -G "Resonite/*.zip" > /dev/null; then
+            unzip -o Resonite/*.zip -d Resonite >/dev/null
+          fi
+          # In case assets were separate DLLs in the release, attempt direct download patterns as well
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "ResoniteModLoader.dll" --dir Resonite --clobber || true
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "0Harmony.dll" --dir Resonite --clobber || true
+
+          echo "Downloading HotReload libs..."
+          gh release download -R Nytra/ResoniteHotReloadLib --pattern "HotReloadLib.*.RML.zip" --dir Resonite --clobber
+          unzip -o Resonite/HotReloadLib.*.RML.zip -d Resonite >/dev/null
+
+          echo "Listing Resonite/ contents"
+          ls -la Resonite || true
+
       - name: .NET format
         run: |
           dotnet format --verify-no-changes --no-restore
