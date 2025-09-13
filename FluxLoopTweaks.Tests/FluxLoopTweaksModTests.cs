@@ -72,20 +72,7 @@ public static class FluxLoopTweaksModTests
         timeout.Should().BePositive();
     }
 
-    [Fact]
-    public static void HarmonyId_Should_Be_Valid()
-    {
-        // Act
-        var harmonyId = typeof(FluxLoopTweaksMod)
-            .GetProperty("HarmonyId", BindingFlags.NonPublic | BindingFlags.Static)
-            ?.GetValue(null)
-            ?.ToString();
-
-        // Assert
-        harmonyId.Should().NotBeNullOrEmpty();
-        harmonyId.Should().Contain("com.nekometer.esnya");
-        harmonyId.Should().Contain("FluxLoopTweaks");
-    }
+    // HarmonyId の検証は共通基底のテスト（Common.Tests）へ集約
 
     [Fact]
     public static void Mod_Should_Implement_ResoniteModBase()

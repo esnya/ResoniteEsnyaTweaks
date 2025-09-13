@@ -1,11 +1,6 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
 
 [assembly: InternalsVisibleTo("EsnyaTweaks.FluxLoopTweaks.Tests")]
 
@@ -14,8 +9,6 @@ namespace EsnyaTweaks.FluxLoopTweaks;
 /// <inheritdoc/>
 public class FluxLoopTweaksMod : EsnyaResoniteMod
 {
-    private static readonly Harmony Harmony = new(HarmonyId);
-
     [AutoRegisterConfigKey]
     private static readonly ModConfigurationKey<int> TimeoutKey = new(
         "Timeout",
@@ -29,17 +22,19 @@ public class FluxLoopTweaksMod : EsnyaResoniteMod
     /// </summary>
     public static int TimeoutMs => config?.GetValue(TimeoutKey) ?? 30_000;
 
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
+    private static new string HarmonyId => $"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}";
 
-    private static Assembly ThisAssembly => typeof(FluxLoopTweaksMod).Assembly;
-
+#pragma warning disable SA1512 // Single-line comments should not be followed by blank line
+    // Use base HarmonyId for runtime behavior; static HarmonyId is for tests via reflection.
+#pragma warning restore SA1512 // Single-line comments should not be followed by blank line
 #if DEBUG
     /// <summary>
     /// Unpatches Harmony patches before hot reload.
     /// </summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload($"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}");
     }
 
     /// <summary>
@@ -48,19 +43,15 @@ public class FluxLoopTweaksMod : EsnyaResoniteMod
     /// <param name="modInstance">The mod instance.</param>
     public static void OnHotReload(ResoniteMod modInstance)
     {
-        Harmony.PatchAll();
-        config = modInstance?.GetConfiguration();
+        OnHotReload(
+            modInstance,
+            $"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}");
     }
 #endif
 
     /// <inheritdoc/>
-    public override void OnEngineInit()
+    protected override void OnInit(ModConfiguration config)
     {
-        Harmony.PatchAll();
-        config = GetConfiguration();
-
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
+        FluxLoopTweaksMod.config = config;
     }
 }

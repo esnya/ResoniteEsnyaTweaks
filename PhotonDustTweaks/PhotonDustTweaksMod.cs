@@ -1,8 +1,5 @@
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
+using ResoniteModLoader;
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 
@@ -11,10 +8,12 @@ namespace EsnyaTweaks.PhotonDustTweaks;
 /// </summary>
 public class PhotonDustTweaksMod : EsnyaResoniteMod
 {
-    internal static string HarmonyId =>
-        $"com.nekometer.esnya.{typeof(PhotonDustTweaksMod).Assembly.GetName()}";
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
+    private static new string HarmonyId => HarmonyIdValue;
 
-    internal static Harmony Harmony { get; } = new(HarmonyId);
+    // Use base HarmonyId for runtime behavior; static HarmonyId is for tests via reflection.
+    private static string HarmonyIdValue =>
+        $"com.nekometer.esnya.{typeof(PhotonDustTweaksMod).Assembly.GetName()}";
 
 #if DEBUG
     /// <summary>
@@ -22,30 +21,16 @@ public class PhotonDustTweaksMod : EsnyaResoniteMod
     /// </summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload(HarmonyIdValue);
     }
 
     /// <summary>
     /// Reapplies patches after hot reload.
     /// </summary>
-    public static void OnHotReload()
+    /// <param name="mod">Reloaded mod instance.</param>
+    public static void OnHotReload(ResoniteMod mod)
     {
-        Init();
+        OnHotReload(mod, HarmonyIdValue);
     }
 #endif
-
-    /// <inheritdoc />
-    public override void OnEngineInit()
-    {
-        Init();
-
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
-
-    private static void Init()
-    {
-        Harmony.PatchAll();
-    }
 }

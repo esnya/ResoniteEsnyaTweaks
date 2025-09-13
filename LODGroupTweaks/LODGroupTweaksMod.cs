@@ -1,45 +1,26 @@
-using System.Reflection;
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
-#if DEBUG
 using ResoniteModLoader;
-using ResoniteHotReloadLib;
-#endif
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
 /// <inheritdoc/>
 public class LODGroupTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ThisAssembly => typeof(LODGroupTweaksMod).Assembly;
-
-    private static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    private static Harmony Harmony { get; } = new(HarmonyId);
-
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
+    private static new string HarmonyId => $"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}";
+    // Use base HarmonyId for runtime behavior; static HarmonyId is for tests via reflection.
 #if DEBUG
     /// <summary>Unpatches all Harmony hooks before hot reload.</summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload($"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}");
     }
 
     /// <summary>Reapplies Harmony hooks after hot reload.</summary>
-    /// <param name="mod">Unused mod instance.</param>
+    /// <param name="mod">Reloaded mod instance.</param>
     public static void OnHotReload(ResoniteMod mod)
     {
-        _ = mod;
-        Harmony.PatchAll();
+        OnHotReload(mod, $"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}");
     }
 #endif
-
-    /// <inheritdoc/>
-    public override void OnEngineInit()
-    {
-        Harmony.PatchAll();
-
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
 }

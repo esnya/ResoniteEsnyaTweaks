@@ -1,11 +1,6 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
-#if DEBUG
 using ResoniteModLoader;
-using ResoniteHotReloadLib;
-#endif
 
 [assembly: InternalsVisibleTo("EsnyaTweaks.InventoryUITweaks.Tests")]
 
@@ -14,34 +9,21 @@ namespace EsnyaTweaks.InventoryUITweaks;
 /// <inheritdoc/>
 public class InventoryUITweaksMod : EsnyaResoniteMod
 {
-    internal static string HarmonyId => $"com.nekometer.esnya.{ThisAssembly.GetName()}";
-
-    private static Harmony Harmony { get; } = new(HarmonyId);
-
-    private static Assembly ThisAssembly => typeof(InventoryUITweaksMod).Assembly;
+    /// <inheritdoc/>
+    protected override string HarmonyId => $"com.nekometer.esnya.{typeof(InventoryUITweaksMod).Assembly.GetName()}";
 
 #if DEBUG
     /// <summary>Unpatches Harmony before hot reload.</summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload($"com.nekometer.esnya.{typeof(InventoryUITweaksMod).Assembly.GetName()}");
     }
 
     /// <summary>Reapplies Harmony patches after hot reload.</summary>
-    /// <param name="mod">Unused reference to the reloaded mod.</param>
+    /// <param name="mod">Reloaded mod instance.</param>
     public static void OnHotReload(ResoniteMod mod)
     {
-        _ = mod;
-        Harmony.PatchAll();
+        OnHotReload(mod, $"com.nekometer.esnya.{typeof(InventoryUITweaksMod).Assembly.GetName()}");
     }
 #endif
-
-    /// <inheritdoc/>
-    public override void OnEngineInit()
-    {
-        Harmony.PatchAll();
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
 }

@@ -1,9 +1,5 @@
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
 
 namespace EsnyaTweaks.UniLogTweaks;
 
@@ -13,9 +9,6 @@ namespace EsnyaTweaks.UniLogTweaks;
 /// </summary>
 public sealed class UniLogTweaksMod : EsnyaResoniteMod
 {
-    internal static string HarmonyId =>
-        $"com.nekometer.esnya.{typeof(UniLogTweaksMod).Assembly.GetName()}";
-
     internal static bool AllowInfo =>
         Config?.TryGetValue(AllowInfoKey, out var value) == true && value;
 
@@ -28,7 +21,12 @@ public sealed class UniLogTweaksMod : EsnyaResoniteMod
     internal static bool AddIndent =>
         Config?.TryGetValue(AddIndentKey, out var value) != true || value;
 
-    private static Harmony Harmony { get; } = new(HarmonyId);
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
+    private static new string HarmonyId => HarmonyIdValue;
+
+    // Use base HarmonyId.
+    private static string HarmonyIdValue =>
+        $"com.nekometer.esnya.{typeof(UniLogTweaksMod).Assembly.GetName()}";
 
     private static ModConfigurationKey<bool> AllowInfoKey { get; } = new(
         "AllowInfo",
@@ -58,7 +56,7 @@ public sealed class UniLogTweaksMod : EsnyaResoniteMod
     /// </summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload(HarmonyIdValue);
     }
 
     /// <summary>
@@ -67,25 +65,15 @@ public sealed class UniLogTweaksMod : EsnyaResoniteMod
     /// <param name="modInstance">Reloaded mod instance.</param>
     public static void OnHotReload(ResoniteMod modInstance)
     {
-        Init(modInstance);
+        OnHotReload(
+            modInstance,
+            HarmonyIdValue);
     }
 #endif
 
-    /// <summary>
-    /// Initializes the mod.
-    /// </summary>
-    public override void OnEngineInit()
+    /// <inheritdoc/>
+    protected override void OnInit(ModConfiguration config)
     {
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-
-        Init(this);
-    }
-
-    private static void Init(ResoniteMod modInstance)
-    {
-        Harmony.PatchAll();
-        Config = modInstance?.GetConfiguration() ?? Config;
+        Config = config;
     }
 }

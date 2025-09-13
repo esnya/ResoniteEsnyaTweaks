@@ -39,6 +39,16 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Tests can import the same `.projitems` directly to exercise pure helpers without depending on any mod project.
 - Avoid hard-coded paths or project-specific references in shared code; keep it framework-agnostic.
 
+### Mod Base (Must)
+- Inherit mods from `EsnyaTweaks.Common.Modding.EsnyaResoniteMod`.
+- Base class auto-applies Harmony patches on `OnEngineInit` and registers hot reload in DEBUG.
+- Override `protected override string HarmonyId` only when a custom ID is required; default uses full `AssemblyName` to keep legacy behavior.
+- Use `protected override void OnInit(ModConfiguration config)` for post-patch initialization (e.g., capture config).
+- For hot reload, define static shims per mod that delegate to helpers:
+  - `EsnyaResoniteMod.BeforeHotReload("<harmonyId>")`
+  - `EsnyaResoniteMod.OnHotReload(modInstance, "<harmonyId>", cfg => /* optional init */)`
+- DevCreateNew registration: use `RegisterDevCreateNew(category, optionName, register)` from the base class. It wires DEBUG-only auto-unregister via HotReloadLib, so you don't have to call Unregister manually.
+
 ## Checklist for Agents
 
 - Formatting is enforced with `dotnet format`.

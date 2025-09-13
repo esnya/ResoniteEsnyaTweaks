@@ -1,9 +1,6 @@
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
 using EsnyaTweaks.SceneAuditor.Editor;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
+using ResoniteModLoader;
 
 namespace EsnyaTweaks.SceneAuditor;
 
@@ -12,10 +9,8 @@ namespace EsnyaTweaks.SceneAuditor;
 /// </summary>
 public sealed class SceneAuditorMod : EsnyaResoniteMod
 {
-    internal static string HarmonyId =>
-        $"com.nekometer.esnya.{typeof(SceneAuditorMod).Assembly.GetName()}";
-
-    private static Harmony Harmony { get; } = new(HarmonyId);
+    /// <inheritdoc/>
+    protected override string HarmonyId => $"com.nekometer.esnya.{typeof(SceneAuditorMod).Assembly.GetName()}";
 
 #if DEBUG
     /// <summary>
@@ -23,32 +18,27 @@ public sealed class SceneAuditorMod : EsnyaResoniteMod
     /// </summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
-        CreateNewRegistration.Unregister();
+        BeforeHotReload($"com.nekometer.esnya.{typeof(SceneAuditorMod).Assembly.GetName()}");
     }
 
     /// <summary>
-    /// Reapplies patches after hot reload.
+    /// Reapplies patches and re-registers UI after hot reload.
     /// </summary>
-    public static void OnHotReload()
+    /// <param name="mod">Reloaded mod instance.</param>
+    public static void OnHotReload(ResoniteMod mod)
     {
-        Init();
+        OnHotReload(
+            mod,
+            $"com.nekometer.esnya.{typeof(SceneAuditorMod).Assembly.GetName()}");
     }
 #endif
 
     /// <inheritdoc />
-    public override void OnEngineInit()
+    protected override void OnInit(ModConfiguration config)
     {
-        Init();
-
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
-
-    private static void Init()
-    {
-        Harmony.PatchAll();
-        CreateNewRegistration.Register();
+        RegisterDevCreateNew(
+            CreateNewRegistration.Category,
+            CreateNewRegistration.OptionName,
+            CreateNewRegistration.Register);
     }
 }

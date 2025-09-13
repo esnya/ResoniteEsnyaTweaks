@@ -1,9 +1,6 @@
 using System.Runtime.CompilerServices;
-using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
+using ResoniteModLoader;
 
 [assembly: InternalsVisibleTo("EsnyaTweaks.AssetOptimizationTweaks.Tests")]
 
@@ -14,10 +11,11 @@ namespace EsnyaTweaks.AssetOptimizationTweaks;
 /// </summary>
 public class AssetOptimizationTweaksMod : EsnyaResoniteMod
 {
-    internal static string HarmonyId =>
-        $"com.nekometer.esnya.{typeof(AssetOptimizationTweaksMod).Assembly.GetName().Name}";
+    /// <inheritdoc/>
+    protected override string HarmonyId => HarmonyIdValue;
 
-    private static Harmony Harmony { get; } = new(HarmonyId);
+    private static string HarmonyIdValue =>
+        $"com.nekometer.esnya.{typeof(AssetOptimizationTweaksMod).Assembly.GetName().Name}";
 
 #if DEBUG
     /// <summary>
@@ -25,30 +23,16 @@ public class AssetOptimizationTweaksMod : EsnyaResoniteMod
     /// </summary>
     public static void BeforeHotReload()
     {
-        Harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload(HarmonyIdValue);
     }
 
     /// <summary>
     /// Reapplies patches after hot reload.
     /// </summary>
-    public static void OnHotReload()
+    /// <param name="mod">Reloaded mod instance.</param>
+    public static void OnHotReload(ResoniteMod mod)
     {
-        Init();
+        OnHotReload(mod, HarmonyIdValue);
     }
 #endif
-
-    /// <inheritdoc />
-    public override void OnEngineInit()
-    {
-        Init();
-
-#if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
-
-    private static void Init()
-    {
-        Harmony.PatchAll();
-    }
 }

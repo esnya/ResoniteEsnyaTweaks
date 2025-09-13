@@ -7,8 +7,8 @@ namespace EsnyaTweaks.SceneAuditor.Editor;
 
 internal static class CreateNewRegistration
 {
-    private const string Category = "Editor";
-    private const string OptionName = "Scene Auditor (Mod)";
+    internal const string Category = "Editor";
+    internal const string OptionName = "Scene Auditor (Mod)";
 
     public static void Register()
     {
@@ -19,6 +19,7 @@ internal static class CreateNewRegistration
 
     public static void Unregister()
     {
+        // Kept for backward compatibility; base class now offers auto-unregister helper.
         // Remove via HotReloadLib just before hot reload to avoid stale entries
 #if DEBUG
         HotReloader.RemoveMenuOption(Category, OptionName);
