@@ -2,8 +2,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using EsnyaTweaks.Common.Modding;
-using ResoniteModLoader;
 #if DEBUG
+using ResoniteModLoader;
 using ResoniteHotReloadLib;
 #endif
 

@@ -70,6 +70,7 @@ The CI workflow uses static checks that do not require Resonite assemblies.
   - Prefer adjusting signatures or accessibility to eliminate warnings before using `SuppressMessage` or `#pragma`.
   - Harmony magic parameter names (e.g., `__instance`, `__result`) may use `[SuppressMessage("Style", "SA1313")]` with justification.
   - Globalization string warnings (`CA1303`) are disabled repository-wide; logs are English-only.
+  - Condition debug-only `using` directives with `#if DEBUG` to avoid unused-using warnings in Release builds.
 
 - Commit hygiene:
   - Use Conventional Commit + gitmoji. One concise subject line per commit.
