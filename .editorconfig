@@ -71,6 +71,10 @@ dotnet_diagnostic.SA1513.severity = none  # closing brace should be followed by 
 dotnet_diagnostic.SA1515.severity = none  # single-line comment should be preceded by blank line
 # - C# 12 collection expressions can trip SA1010; disable spacing rule
 dotnet_diagnostic.SA1010.severity = none  # opening square brackets should not be preceded by a space
+dotnet_diagnostic.SA1200.severity = none  # using directives should appear within a namespace declaration
+dotnet_diagnostic.SA1210.severity = none  # using directives should be ordered alphabetically
+dotnet_diagnostic.SA1101.severity = none  # this. prefix
+dotnet_diagnostic.SA1107.severity = none  # multiple statements on one line
 
 [*.{xml,config,props,targets,nuspec,resx,ruleset,vsixmanifest,vsct}]
 indent_size = 2
