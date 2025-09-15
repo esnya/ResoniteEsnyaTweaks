@@ -1,6 +1,8 @@
 using System.Runtime.CompilerServices;
 using EsnyaTweaks.Common.Modding;
+#if DEBUG
 using ResoniteModLoader;
+#endif
 
 [assembly: InternalsVisibleTo("EsnyaTweaks.InventoryUITweaks.Tests")]
 

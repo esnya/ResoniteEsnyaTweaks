@@ -155,9 +155,9 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 
         register();
 
+#if DEBUG
         void Unregister()
         {
-#if DEBUG
             try
             {
                 HotReloader.RemoveMenuOption(category, optionName);
@@ -166,8 +166,12 @@ public abstract class EsnyaResoniteMod : ResoniteMod
             {
                 // ignore in tests or where hot reload lib is missing
             }
-#endif
         }
+#else
+        static void Unregister()
+        {
+        }
+#endif
 
         AutoUnregisters.AddOrUpdate(
             HarmonyId,

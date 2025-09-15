@@ -19,15 +19,6 @@ public sealed class EsnyaResoniteModTests
         var asmName = typeof(DummyMod).Assembly.GetName().Name;
         id.Should().Contain(asmName);
     }
-    public sealed class DummyMod : EsnyaResoniteMod
-    {
-        public string HarmonyIdPublic => HarmonyId;
-
-        public void Auto(Action reg, Action unreg)
-        {
-            RegisterWithAutoUnregister(reg, unreg);
-        }
-    }
 }
 
 public sealed class EsnyaResoniteModAutoUnregisterTests
@@ -35,7 +26,7 @@ public sealed class EsnyaResoniteModAutoUnregisterTests
     [Fact]
     public void RegisterWithAutoUnregister_Should_Invoke_Unregister_On_BeforeHotReload()
     {
-        var mod = new EsnyaResoniteModTests.DummyMod();
+        var mod = new DummyMod();
         var id = mod.HarmonyIdPublic;
         var called = 0;
         var regCalled = false;
@@ -56,7 +47,7 @@ public sealed class EsnyaResoniteModAutoUnregisterTests
     [Fact]
     public void Multiple_Registers_Should_All_Unregister_On_BeforeHotReload()
     {
-        var mod = new EsnyaResoniteModTests.DummyMod();
+        var mod = new DummyMod();
         var id = mod.HarmonyIdPublic;
         var a = 0;
         var b = 0;
@@ -72,4 +63,14 @@ public sealed class EsnyaResoniteModAutoUnregisterTests
 
     // NOTE: OnHotReload は内部で GetConfiguration() を呼ぶため、
     // テスト環境では Mod 初期化前例外となる。必要であれば別シナリオで検証する。
+}
+
+internal sealed class DummyMod : EsnyaResoniteMod
+{
+    public string HarmonyIdPublic => HarmonyId;
+
+    public void Auto(Action reg, Action unreg)
+    {
+        RegisterWithAutoUnregister(reg, unreg);
+    }
 }

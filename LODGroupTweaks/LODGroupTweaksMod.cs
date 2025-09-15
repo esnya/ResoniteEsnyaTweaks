@@ -1,5 +1,7 @@
 using EsnyaTweaks.Common.Modding;
+#if DEBUG
 using ResoniteModLoader;
+#endif
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
