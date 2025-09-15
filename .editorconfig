@@ -23,15 +23,14 @@ dotnet_diagnostic.SA1513.severity = none
 dotnet_diagnostic.SA1515.severity = none
 dotnet_diagnostic.SA1010.severity = none
 dotnet_diagnostic.SA1101.severity = none
-dotnet_diagnostic.SA1107.severity = none
 
 # Wrapping preferences
-csharp_preserve_single_line_statements = false:warning
+csharp_preserve_single_line_statements = false:error
 
 # Style preferences - use var instead of explicit type
-csharp_style_var_for_built_in_types = true:warning
-csharp_style_var_when_type_is_apparent = true:warning
-csharp_style_var_elsewhere = true:warning
+csharp_style_var_for_built_in_types = true:error
+csharp_style_var_when_type_is_apparent = true:error
+csharp_style_var_elsewhere = true:error
 
 # Code analysis rules - Category-level settings (キツめ設定)
 dotnet_analyzer_diagnostic.category-design.severity = warning
@@ -41,7 +40,7 @@ dotnet_analyzer_diagnostic.category-maintainability.severity = warning
 dotnet_analyzer_diagnostic.category-naming.severity = warning
 dotnet_analyzer_diagnostic.category-performance.severity = warning
 dotnet_analyzer_diagnostic.category-security.severity = warning
-dotnet_analyzer_diagnostic.category-style.severity = warning
+dotnet_analyzer_diagnostic.category-style.severity = error
 dotnet_analyzer_diagnostic.category-usage.severity = warning
 dotnet_analyzer_diagnostic.category-reliability.severity = warning
 
@@ -61,6 +60,10 @@ dotnet_diagnostic.IDE0058.severity = none    # Allow implicit discard of express
 dotnet_diagnostic.IDE0130.severity = error
 
 dotnet_diagnostic.CA1031.severity = none  # Mod should not throw exceptions to keep game running
+dotnet_diagnostic.CA1034.severity = none  # nested test helper is acceptable
+dotnet_diagnostic.CA1721.severity = none  # property name vs method for tests
+dotnet_diagnostic.CA1024.severity = none  # test exposure method
+dotnet_diagnostic.CA1515.severity = none  # internal visibility recommendations not needed
 
 
 # Tests Overrides
@@ -69,9 +72,9 @@ dotnet_diagnostic.CS1591.severity = none  # test classes often don't have XML co
 dotnet_diagnostic.CA1707.severity = none  # test classes often don't follow naming conventions
 
 # StyleCop: configure per rule (base off)
-dotnet_analyzer_diagnostic.category-StyleCop.severity = none
+dotnet_analyzer_diagnostic.category-StyleCop.severity = error
 dotnet_diagnostic.SA1649.severity = error
-dotnet_diagnostic.SA1111.severity = warning
+dotnet_diagnostic.SA1111.severity = error
 
 # StyleCop exclusions (repo policy)
 # - File header/element docs are not required; keep code concise
@@ -85,7 +88,6 @@ dotnet_diagnostic.SA1010.severity = none  # opening square brackets should not b
 dotnet_diagnostic.SA1200.severity = none  # using directives should appear within a namespace declaration
 dotnet_diagnostic.SA1210.severity = none  # using directives should be ordered alphabetically
 dotnet_diagnostic.SA1101.severity = none  # this. prefix
-dotnet_diagnostic.SA1107.severity = none  # multiple statements on one line
 dotnet_diagnostic.SA1202.severity = none  # member order rules
 dotnet_diagnostic.SA1311.severity = none  # static readonly fields casing
 dotnet_diagnostic.SA1009.severity = none  # closing parenthesis spacing

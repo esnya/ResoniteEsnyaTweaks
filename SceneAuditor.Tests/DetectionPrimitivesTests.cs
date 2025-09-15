@@ -19,7 +19,9 @@ public sealed class DetectionPrimitivesTests
     [Fact]
     public void BuildDuplicateOwnersIndex_Should_Index_Duplicates()
     {
-        var a = "A"; var b = "B"; var c = "C";
+        var a = "A";
+        var b = "B";
+        var c = "C";
         var ab = new List<string> { a, b };
         var bc = new List<string> { b, c };
         var cOnly = new List<string> { c };

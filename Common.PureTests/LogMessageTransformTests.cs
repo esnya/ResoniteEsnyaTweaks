@@ -16,4 +16,3 @@ public sealed class LogMessageTransformTests
         LogMessageTransform.ApplyIndent(input, addIndent).Should().Be(expected);
     }
 }
-

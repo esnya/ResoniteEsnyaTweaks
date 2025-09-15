@@ -17,4 +17,3 @@ public sealed class OrderValidationPureTests
         OrderValidation.HasNonDescending(data).Should().Be(expected);
     }
 }
-
