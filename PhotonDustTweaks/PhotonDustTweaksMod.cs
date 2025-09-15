@@ -1,5 +1,10 @@
+using System.Runtime.CompilerServices;
 using EsnyaTweaks.Common.Modding;
+#if DEBUG
 using ResoniteModLoader;
+#endif
+
+[assembly: InternalsVisibleTo("EsnyaTweaks.PhotonDustTweaks.Tests")]
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 
@@ -8,10 +13,9 @@ namespace EsnyaTweaks.PhotonDustTweaks;
 /// </summary>
 public class PhotonDustTweaksMod : EsnyaResoniteMod
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
-    private static new string HarmonyId => HarmonyIdValue;
+    internal static new string HarmonyId => HarmonyIdValue;
 
-    // Use base HarmonyId for runtime behavior; static HarmonyId is for tests via reflection.
+    // Use base HarmonyId for runtime behavior; static property is for tests.
     private static string HarmonyIdValue =>
         $"com.nekometer.esnya.{typeof(PhotonDustTweaksMod).Assembly.GetName()}";
 

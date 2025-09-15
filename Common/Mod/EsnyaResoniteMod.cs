@@ -155,9 +155,9 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 
         register();
 
+#if DEBUG
         void Unregister()
         {
-#if DEBUG
             try
             {
                 HotReloader.RemoveMenuOption(category, optionName);
@@ -166,19 +166,17 @@ public abstract class EsnyaResoniteMod : ResoniteMod
             {
                 // ignore in tests or where hot reload lib is missing
             }
-#endif
         }
+#else
+        static void Unregister()
+        {
+        }
+#endif
 
-        // Suppress IDE0028 suggestion to keep compatibility across analyzers and language levels.
-#pragma warning disable IDE0028
         AutoUnregisters.AddOrUpdate(
             HarmonyId,
-            _ => new List<Action> { Unregister },
-            (_, list) =>
-            {
-                list.Add(Unregister);
-                return list;
-            });
+            _ => [Unregister],
+            (_, list) => [.. list, Unregister]);
     }
 
     /// <summary>
@@ -196,13 +194,8 @@ public abstract class EsnyaResoniteMod : ResoniteMod
 
         AutoUnregisters.AddOrUpdate(
             HarmonyId,
-            _ => new List<Action> { unregister },
-            (_, list) =>
-            {
-                list.Add(unregister);
-                return list;
-            });
-#pragma warning restore IDE0028
+            _ => [unregister],
+            (_, list) => [.. list, unregister]);
     }
 
     private static void RunAutoUnregisters(string harmonyId)

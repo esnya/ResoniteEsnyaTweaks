@@ -22,12 +22,9 @@ public class FluxLoopTweaksMod : EsnyaResoniteMod
     /// </summary>
     public static int TimeoutMs => config?.GetValue(TimeoutKey) ?? 30_000;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
-    private static new string HarmonyId => $"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}";
+    internal static new string HarmonyId => $"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}";
 
-#pragma warning disable SA1512 // Single-line comments should not be followed by blank line
-    // Use base HarmonyId for runtime behavior; static HarmonyId is for tests via reflection.
-#pragma warning restore SA1512 // Single-line comments should not be followed by blank line
+    // Use base HarmonyId for runtime behavior; static property is for tests.
 #if DEBUG
     /// <summary>
     /// Unpatches Harmony patches before hot reload.

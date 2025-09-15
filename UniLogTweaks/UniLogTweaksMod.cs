@@ -1,5 +1,8 @@
+using System.Runtime.CompilerServices;
 using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
+
+[assembly: InternalsVisibleTo("EsnyaTweaks.UniLogTweaks.Tests")]
 
 namespace EsnyaTweaks.UniLogTweaks;
 
@@ -21,10 +24,9 @@ public sealed class UniLogTweaksMod : EsnyaResoniteMod
     internal static bool AddIndent =>
         Config?.TryGetValue(AddIndentKey, out var value) != true || value;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
-    private static new string HarmonyId => HarmonyIdValue;
+    internal static new string HarmonyId => HarmonyIdValue;
 
-    // Use base HarmonyId.
+    // Use base HarmonyId for runtime behavior; static property is for tests.
     private static string HarmonyIdValue =>
         $"com.nekometer.esnya.{typeof(UniLogTweaksMod).Assembly.GetName()}";
 

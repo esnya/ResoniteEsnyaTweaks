@@ -18,6 +18,7 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Prefer pure functions, immutability, and declarative style.
 - Good naming & structure > comments; comment only non-obvious WHY
 - Keep code self-explanatory.
+- Keep one statement per line (SA1107).
 - Order members from most to least accessible and ensure each file ends with exactly one trailing newline; place closing parentheses on the line of the last parameter.
 - Keep one type per file and place static members before instance members.
 - Avoid underscores in field or parameter names except for Harmony magic parameters.
@@ -79,9 +80,11 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 - Warnings policy:
   - Zero-warnings baseline（Must）: タスク完了時は原則警告ゼロ。既存・新規とも修正し、抑制は最小限（やむを得ないシグネチャのみ）。
   - Prefer adjusting signatures or accessibility to eliminate warnings before using `SuppressMessage` or `#pragma`.
+  - Expose test-only members with `internal` and `[InternalsVisibleTo]` instead of suppressing `IDE0051`.
   - Harmony magic parameter names (e.g., `__instance`, `__result`) may use `[SuppressMessage("Style", "SA1313")]` with justification.
   - Globalization string warnings (`CA1303`) are disabled repository-wide; logs are English-only.
   - Condition debug-only `using` directives with `#if DEBUG` to avoid unused-using warnings in Release builds.
+  - Formatting/style analyzers are enforced as errors; difficult rules may be disabled individually (e.g., CA1034, CA1721, CA1024, CA1515).
 
 ## Pure Tests (Must)
 

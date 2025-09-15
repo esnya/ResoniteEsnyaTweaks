@@ -19,10 +19,9 @@ public sealed class DetectionPrimitivesTests
     [Fact]
     public void BuildDuplicateOwnersIndex_Should_Index_Duplicates()
     {
-        var a = "A"; var b = "B"; var c = "C";
-        var ab = new List<string> { a, b };
-        var bc = new List<string> { b, c };
-        var cOnly = new List<string> { c };
+        var ab = new List<string> { "A", "B" };
+        var bc = new List<string> { "B", "C" };
+        var cOnly = new List<string> { "C" };
         (string, IEnumerable<string>)[] groups =
         [
             ("G1", ab),
@@ -31,8 +30,8 @@ public sealed class DetectionPrimitivesTests
         ];
 
         var index = DetectionPrimitives.BuildDuplicateOwnersIndex(groups);
-        index[a].Should().HaveCount(1);
-        index[b].Should().HaveCount(2);
-        index[c].Should().HaveCount(2);
+        index["A"].Should().HaveCount(1);
+        index["B"].Should().HaveCount(2);
+        index["C"].Should().HaveCount(2);
     }
 }

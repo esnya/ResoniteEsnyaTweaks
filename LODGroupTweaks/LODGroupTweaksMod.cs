@@ -1,14 +1,15 @@
 using EsnyaTweaks.Common.Modding;
+#if DEBUG
 using ResoniteModLoader;
+#endif
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
 /// <inheritdoc/>
 public class LODGroupTweaksMod : EsnyaResoniteMod
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051", Justification = "Accessed via reflection by tests")]
-    private static new string HarmonyId => $"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}";
-    // Use base HarmonyId for runtime behavior; static HarmonyId is for tests via reflection.
+    internal static new string HarmonyId => $"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}";
+    // Use base HarmonyId for runtime behavior; static property is for tests.
 #if DEBUG
     /// <summary>Unpatches all Harmony hooks before hot reload.</summary>
     public static void BeforeHotReload()
