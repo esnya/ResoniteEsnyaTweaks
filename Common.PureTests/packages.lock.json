@@ -1214,9 +1214,6 @@
         "dependencies": {
           "xunit.v3.common": "[2.0.2]"
         }
-      },
-      "EsnyaTweaks.AssetOptimizationTweaks": {
-        "type": "Project"
       }
     }
   }
