@@ -1,85 +1,40 @@
-using System.Linq;
-using System.Reflection;
-using Elements.Core;
-using HarmonyLib;
-using ResoniteModLoader;
+using System.Runtime.CompilerServices;
+using EsnyaTweaks.Common.Modding;
 #if DEBUG
-using ResoniteHotReloadLib;
+using ResoniteModLoader;
 #endif
+
+[assembly: InternalsVisibleTo("EsnyaTweaks.PhotonDustTweaks.Tests")]
 
 namespace EsnyaTweaks.PhotonDustTweaks;
 
-/// <inheritdoc/>
-public class PhotonDustTweaksMod : ResoniteMod
+/// <summary>
+/// Mod entry point for Photon Dust tweaks.
+/// </summary>
+public class PhotonDustTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ModAssembly => typeof(PhotonDustTweaksMod).Assembly;
+    internal static new string HarmonyId => HarmonyIdValue;
 
-    /// <inheritdoc/>
-    public override string Name =>
-        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Version
-    {
-        get
-        {
-            var informationalVersion = ModAssembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (informationalVersion != null)
-            {
-                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
-                return plusIndex >= 0 ? informationalVersion[..plusIndex] : informationalVersion;
-            }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version
-                ?? string.Empty;
-        }
-    }
-
-    /// <inheritdoc/>
-    public override string Link =>
-        ModAssembly
-            .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .First(meta => meta.Key == "RepositoryUrl")
-            .Value ?? string.Empty;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
-
-    //private static ModConfiguration? config;
-    private static readonly Harmony harmony = new(HarmonyId);
-
-    /// <inheritdoc/>
-    public override void OnEngineInit()
-    {
-        Init(this);
+    // Use base HarmonyId for runtime behavior; static property is for tests.
+    private static string HarmonyIdValue =>
+        $"com.nekometer.esnya.{typeof(PhotonDustTweaksMod).Assembly.GetName()}";
 
 #if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
-#pragma warning disable IDE0060 // Remove unused parameter
-    private static void Init(ResoniteMod modInstance)
-    {
-        harmony.PatchAll();
-        //config = modInstance?.GetConfiguration();
-    }
-
-#if DEBUG
-    /// <inheritdoc/>
+    /// <summary>
+    /// Unpatches before hot reload.
+    /// </summary>
     public static void BeforeHotReload()
     {
-        harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload(HarmonyIdValue);
     }
 
-    /// <inheritdoc/>
-    public static void OnHotReload(ResoniteMod modInstance)
+    /// <summary>
+    /// Reapplies patches after hot reload.
+    /// </summary>
+    /// <param name="mod">Reloaded mod instance.</param>
+    public static void OnHotReload(ResoniteMod mod)
     {
-        Init(modInstance);
+        OnHotReload(mod, HarmonyIdValue);
     }
 #endif
 }

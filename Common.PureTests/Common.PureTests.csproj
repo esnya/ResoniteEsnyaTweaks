@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>EsnyaTweaks.Common.PureTests</RootNamespace>
+    <AssemblyName>EsnyaTweaks.Common.PureTests</AssemblyName>
+    <AssemblyTitle>EsnyaTweaks.Common.PureTests</AssemblyTitle>
+    <ExcludeEngineAssemblies>true</ExcludeEngineAssemblies>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <Import Project="..\Common\Common.Pure.projitems" Label="Shared" />
+</Project>
+

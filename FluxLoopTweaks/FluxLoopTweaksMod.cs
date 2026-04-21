@@ -1,101 +1,54 @@
-using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using Elements.Core;
-using HarmonyLib;
+using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
 
 [assembly: InternalsVisibleTo("EsnyaTweaks.FluxLoopTweaks.Tests")]
 
 namespace EsnyaTweaks.FluxLoopTweaks;
 
 /// <inheritdoc/>
-public class FluxLoopTweaksMod : ResoniteMod
+public class FluxLoopTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ModAssembly => typeof(FluxLoopTweaksMod).Assembly;
-
-    /// <inheritdoc/>
-    public override string Name =>
-        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Version
-    {
-        get
-        {
-            var informationalVersion = ModAssembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (informationalVersion != null)
-            {
-                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
-                return plusIndex >= 0 ? informationalVersion[..plusIndex] : informationalVersion;
-            }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version
-                ?? string.Empty;
-        }
-    }
-
-    /// <inheritdoc/>
-    public override string Link =>
-        ModAssembly
-            .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .First(meta => meta.Key == "RepositoryUrl")
-            .Value ?? string.Empty;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
+    [AutoRegisterConfigKey]
+    private static readonly ModConfigurationKey<int> TimeoutKey = new(
+        "Timeout",
+        "Timeout in milliseconds.",
+        computeDefault: () => 30_000);
 
     private static ModConfiguration? config;
-    private static readonly Harmony harmony = new(HarmonyId);
-
-    [AutoRegisterConfigKey]
-    private static readonly ModConfigurationKey<int> timeoutKey = new(
-        "Timeout",
-        "Timeout for in milliseconds.",
-        computeDefault: () => 30_000
-    );
 
     /// <summary>
     /// Gets the timeout value in milliseconds for loop operations.
     /// </summary>
-    public static int TimeoutMs => config?.GetValue(timeoutKey) ?? 30_000;
+    public static int TimeoutMs => config?.GetValue(TimeoutKey) ?? 30_000;
 
-    /// <inheritdoc/>
-    public override void OnEngineInit()
-    {
-        Init(this);
+    internal static new string HarmonyId => $"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}";
 
+    // Use base HarmonyId for runtime behavior; static property is for tests.
 #if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
-
-    private static void Init(ResoniteMod modInstance)
-    {
-        harmony.PatchAll();
-        config = modInstance?.GetConfiguration();
-    }
-
-#if DEBUG
-    /// <inheritdoc/>
+    /// <summary>
+    /// Unpatches Harmony patches before hot reload.
+    /// </summary>
     public static void BeforeHotReload()
     {
-        harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload($"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}");
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Reapplies Harmony patches after hot reload.
+    /// </summary>
     /// <param name="modInstance">The mod instance.</param>
     public static void OnHotReload(ResoniteMod modInstance)
     {
-        Init(modInstance);
+        OnHotReload(
+            modInstance,
+            $"com.nekometer.esnya.{typeof(FluxLoopTweaksMod).Assembly.GetName()}");
     }
 #endif
+
+    /// <inheritdoc/>
+    protected override void OnInit(ModConfiguration config)
+    {
+        FluxLoopTweaksMod.config = config;
+    }
 }

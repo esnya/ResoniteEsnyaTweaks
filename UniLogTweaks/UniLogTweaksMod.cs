@@ -1,11 +1,8 @@
-using System.Linq;
-using System.Reflection;
-using Elements.Core;
-using HarmonyLib;
+using System.Runtime.CompilerServices;
+using EsnyaTweaks.Common.Modding;
 using ResoniteModLoader;
-#if DEBUG
-using ResoniteHotReloadLib;
-#endif
+
+[assembly: InternalsVisibleTo("EsnyaTweaks.UniLogTweaks.Tests")]
 
 namespace EsnyaTweaks.UniLogTweaks;
 
@@ -13,123 +10,72 @@ namespace EsnyaTweaks.UniLogTweaks;
 /// Represents the UniLogTweaksMod which is a sealed class inheriting from ResoniteMod.
 /// This class provides the necessary configurations and methods to initialize and manage the mod.
 /// </summary>
-public sealed class UniLogTweaksMod : ResoniteMod
+public sealed class UniLogTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ModAssembly => typeof(UniLogTweaksMod).Assembly;
-
-    /// <summary>
-    /// Gets the name of the mod from the AssemblyTitle attribute of the assembly.
-    /// </summary>
-    public override string Name =>
-        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
-
-    /// <summary>
-    /// Gets the author of the mod from the AssemblyCompany attribute of the assembly.
-    /// </summary>
-    public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
-
-    /// <summary>
-    /// Gets the version of the mod from the AssemblyInformationalVersion attribute of the assembly.
-    /// </summary>
-    public override string Version
-    {
-        get
-        {
-            var informationalVersion = ModAssembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (informationalVersion != null)
-            {
-                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
-                return plusIndex >= 0 ? informationalVersion[..plusIndex] : informationalVersion;
-            }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version
-                ?? string.Empty;
-        }
-    }
-
-    /// <summary>
-    /// Gets the link to the repository of the mod from the AssemblyMetadata attribute of the assembly.
-    /// </summary>
-    public override string Link =>
-        ModAssembly
-            .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .First(meta => meta.Key == "RepositoryUrl")
-            .Value ?? string.Empty;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
-
-    private static ModConfiguration? config;
-    private static readonly Harmony harmony = new(HarmonyId);
-    private static readonly ModConfigurationKey<bool> allowInfo = new(
-        "AllowInfo",
-        "Allow stack trace for Info log.",
-        computeDefault: () => false
-    );
-    private static readonly ModConfigurationKey<bool> allowWarning = new(
-        "AllowWarning",
-        "Allow stack trace for Warning log.",
-        computeDefault: () => false
-    );
-    private static readonly ModConfigurationKey<bool> allowError = new(
-        "AllowError",
-        "Allow stack trace for Error log.",
-        computeDefault: () => true
-    );
-
-    private static readonly ModConfigurationKey<bool> addIndent = new(
-        "AddIndent",
-        "Add indent to multi-line logs.",
-        computeDefault: () => true
-    );
-
     internal static bool AllowInfo =>
-        config?.TryGetValue(allowInfo, out var value) == true && value;
+        Config?.TryGetValue(AllowInfoKey, out var value) == true && value;
+
     internal static bool AllowWarning =>
-        config?.TryGetValue(allowWarning, out var value) == true && value;
+        Config?.TryGetValue(AllowWarningKey, out var value) == true && value;
+
     internal static bool AllowError =>
-        (config?.TryGetValue(allowError, out var value)) != true || value;
+        Config?.TryGetValue(AllowErrorKey, out var value) != true || value;
 
     internal static bool AddIndent =>
-        config?.TryGetValue(addIndent, out var value) != true || value;
+        Config?.TryGetValue(AddIndentKey, out var value) != true || value;
 
-    /// <summary>
-    /// Initializes the mod.
-    /// </summary>
-    public override void OnEngineInit()
-    {
+    internal static new string HarmonyId => HarmonyIdValue;
+
+    // Use base HarmonyId for runtime behavior; static property is for tests.
+    private static string HarmonyIdValue =>
+        $"com.nekometer.esnya.{typeof(UniLogTweaksMod).Assembly.GetName()}";
+
+    private static ModConfigurationKey<bool> AllowInfoKey { get; } = new(
+        "AllowInfo",
+        "Allow stack trace for Info log.",
+        computeDefault: () => false);
+
+    private static ModConfigurationKey<bool> AllowWarningKey { get; } = new(
+        "AllowWarning",
+        "Allow stack trace for Warning log.",
+        computeDefault: () => false);
+
+    private static ModConfigurationKey<bool> AllowErrorKey { get; } = new(
+        "AllowError",
+        "Allow stack trace for Error log.",
+        computeDefault: () => true);
+
+    private static ModConfigurationKey<bool> AddIndentKey { get; } = new(
+        "AddIndent",
+        "Add indent to multi-line logs.",
+        computeDefault: () => true);
+
+    private static ModConfiguration? Config { get; set; }
+
 #if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-
-        Init(this);
-    }
-
-    private static void Init(ResoniteMod modInstance)
-    {
-        harmony.PatchAll();
-        config = modInstance?.GetConfiguration() ?? config;
-    }
-
-#if DEBUG
-
     /// <summary>
     /// Called before hot reload.
     /// </summary>
     public static void BeforeHotReload()
     {
-        harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload(HarmonyIdValue);
     }
 
     /// <summary>
     /// Called after hot reload.
     /// </summary>
-    /// <param name="modInstance"></param>
+    /// <param name="modInstance">Reloaded mod instance.</param>
     public static void OnHotReload(ResoniteMod modInstance)
     {
-        Init(modInstance);
+        OnHotReload(
+            modInstance,
+            HarmonyIdValue);
     }
 #endif
+
+    /// <inheritdoc/>
+    protected override void OnInit(ModConfiguration config)
+    {
+        Config = config;
+    }
 }

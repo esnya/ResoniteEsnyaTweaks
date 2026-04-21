@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
-using FluentAssertions;
 using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
@@ -11,8 +11,7 @@ public static class UniLog_PatchBehaviorTests
     {
         return typeof(UniLogTweaksMod).Assembly.GetType(
             "EsnyaTweaks.UniLogTweaks.UniLog_Patch",
-            true
-        )!;
+            true)!;
     }
 
     [Fact]
@@ -37,6 +36,20 @@ public static class UniLog_PatchBehaviorTests
         patch.Invoke(null, args);
 
         args[0].Should().Be(original);
+        args[1].Should().Be(true);
+    }
+
+    [Fact]
+    public static void Patch_Should_Handle_Null_Message()
+    {
+        var patch = GetPatchType()
+            .GetMethod("Patch", BindingFlags.Static | BindingFlags.NonPublic)!;
+        object?[] args = [null, true, true];
+
+        var act = () => patch.Invoke(null, args);
+
+        act.Should().NotThrow();
+        args[0].Should().Be(string.Empty);
         args[1].Should().Be(true);
     }
 }

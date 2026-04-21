@@ -1,8 +1,8 @@
 using System.Reflection;
 using Elements.Core;
-using FluentAssertions;
 using HarmonyLib;
 using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.UniLogTweaks.Tests;
 
@@ -12,8 +12,7 @@ public static class UniLog_PatchTests
     {
         return typeof(UniLogTweaksMod).Assembly.GetType(
             "EsnyaTweaks.UniLogTweaks.UniLog_Patch",
-            true
-        )!;
+            true)!;
     }
 
     [Fact]

@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using FrooxEngine.ProtoFlux;
-using Moq;
 using ProtoFlux.Core;
 using ProtoFlux.Runtimes.Execution;
 using ProtoFlux.Runtimes.Execution.Nodes;
+using Moq;
 using Xunit;
 
 namespace EsnyaTweaks.FluxLoopTweaks.Tests;
@@ -22,8 +22,7 @@ public class AsyncWhile_RunAsync_PatchTests
         var shouldContinue = AsyncWhile_RunAsync_Patch.Prefix(
             mockAsyncWhile.Object,
             mockExecutionContext.Object,
-            ref result!
-        );
+            ref result!);
 
         // Assert
         Assert.True(shouldContinue);
@@ -42,8 +41,7 @@ public class AsyncWhile_RunAsync_PatchTests
         var shouldContinue = AsyncWhile_RunAsync_Patch.Prefix(
             mockAsyncWhile.Object,
             mockFrooxEngineContext.Object,
-            ref result!
-        );
+            ref result!);
 
         // Assert
         Assert.False(shouldContinue);

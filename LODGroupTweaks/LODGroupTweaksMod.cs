@@ -1,83 +1,27 @@
-using System.Linq;
-using System.Reflection;
-using Elements.Core;
-using HarmonyLib;
-using ResoniteModLoader;
+using EsnyaTweaks.Common.Modding;
 #if DEBUG
-using ResoniteHotReloadLib;
+using ResoniteModLoader;
 #endif
 
 namespace EsnyaTweaks.LODGroupTweaks;
 
 /// <inheritdoc/>
-public class LODGroupTweaksMod : ResoniteMod
+public class LODGroupTweaksMod : EsnyaResoniteMod
 {
-    private static Assembly ModAssembly => typeof(LODGroupTweaksMod).Assembly;
-
-    /// <inheritdoc/>
-    public override string Name =>
-        ModAssembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Author =>
-        ModAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Unknown";
-
-    /// <inheritdoc/>
-    public override string Version
-    {
-        get
-        {
-            var informationalVersion = ModAssembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (informationalVersion != null)
-            {
-                // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
-                return plusIndex >= 0 ? informationalVersion[..plusIndex] : informationalVersion;
-            }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version
-                ?? string.Empty;
-        }
-    }
-
-    /// <inheritdoc/>
-    public override string Link =>
-        ModAssembly
-            .GetCustomAttributes<AssemblyMetadataAttribute>()
-            .First(meta => meta.Key == "RepositoryUrl")
-            .Value ?? string.Empty;
-
-    internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
-
-    private static readonly Harmony harmony = new(HarmonyId);
-
-    /// <inheritdoc/>
-    public override void OnEngineInit()
-    {
-        Init();
-
+    internal static new string HarmonyId => $"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}";
+    // Use base HarmonyId for runtime behavior; static property is for tests.
 #if DEBUG
-        HotReloader.RegisterForHotReload(this);
-#endif
-    }
-
-    private static void Init()
-    {
-        harmony.PatchAll();
-    }
-
-#if DEBUG
-    /// <inheritdoc/>
+    /// <summary>Unpatches all Harmony hooks before hot reload.</summary>
     public static void BeforeHotReload()
     {
-        harmony.UnpatchAll(HarmonyId);
+        BeforeHotReload($"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}");
     }
 
-    /// <inheritdoc/>
-    public static void OnHotReload(ResoniteMod _)
+    /// <summary>Reapplies Harmony hooks after hot reload.</summary>
+    /// <param name="mod">Reloaded mod instance.</param>
+    public static void OnHotReload(ResoniteMod mod)
     {
-        Init();
+        OnHotReload(mod, $"com.nekometer.esnya.{typeof(LODGroupTweaksMod).Assembly.GetName()}");
     }
 #endif
 }

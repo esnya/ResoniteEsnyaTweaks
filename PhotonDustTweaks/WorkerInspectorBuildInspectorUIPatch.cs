@@ -7,7 +7,7 @@ using ResoniteModLoader;
 namespace EsnyaTweaks.PhotonDustTweaks;
 
 [HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.BuildInspectorUI))]
-internal static class PhotonDust_WorkerInspector_BuildInspectorUI_Patch
+internal static class WorkerInspectorBuildInspectorUIPatch
 {
     private static void Postfix(Worker worker, UIBuilder ui)
     {
@@ -15,8 +15,7 @@ internal static class PhotonDust_WorkerInspector_BuildInspectorUI_Patch
         {
             module.BuildInspectorUI(ui);
             ResoniteMod.DebugFunc(() =>
-                $"ParticleSystem module {module} found. Building inspector UI..."
-            );
+                $"ParticleSystem module {module} found. Building inspector UI...");
         }
         if (worker is ParticleStyle style)
         {

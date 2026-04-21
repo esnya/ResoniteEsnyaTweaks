@@ -1,6 +1,5 @@
-using System.Reflection;
-using FluentAssertions;
 using Xunit;
+using FluentAssertions;
 
 namespace EsnyaTweaks.PhotonDustTweaks.Tests;
 
@@ -31,18 +30,7 @@ public static class PhotonDustTweaksModTests
         mod.Version.Should().NotBe("0.0.0");
     }
 
-    [Fact]
-    public static void HarmonyId_Should_Be_Valid()
-    {
-        var harmonyId = typeof(PhotonDustTweaksMod)
-            .GetProperty("HarmonyId", BindingFlags.NonPublic | BindingFlags.Static)
-            ?.GetValue(null)
-            ?.ToString();
-
-        harmonyId.Should().NotBeNullOrEmpty();
-        harmonyId.Should().Contain("com.nekometer.esnya");
-        harmonyId.Should().Contain("PhotonDustTweaks");
-    }
+    // HarmonyId の検証は共通基底のテスト（Common.Tests）へ集約
 
     [Fact]
     public static void Mod_Should_Implement_ResoniteMod()

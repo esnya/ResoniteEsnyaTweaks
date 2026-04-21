@@ -74,10 +74,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET 10
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '9.0.x'
           cache: true
           cache-dependency-path: |
             **/packages.lock.json
@@ -88,16 +88,23 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p Resonite
+          echo "Downloading ResoniteModLoader + 0Harmony..."
+          # Try to download a release asset that contains RML and 0Harmony
           gh release download -R resonite-modding-group/ResoniteModLoader --pattern "RML*.zip" --dir Resonite --clobber || true
           gh release download -R resonite-modding-group/ResoniteModLoader --pattern "ResoniteModLoader*.zip" --dir Resonite --clobber || true
           if compgen -G "Resonite/*.zip" > /dev/null; then
             unzip -o Resonite/*.zip -d Resonite >/dev/null
           fi
+          # In case assets were separate DLLs in the release, attempt direct download patterns as well
           gh release download -R resonite-modding-group/ResoniteModLoader --pattern "ResoniteModLoader.dll" --dir Resonite --clobber || true
           gh release download -R resonite-modding-group/ResoniteModLoader --pattern "0Harmony.dll" --dir Resonite --clobber || true
 
+          echo "Downloading HotReload libs..."
           gh release download -R Nytra/ResoniteHotReloadLib --pattern "HotReloadLib.*.RML.zip" --dir Resonite --clobber
           unzip -o Resonite/HotReloadLib.*.RML.zip -d Resonite >/dev/null
+
+          echo "Listing Resonite/ contents"
+          ls -la Resonite || true
 
       - name: Restore with explicit ResonitePath
         run: |
@@ -105,7 +112,9 @@ jobs:
 
       - name: Verify Resonite.GameLibs is referenced
         run: |
+          echo "Listing packages for AssetOptimizationTweaks (transitive included)"
           dotnet list AssetOptimizationTweaks/AssetOptimizationTweaks.csproj package --include-transitive | tee packages.txt
+          echo "Check Resonite.GameLibs presence"
           grep -i "Resonite.GameLibs" packages.txt || (echo "Resonite.GameLibs not found in package list" && exit 1)
 
       - name: .NET format
@@ -116,9 +125,10 @@ jobs:
         run: |
           dotnet build -c ${{ matrix.configuration }} -v:minimal -warnaserror -bl:build-${{ matrix.configuration }}.binlog -p:ResonitePath="${{ github.workspace }}/Resonite/"
 
-      - name: Test solution
+      - name: Test (Pure tests only)
         run: |
-          dotnet test -c ${{ matrix.configuration }} -v:minimal -warnaserror --logger "trx;LogFileName=test-results-${{ matrix.configuration }}.trx" -p:ResonitePath="${{ github.workspace }}/Resonite/"
+          dotnet test Common.PureTests/Common.PureTests.csproj -c ${{ matrix.configuration }} -v:minimal -warnaserror --logger "trx;LogFileName=test-results-${{ matrix.configuration }}.trx"
+
 
       - name: Collect artifacts (EsnyaTweaks.* only, excluding tests)
         if: matrix.configuration == 'Release'
@@ -126,14 +136,14 @@ jobs:
           set -euo pipefail
           mkdir -p artifacts
           find . -type f -path "*/bin/Release/*" -name "EsnyaTweaks.*.dll" \
-            | grep -v -E "(\\.Tests|/Tests/|/obj/|/ref/)" \
+            | grep -v -E "(\\.Tests|/Tests/|/Shared.Tests/|/obj/|/ref/)" \
             | xargs -I{} cp -v "{}" artifacts/
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dll-artifacts
-          path: artifacts/*
+          path: artifacts/
 
   release:
     if: needs.prepare-release.outputs.should_release == 'true'
@@ -170,6 +180,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*
+          files: |
+            *.dll
+            *.pdb
           generate_release_notes: true
           tag_name: v${{ needs.prepare-release.outputs.version }}

@@ -238,6 +238,9 @@ ClientBin/
 *.dbmdl
 *.dbproj.schemaview
 *.jfm
+
+# Local working area (do not commit)
+.local/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
@@ -398,3 +401,14 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+Resonite/
+
+# Experimental local console projects (exclude from VCS)
+/FPOS/
+/FTP/
+/FX/
+/FX2/
+/FX3/
+/FX4/
+/I2/
+/LT/
