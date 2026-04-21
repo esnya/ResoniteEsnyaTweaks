@@ -16,6 +16,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   prepare-release:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/ci' || startsWith(github.ref, 'refs/heads/ci/'))
@@ -60,16 +64,9 @@ jobs:
     permissions:
       contents: read
     strategy:
+      fail-fast: false
       matrix:
-        include:
-          - project: FluxLoopTweaks
-            artifact: EsnyaTweaks.FluxLoopTweaks.dll
-          - project: LODGroupTweaks
-            artifact: EsnyaTweaks.LODGroupTweaks.dll
-          - project: PhotonDustTweaks
-            artifact: EsnyaTweaks.PhotonDustTweaks.dll
-          - project: UniLogTweaks
-            artifact: EsnyaTweaks.UniLogTweaks.dll
+        configuration: [Debug, Release]
     steps:
       - id: checkout
         name: Checkout
@@ -77,43 +74,66 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Resonite environment
-        id: build-env
-        uses: resonite-modding-group/setup-resonite-env-action@v0.1.0
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
         with:
-          steam-user: ${{ secrets.STEAMUSER }}
-          steam-password: ${{ secrets.STEAMPASS }}
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: |
+            **/packages.lock.json
 
-      - name: Install ResoniteModLoader and Harmony
+      - name: Fetch Resonite shim assemblies (RML/Harmony/HotReload)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          LIBS_PATH="${{ steps.build-env.outputs.libraries-path }}"
-          RESONITE_DIR="$(dirname "${LIBS_PATH}")"
-          echo "Libraries: ${LIBS_PATH}"
-          echo "Resonite dir: ${RESONITE_DIR}"
-          mkdir -p "${LIBS_PATH}"
-          mkdir -p "${RESONITE_DIR}/rml_libs"
-          # Download RML
-          curl -fsSL -o "${LIBS_PATH}/ResoniteModLoader.dll" \
-            https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll
-          # Download Harmony DLL. Try rml_libs, fallback to root if needed
-          if ! curl -fsSL -o "${RESONITE_DIR}/rml_libs/0Harmony.dll" \
-            https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll; then
-            echo "Falling back to placing 0Harmony.dll in Resonite root"
-            curl -fsSL -o "${RESONITE_DIR}/0Harmony.dll" \
-              https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll
+          mkdir -p Resonite
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "RML*.zip" --dir Resonite --clobber || true
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "ResoniteModLoader*.zip" --dir Resonite --clobber || true
+          if compgen -G "Resonite/*.zip" > /dev/null; then
+            unzip -o Resonite/*.zip -d Resonite >/dev/null
           fi
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "ResoniteModLoader.dll" --dir Resonite --clobber || true
+          gh release download -R resonite-modding-group/ResoniteModLoader --pattern "0Harmony.dll" --dir Resonite --clobber || true
 
-      - name: Build RML mod
+          gh release download -R Nytra/ResoniteHotReloadLib --pattern "HotReloadLib.*.RML.zip" --dir Resonite --clobber
+          unzip -o Resonite/HotReloadLib.*.RML.zip -d Resonite >/dev/null
+
+      - name: Restore with explicit ResonitePath
         run: |
-          dotnet restore
-          dotnet build ${{ matrix.project }} --configuration Release
+          dotnet restore -v:minimal -p:ResonitePath="${{ github.workspace }}/Resonite/"
+
+      - name: Verify Resonite.GameLibs is referenced
+        run: |
+          dotnet list AssetOptimizationTweaks/AssetOptimizationTweaks.csproj package --include-transitive | tee packages.txt
+          grep -i "Resonite.GameLibs" packages.txt || (echo "Resonite.GameLibs not found in package list" && exit 1)
+
+      - name: .NET format
+        run: |
+          dotnet format --verify-no-changes --no-restore
+
+      - name: Build solution
+        run: |
+          dotnet build -c ${{ matrix.configuration }} -v:minimal -warnaserror -bl:build-${{ matrix.configuration }}.binlog -p:ResonitePath="${{ github.workspace }}/Resonite/"
+
+      - name: Test solution
+        run: |
+          dotnet test -c ${{ matrix.configuration }} -v:minimal -warnaserror --logger "trx;LogFileName=test-results-${{ matrix.configuration }}.trx" -p:ResonitePath="${{ github.workspace }}/Resonite/"
+
+      - name: Collect artifacts (EsnyaTweaks.* only, excluding tests)
+        if: matrix.configuration == 'Release'
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          find . -type f -path "*/bin/Release/*" -name "EsnyaTweaks.*.dll" \
+            | grep -v -E "(\\.Tests|/Tests/|/obj/|/ref/)" \
+            | xargs -I{} cp -v "{}" artifacts/
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.project }}/bin/Release/net9.0/${{ matrix.artifact }}
+          name: dll-artifacts
+          path: artifacts/*
 
   release:
     if: needs.prepare-release.outputs.should_release == 'true'
@@ -150,7 +170,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            **/*.dll
+          files: artifacts/*
           generate_release_notes: true
           tag_name: v${{ needs.prepare-release.outputs.version }}

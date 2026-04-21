@@ -33,12 +33,11 @@ public class PhotonDustTweaksMod : ResoniteMod
             if (informationalVersion != null)
             {
                 // Remove git hash if present (e.g., "1.0.0+abc123" -> "1.0.0")
-                var plusIndex = informationalVersion.IndexOf('+');
-                return plusIndex >= 0
-                    ? informationalVersion.Substring(0, plusIndex)
-                    : informationalVersion;
+                var plusIndex = informationalVersion.IndexOf('+', System.StringComparison.Ordinal);
+                return plusIndex >= 0 ? informationalVersion[..plusIndex] : informationalVersion;
             }
-            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version ?? "0.0.0";
+            return ModAssembly.GetCustomAttribute<AssemblyVersionAttribute>()?.Version
+                ?? string.Empty;
         }
     }
 
@@ -47,7 +46,7 @@ public class PhotonDustTweaksMod : ResoniteMod
         ModAssembly
             .GetCustomAttributes<AssemblyMetadataAttribute>()
             .First(meta => meta.Key == "RepositoryUrl")
-            .Value;
+            .Value ?? string.Empty;
 
     internal static string HarmonyId => $"com.nekometer.esnya.{ModAssembly.GetName()}";
 

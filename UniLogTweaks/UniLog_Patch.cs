@@ -14,7 +14,7 @@ internal static class UniLog_Patch
     {
         if (UniLogTweaksMod.AddIndent)
         {
-            message = message.Replace("\n", "\n\t");
+            message = message.Replace("\n", "\n\t", System.StringComparison.Ordinal);
         }
 
         if (!allowStackTrace)

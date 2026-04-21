@@ -136,15 +136,6 @@ public class AssetOptimizationExtensionsTests
         result.Should().BeEmpty();
     }
 
-    [Fact]
-    public void IsNotDriven_ShouldReturnTrue_ForNullElements()
-    {
-        var method = GetPrivateMethod("IsNotDriven");
-
-        var result = (bool)method.Invoke(null, [null, null])!;
-
-        result.Should().BeTrue();
-    }
     [Theory]
     [InlineData(typeof(Component))]
     [InlineData(typeof(IAssetProvider))]

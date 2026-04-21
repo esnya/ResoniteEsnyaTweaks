@@ -8,14 +8,15 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Product>$(AssemblyTitle)</Product>
     <RootNamespace Condition="'$(RootNamespace)'==''"
-    >EsnyaTweaks.$(MSBuildProjectName)</RootNamespace>
+      >EsnyaTweaks.$(MSBuildProjectName)</RootNamespace
+    >
     <AssemblyName Condition="'$(AssemblyName)'==''">EsnyaTweaks.$(MSBuildProjectName)</AssemblyName>
     <AssemblyTitle Condition="'$(AssemblyTitle)'==''">$(AssemblyName)</AssemblyTitle>
     <Title Condition="'$(Title)'==''">$(AssemblyTitle)</Title>
     <Copyright>Copyright (c) 2025 $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
@@ -25,6 +26,10 @@
     <AnalysisLevel>latest-all</AnalysisLevel>
     <WarningLevel>9999</WarningLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <ExcludeEngineAssemblies Condition="'$(ExcludeEngineAssemblies)'==''"
+      >false</ExcludeEngineAssemblies
+    >
   </PropertyGroup>
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <IsPackable>false</IsPackable>
@@ -32,41 +37,69 @@
     <OutputType>Exe</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TreatWarningsAsErrors Condition="'$(Configuration)'=='Release'">true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CA1515</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(ResonitePath)'==''">
     <ResonitePath>$(MSBuildThisFileDirectory)Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('$(MSBuildProjectDirectory)\Resonite\')"
+      >$(MSBuildProjectDirectory)\Resonite\</ResonitePath
     >
-      $(MSBuildProjectDirectory)\Resonite\</ResonitePath>
     <ResonitePath Condition="Exists('C:\Program Files (x86)\Steam\steamapps\common\Resonite\')"
-    >C:\Program
-      Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath>
+      >C:\Program Files (x86)\Steam\steamapps\common\Resonite\</ResonitePath
+    >
     <ResonitePath Condition="Exists('$(HOME)/.steam/steam/steamapps/common/Resonite/')"
+      >$(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath
     >
-      $(HOME)/.steam/steam/steamapps/common/Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('C:\Program Files\Steam\steamapps\common\Resonite\')"
-    >C:\Program
-      Files\Steam\steamapps\common\Resonite\</ResonitePath>
+      >C:\Program Files\Steam\steamapps\common\Resonite\</ResonitePath
+    >
     <ResonitePath Condition="Exists('$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\')"
+      >$(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath
     >
-      $(USERPROFILE)\.steam\steam\steamapps\common\Resonite\</ResonitePath>
     <ResonitePath Condition="Exists('$(HOME)/.local/share/Steam/steamapps/common/Resonite/')"
+      >$(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath
     >
-      $(HOME)/.local/share/Steam/steamapps/common/Resonite/</ResonitePath>
     <ResonitePath Condition="Exists('/home/deck/.steam/steam/steamapps/common/Resonite/')"
+      >/home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath
     >
-      /home/deck/.steam/steam/steamapps/common/Resonite/</ResonitePath>
+    <ResonitePath Condition="Exists('/mnt/c/Program Files (x86)/Steam/steamapps/common/Resonite/')"
+      >/mnt/c/Program Files (x86)/Steam/steamapps/common/Resonite/</ResonitePath
+    >
+    <ResonitePath Condition="Exists('/mnt/c/Program Files/Steam/steamapps/common/Resonite/')"
+      >/mnt/c/Program Files/Steam/steamapps/common/Resonite/</ResonitePath
+    >
+    <ResonitePath Condition="Exists('/mnt/c/SteamLibrary/steamapps/common/Resonite/')"
+      >/mnt/c/SteamLibrary/steamapps/common/Resonite/</ResonitePath
+    >
+    <ResonitePath Condition="Exists('/mnt/d/SteamLibrary/steamapps/common/Resonite/')"
+      >/mnt/d/SteamLibrary/steamapps/common/Resonite/</ResonitePath
+    >
   </PropertyGroup>
-  <ItemGroup>
+  <PropertyGroup>
+    <FrooxEnginePresent Condition="Exists('$(ResonitePath)FrooxEngine.dll')"
+      >true</FrooxEnginePresent
+    >
+    <FrooxEnginePresent Condition="'$(FrooxEnginePresent)'==''">false</FrooxEnginePresent>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'=='true'">
     <Reference Include="ResoniteModLoader">
-      <HintPath>$(ResonitePath)Libraries/ResoniteModLoader.dll</HintPath>
+      <HintPath Condition="Exists('$(ResonitePath)Libraries/ResoniteModLoader.dll')"
+        >$(ResonitePath)Libraries/ResoniteModLoader.dll</HintPath
+      >
+      <HintPath Condition="Exists('$(ResonitePath)ResoniteModLoader.dll')"
+        >$(ResonitePath)ResoniteModLoader.dll</HintPath
+      >
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="HarmonyLib">
       <HintPath>$(ResonitePath)rml_libs/0Harmony.dll</HintPath>
-      <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')">$(ResonitePath)0Harmony.dll</HintPath>
+      <HintPath Condition="Exists('$(ResonitePath)0Harmony.dll')"
+        >$(ResonitePath)0Harmony.dll</HintPath
+      >
       <Private>$(IsTestProject)</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'=='true' and '$(ExcludeEngineAssemblies)'!='true'">
     <Reference Include="FrooxEngine">
       <HintPath>$(ResonitePath)FrooxEngine.dll</HintPath>
       <Private>$(IsTestProject)</Private>
@@ -83,12 +116,40 @@
       <HintPath>$(ResonitePath)rml_libs/ResoniteHotReloadLib.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
+    <Reference Include="ResoniteHotReloadLibCore" Condition="'$(Configuration)'=='Debug'">
+      <HintPath>$(ResonitePath)rml_libs/ResoniteHotReloadLibCore.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
     <Reference Include="ProtoFlux.Core">
       <HintPath>$(ResonitePath)ProtoFlux.Core.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
     <Reference Include="ProtoFlux.Nodes.FrooxEngine">
       <HintPath>$(ResonitePath)ProtoFlux.Nodes.FrooxEngine.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'!='true'">
+    <PackageReference
+      Include="Resonite.GameLibs"
+      Condition="'$(ExcludeEngineAssemblies)'!='true'"
+    />
+    <Reference Include="ResoniteModLoader">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteModLoader.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+    <Reference Include="HarmonyLib">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/0Harmony.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(FrooxEnginePresent)'!='true' and '$(Configuration)'=='Debug'">
+    <Reference Include="ResoniteHotReloadLib">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLib.dll</HintPath>
+      <Private>$(IsTestProject)</Private>
+    </Reference>
+    <Reference Include="ResoniteHotReloadLibCore">
+      <HintPath>$(MSBuildThisFileDirectory)Resonite/ResoniteHotReloadLibCore.dll</HintPath>
       <Private>$(IsTestProject)</Private>
     </Reference>
   </ItemGroup>
