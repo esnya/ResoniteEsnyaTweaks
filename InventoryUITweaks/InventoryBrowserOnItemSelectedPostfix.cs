@@ -44,10 +44,7 @@ internal static class InventoryBrowserOnItemSelectedPostfix
             var isSelected = ReferenceEquals(it, selected);
             helper.BaseColor.Value = isSelected ? InventoryBrowser.SELECTED_COLOR : RadiantUI_Constants.BUTTON_COLOR;
             var checkImg = helperSlot.FindChild("ET_SelectFolderCheck")?.GetComponent<Image>();
-            if (checkImg != null)
-            {
-                checkImg.Tint.Value = isSelected ? colorX.White : ((colorX)checkImg.Tint).SetA(0f);
-            }
+            checkImg?.Tint.Value = isSelected ? colorX.White : ((colorX)checkImg.Tint).SetA(0f);
         }
 
         Pool.Return(ref items);

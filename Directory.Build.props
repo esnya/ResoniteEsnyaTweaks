@@ -15,7 +15,7 @@
     <Copyright>Copyright (c) 2025 $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <CopyToMods Condition="'$(CopyToMods)'==''">true</CopyToMods>
