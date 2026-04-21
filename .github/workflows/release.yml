@@ -112,8 +112,8 @@ jobs:
 
       - name: Verify Resonite.GameLibs is referenced
         run: |
-          echo "Listing packages for AssetOptimizationTweaks (transitive included)"
-          dotnet list AssetOptimizationTweaks/AssetOptimizationTweaks.csproj package --include-transitive | tee packages.txt
+          echo "Listing packages for FluxLoopTweaks (transitive included)"
+          dotnet list FluxLoopTweaks/FluxLoopTweaks.csproj package --include-transitive | tee packages.txt
           echo "Check Resonite.GameLibs presence"
           grep -i "Resonite.GameLibs" packages.txt || (echo "Resonite.GameLibs not found in package list" && exit 1)
 
