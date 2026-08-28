@@ -323,7 +323,7 @@ internal static class SceneAuditorPanel
                     // Only flag when TextEditor itself is missing. Text (IText) missing is out of scope.
                     if (teRef.Target == null)
                     {
-                        results.Add((c!, "Inspector: Primitive editor TextEditor missing", nameof(PrimitiveMemberEditor)));
+                        results.Add((pme, "Inspector: Primitive editor TextEditor missing", nameof(PrimitiveMemberEditor)));
                     }
                 }
             }

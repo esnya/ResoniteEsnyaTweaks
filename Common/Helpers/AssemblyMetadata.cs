@@ -35,6 +35,6 @@ public static class AssemblyMetadata
             asm.GetCustomAttributes<AssemblyMetadataAttribute>()
                .FirstOrDefault(meta => meta.Key == "RepositoryUrl")?.Value
             ?? string.Empty;
-        return (name, author, version!, link);
+        return (name, author, version, link);
     }
 }

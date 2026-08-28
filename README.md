@@ -30,6 +30,8 @@ A collection of small [ResoniteModLoader](https://github.com/resonite-modding-gr
 3. Place them into your `rml_mods` folder. This folder should be located at `C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods` for a standard installation. You can create it if it's missing, or if you start the game once with the ResoniteModLoader installed it will create this folder for you.
 4. Launch the game. Check your Resonite logs if you want to confirm that the mods are loaded.
 
+Version 2.0.0 is built against Resonite `2026.8.27.1094`. It no longer ships the retired `AssetOptimizationTweaks` project; the remaining DLLs continue to be installed independently.
+
 ## Development
 
 For development, you will need the [ResoniteHotReloadLib](https://github.com/Nytra/ResoniteHotReloadLib) to be able to hot reload your mod with DEBUG build.

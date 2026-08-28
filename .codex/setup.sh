@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-# Ensure .NET 9 SDK is available
-if ! (command -v dotnet >/dev/null && dotnet --list-sdks 2>/dev/null | grep -q '^9\.') ; then
-  curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 9.0
+# Ensure .NET 10 SDK is available
+if ! (command -v dotnet >/dev/null && dotnet --list-sdks 2>/dev/null | grep -q '^10\.') ; then
+  curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0
 fi
 
 env_file="$(dirname "$0")/dotnet-env.sh"
