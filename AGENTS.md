@@ -99,7 +99,7 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 ## CI Simplification (Proposal)
 
 - Build/test at solution level: `dotnet format --verify-no-changes --no-restore`, `dotnet build -c Release -v:minimal`, `dotnet test -c Release -v:minimal`.
-- Avoid hardcoding project matrices; collect artifacts via glob: `**/bin/Release/net*/EsnyaTweaks.*.dll` excluding `**/*.Tests/**`.
+- Keep a fail-closed, explicit manifest of releaseable mod project outputs; do not collect release assets with a broad wildcard.
 - Keep Resonite references via shim approach already configured; do not bake paths into csproj.
 
 ## Local Notes
@@ -141,3 +141,4 @@ The CI workflow uses static checks that do not require Resonite assemblies.
 
 - Publish only mod binaries matching `EsnyaTweaks.*.dll`.
 - Exclude: test binaries（`*.Tests*`）、外部DLL（RML/Harmony 等）、`obj/`・`ref/` 生成物。
+- Explicitly enumerate the six current mod binaries in the release workflow: FluxLoopTweaks, InventoryUITweaks, LODGroupTweaks, PhotonDustTweaks, SceneAuditor, and UniLogTweaks. Update the manifest whenever a mod project is added, renamed, or retired.
