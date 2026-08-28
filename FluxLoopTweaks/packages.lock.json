@@ -2,6 +2,12 @@
   "version": 2,
   "dependencies": {
     "net10.0": {
+      "Resonite.GameLibs": {
+        "type": "Direct",
+        "requested": "[2026.8.27.1094, )",
+        "resolved": "2026.8.27.1094",
+        "contentHash": "ArwqFi/iLI7TsBBytfTRnYcAq7H0RFAwnCnEbJFmh33kVE14p8XGD8MwW3V7yFl2C9+Mu/5L9b7mYBUxtmRR3A=="
+      },
       "StyleCop.Analyzers": {
         "type": "Direct",
         "requested": "[1.2.0-beta.435, )",

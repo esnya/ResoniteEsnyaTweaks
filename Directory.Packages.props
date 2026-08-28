@@ -16,7 +16,7 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0" />
     <PackageVersion Include="xunit.v3" Version="2.0.2" />
     <PackageVersion Include="xunit.v3.runner.inproc.console" Version="2.0.2" />
-    <PackageVersion Include="Resonite.GameLibs" Version="2026.4.16.1327" />
+    <PackageVersion Include="Resonite.GameLibs" Version="2026.8.27.1094" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.435" />
   </ItemGroup>
 </Project>
